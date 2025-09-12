@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -7,27 +7,19 @@ import DoneIcon from "@mui/icons-material/Done";
 
 const todo = "bg-[#A1C2BD] text-black pl-3 rounded-lg text-base mt-3 py-1 ";
 
-// type CardType = {
-//   card: { text: string; done: boolean }[];
-//   setCard: React.Dispatch<
-//     React.SetStateAction<{ text: string; done: boolean }[]>
-//   >;
-// };
+type CardType = {
+  card: { text: string; done: boolean }[];
+  setCard: React.Dispatch<
+    React.SetStateAction<{ text: string; done: boolean }[]>
+  >;
+};
 
-export default function Card() {
-  const [card, setCard] = useState<{ text: string; done: boolean }[]>(() => {
-    const savedCard = localStorage.getItem("card");
-    return savedCard ? JSON.parse(savedCard) : [];
-  });
+export default function Card({ card, setCard }: CardType) {
   const [input, setInput] = useState("");
   const [add, setAdd] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState("");
-
-  useEffect(() => {
-    localStorage.setItem("card", JSON.stringify(card));
-  }, [card]);
 
   const addCard = () => {
     if (input.trim() === "") return;
@@ -35,7 +27,7 @@ export default function Card() {
     setInput("");
   };
 
-  const removeCard = (index: number) => {
+  const removeTodo = (index: number) => {
     setCard(card.filter((_, i) => i !== index));
   };
 
@@ -61,7 +53,7 @@ export default function Card() {
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        className="h-20 pt-1.5 mt-4 bg-gray-700 text-white placeholder:text-gray-400 rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-zinc-700 focus:border-blue-700"
+        className="h-20 pt-1.5 mt-4 bg-gray-700 text-white placeholder:text-gray-400 rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-zinc-700 focus:border-blue-700 "
         placeholder="Add a new card"
       />
       <div className="flex flex-row mt-2">
@@ -100,7 +92,7 @@ export default function Card() {
                   onChange={(e) => setEditingValue(e.target.value)}
                   onBlur={() => {
                     if (editingValue.trim() === "") {
-                      removeCard(index);
+                      removeTodo(index);
                     } else {
                       handleEdit(index, editingValue);
                     }
@@ -109,7 +101,7 @@ export default function Card() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       if (editingValue.trim() === "") {
-                        removeCard(index);
+                        removeTodo(index);
                       } else {
                         handleEdit(index, editingValue);
                       }
@@ -154,7 +146,7 @@ export default function Card() {
                   {item.text}
                 </span>
                 <button
-                  onClick={() => removeCard(index)}
+                  onClick={() => removeTodo(index)}
                   className={`hover:bg-red-600 px-2 rounded mr-2 cursor-pointer   ${
                     hovered === index ? "opacity-100" : "opacity-0"
                   } transition-opacity duration-300`}
