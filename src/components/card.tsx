@@ -47,14 +47,27 @@ export default function Card({ card, setCard }: CardType) {
     <div className="flex flex-col">
       {card.map((item, index) => (
         <ul key={index} className={todo}>
-          <li className="py-[1px]">{item.text}</li>
+          <li
+            className={`py-[1px] ${
+              item.done ? "line-through text-gray-700" : ""
+            }`}
+          >
+            {item.text}
+          </li>
         </ul>
       ))}
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        className="h-20 pt-1.5 mt-4 bg-gray-700 text-white placeholder:text-gray-400 rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-zinc-700 focus:border-blue-700 "
+        className="h-20 pt-1.5 mt-4 bg-gray-700 text-zinc-300 placeholder:text-gray-400 rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-gray-700 focus:border-blue-700 "
         placeholder="Add a new card"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addCard();
+            setAdd(false);
+          }
+        }}
       />
       <div className="flex flex-row mt-2">
         <button
@@ -160,7 +173,7 @@ export default function Card({ card, setCard }: CardType) {
       ))}
       <button
         onClick={() => setAdd(true)}
-        className="bg-blue-900 mt-4 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition"
+        className="bg-blue-900 mt-4 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition cursor-pointer"
       >
         <AddIcon />
         Add Card
