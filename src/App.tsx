@@ -3,8 +3,8 @@ import Column from "./components/column";
 
 export default function App() {
   return (
-    <div className="bg-linear-65 from-[#473699] to-[#F797D2] min-h-screen absolute w-screen">
-      <div className="w-screen absolute pb-5 bg-zinc-900/40">
+    <div className="bg-linear-65 bg-[#19183B] min-h-screen absolute w-screen">
+      <div className="w-screen absolute pb-5 bg-gray-700">
         <h1 className="text-2xl font-sans text-center mt-5 text-white font-semibold ">
           My trello board
         </h1>
