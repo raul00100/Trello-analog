@@ -173,7 +173,7 @@ export default function Card({ card, setCard }: CardType) {
       ))}
       <button
         onClick={() => setAdd(true)}
-        className="bg-blue-900 mt-4 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition cursor-pointer"
+        className="bg-blue-900 mt-4 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition cursor-pointer mb-5"
       >
         <AddIcon />
         Add Card
