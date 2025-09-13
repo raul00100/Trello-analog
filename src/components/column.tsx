@@ -1,134 +1,184 @@
-// Column.tsx
-import React, { useState, useEffect } from "react";
-import Card from "./card";
-import AddCardIcon from "@mui/icons-material/AddCard";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import React, { useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+// import DoneIcon from "@mui/icons-material/Done";
+import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 
-type Todo = { text: string; done: boolean };
-type ColumnCard = { name: string; todos: Todo[] };
+const todo = "bg-[#A1C2BD] text-black pl-3 rounded-lg text-sm mt-1.5 py-1 ";
 
-export default function Column() {
-  const [cards, setCards] = useState<ColumnCard[]>(() => {
-    const savedCards = localStorage.getItem("cards");
-    return savedCards ? JSON.parse(savedCards) : [];
-  });
+type CardType = {
+  card: { text: string; done: boolean }[];
+  setCard: React.Dispatch<
+    React.SetStateAction<{ text: string; done: boolean }[]>
+  >;
+};
+
+export default function Column({ card, setCard }: CardType) {
+  const [input, setInput] = useState("");
+  const [add, setAdd] = useState(false);
+  const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingNaming, setEditingNaming] = useState("");
+  const [editingValue, setEditingValue] = useState("");
 
-  useEffect(() => {
-    localStorage.setItem("cards", JSON.stringify(cards));
-  }, [cards]);
-
-  const addEmptyCard = () => {
-    setCards([...cards, { name: `Card ${cards.length + 1}`, todos: [] }]);
+  const addTodo = () => {
+    if (input.trim() === "") return;
+    setCard([...card, { text: input, done: false }]);
+    setInput("");
   };
 
-  const deleteCard = (index: number) => {
-    setCards(cards.filter((_, i) => i !== index));
+  const removeTodo = (index: number) => {
+    setCard(card.filter((_, i) => i !== index));
   };
 
-  const handleOnDragEnd = (result: import("@hello-pangea/dnd").DropResult) => {
-    if (!result.destination) return;
-    const items = Array.from(cards);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setCards(items);
+  const handleEdit = (index: number, value: string) => {
+    const updated = [...card];
+    updated[index].text = value;
+    setCard(updated);
   };
 
-  return (
-    <div className="mt-25 flex flex-row">
-      <DragDropContext onDragEnd={handleOnDragEnd}>
-        <Droppable droppableId="cards" direction="horizontal">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex flex-row items-start"
-            >
-              {cards.map((card, index) => (
-                <Draggable
-                  key={index}
-                  draggableId={String(index)}
-                  index={index}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      // {...provided.dragHandleProps}
-                      className="bg-[#708993] w-[272px] rounded-xl flex flex-col p-3 ml-10"
-                    >
-                      {editingIndex === index ? (
-                        <input
-                          value={editingNaming}
-                          onChange={(e) => setEditingNaming(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              if (editingNaming.trim() === "") {
-                                return;
-                              } else {
-                                const updatedCards = [...cards];
-                                updatedCards[index].name = editingNaming;
-                                setCards(updatedCards);
-                              }
-                              setEditingIndex(null);
-                            }
-                          }}
-                          className="text-lg font-medium font-sans bg-gray-700 rounded px-2 focus:outline-none focus:border-blue-700 border-2 border-gray-700 text-zinc-300"
-                        />
-                      ) : (
-                        <div className="flex flex-row justify-between">
-                          <span
-                            onDoubleClick={() => {
-                              setEditingIndex(index);
-                              setEditingNaming(cards[index].name);
-                            }}
-                          >
-                            <h2 className="text-lg font-medium font-sans text-black cursor-pointer py-0.5">
-                              {cards[index].name}
-                            </h2>
-                          </span>
-                          <button onClick={() => deleteCard(index)}>
-                            <RemoveIcon className="text-black ml-2 cursor-pointer hover:text-red-800 transform scale-120 hover:scale-140 transition-transform duration-500" />
-                          </button>
-                        </div>
-                      )}
-                      <Card
-                        card={card.todos}
-                        setCard={(newTodos) => {
-                          const updatedCards = [...cards];
-                          const resolvedTodos =
-                            typeof newTodos === "function"
-                              ? newTodos(updatedCards[index].todos)
-                              : newTodos;
-                          updatedCards[index].todos = resolvedTodos;
-                          setCards(updatedCards);
-                        }}
-                      />
-                      <div
-                        className="flex justify-center rotate-90 cursor-grab"
-                        {...provided.dragHandleProps}
-                      >
-                        <DragIndicatorIcon />
-                      </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-      <div
-        onClick={addEmptyCard}
-        className="bg-[#708993] w-40 h-12 rounded-xl text-lg flex items-center justify-center hover:animate-pulse cursor-pointer active:scale-95 transition-all ml-10"
-      >
-        <button className="mr-2">Add a card</button>
-        <AddCardIcon />
+  const toggleDone = (index: number) => {
+    const updated = [...card];
+    updated[index].done = !updated[index].done;
+    setCard(updated);
+  };
+
+  return add ? (
+    <div className="flex flex-col">
+      {card.map((item, index) => (
+        <ul key={index} className={todo}>
+          <li
+            className={`py-[1px] ${
+              item.done ? "line-through text-gray-700" : ""
+            }`}
+          >
+            {item.text}
+          </li>
+        </ul>
+      ))}
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        className="h-20 pt-1.5 mt-4 bg-gray-700 text-zinc-300 placeholder:text-gray-400 rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-gray-700 focus:border-blue-700 "
+        placeholder="Add a new card"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addTodo();
+            setAdd(false);
+          }
+        }}
+      />
+      <div className="flex flex-row mt-2">
+        <button
+          onClick={() => {
+            addTodo();
+            setAdd(false);
+          }}
+          className="bg-blue-800 text-white text-base gap-1.5 active:bg-blue-700 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer  active:scale-95 "
+        >
+          Submit
+        </button>
+        <button
+          onClick={() => setAdd(false)}
+          className="hover:bg-red-700 ml-1.5 px-1 rounded cursor-pointer"
+        >
+          <CloseIcon sx={{ color: "white" }} />
+        </button>
       </div>
+    </div>
+  ) : (
+    <div>
+      {card.map((item, index) => (
+        <ul
+          key={index}
+          className={todo}
+          onMouseEnter={() => setHovered(index)}
+          onMouseLeave={() => setHovered(null)}
+        >
+          <li>
+            {editingIndex === index ? (
+              <div className="flex flex-row items-center justify-between">
+                <input
+                  className="bg-gray-700 text-white rounded border-none focus:outline-none pl-1.5"
+                  value={editingValue}
+                  onChange={(e) => setEditingValue(e.target.value)}
+                  onBlur={() => {
+                    if (editingValue.trim() === "") {
+                      removeTodo(index);
+                    } else {
+                      handleEdit(index, editingValue);
+                    }
+                    setEditingIndex(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      if (editingValue.trim() === "") {
+                        removeTodo(index);
+                      } else {
+                        handleEdit(index, editingValue);
+                      }
+                      setEditingIndex(null);
+                    }
+                  }}
+                />
+                <EditIcon sx={{ marginRight: 2 }} />
+              </div>
+            ) : (
+              <div className=" flex flex-row items-center justify-between">
+                <label className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={item.done}
+                    onChange={() => toggleDone(index)}
+                  />
+                  <div
+                    className={`w-[19px] h-[19px] rounded-full border-2 border-zinc-400 mr-2 flex items-center justify-center ${
+                      item.done ? "bg-emerald-500" : ""
+                    } transition-all`}
+                  >
+                    <DoneOutlineIcon
+                      className={`hidden scale-58 ${
+                        item.done ? "text-zinc-800" : "text-[#A1C2BD]"
+                      }`}
+                    />
+                  </div>
+                </label>
+
+                <span
+                  onDoubleClick={() => {
+                    if (item.done) return;
+                    setEditingIndex(index);
+                    setEditingValue(item.text);
+                  }}
+                  className={`flex-1 cursor-pointer select-text ${
+                    item.done ? "line-through text-gray-600" : ""
+                  }`}
+                >
+                  {item.text}
+                </span>
+                <button
+                  onClick={() => removeTodo(index)}
+                  className={`hover:bg-red-600 px-2 rounded mr-2 cursor-pointer   ${
+                    hovered === index ? "opacity-100" : "opacity-0"
+                  } transition-opacity duration-300`}
+                >
+                  <DeleteIcon />
+                </button>
+              </div>
+            )}
+          </li>
+        </ul>
+      ))}
+      <button
+        onClick={() => setAdd(true)}
+        className="bg-blue-900 mt-4 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition cursor-pointer mb-5 opacity-65 hover:opacity-100"
+      >
+        <AddIcon />
+        Add Card
+      </button>
     </div>
   );
 }
