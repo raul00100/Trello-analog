@@ -133,6 +133,3 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
     </div>
   );
 }
-
-//добавить движение в бок ✅
-// добавить возможность создавать новые доски
