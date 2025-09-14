@@ -9,11 +9,15 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 type Todo = { text: string; done: boolean };
 type ColumnCard = { name: string; todos: Todo[] };
 
-export default function ColumnList() {
-  const [cards, setCards] = useState<ColumnCard[]>(() => {
-    const savedCards = localStorage.getItem("cards");
-    return savedCards ? JSON.parse(savedCards) : [];
-  });
+type ColumnListProps = {
+  columns: ColumnCard[];
+  setColumns: React.Dispatch<React.SetStateAction<ColumnCard[]>>;
+};
+
+export default function ColumnList({ columns, setColumns }: ColumnListProps) {
+  // Use columns directly as source of truth
+  const cards = columns;
+  const setCards = setColumns;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
 
@@ -38,7 +42,7 @@ export default function ColumnList() {
   };
 
   return (
-    <div className="mt-25 flex flex-row">
+    <div className=" mt-10 flex flex-row">
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="cards" direction="horizontal">
           {(provided) => (
