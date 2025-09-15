@@ -174,7 +174,7 @@ export default function Column({ card, setCard }: CardType) {
       ))}
       <button
         onClick={() => setAdd(true)}
-        className="bg-blue-900 mt-4 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition cursor-pointer mb-5 opacity-65 hover:opacity-100"
+        className="bg-blue-900 mt-2 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition cursor-pointer mb-5 opacity-65 hover:opacity-100"
       >
         <AddIcon />
         Add Card

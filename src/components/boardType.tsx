@@ -6,15 +6,41 @@ import QueueIcon from "@mui/icons-material/Queue";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import LogoutIcon from "@mui/icons-material/Logout";
+//framer motion
+import { motion, AnimatePresence } from "framer-motion";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-gray-300 antialiased";
+const header2 =
+  "text-white ml-20 font-medium font-stretch-expanded flex items-center text-xl";
+const divHeader =
+  "w-screen relative py-5 bg-gray-600 flex flex-row justify-between items-center";
+const expandIcon = "scale-140 ml-2";
+const setingIcon = "text-white scale-130 cursor-pointer";
+const header1 =
+  "text-2xl font-medium font-stretch-expanded mb-3 text-white mt-3";
+const boardNameDiv = "flex flex-row items-center justify-between w-full";
+const icons = "mr-2 scale-105";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { name: string; todos: Todo[] };
 type BoardTypeProps = {
   name: string;
   lists: ColumnCard[];
+};
+
+const panelVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: -10 },
+  visible: { opacity: 1, y: 0 },
 };
 
 export default function BoardType() {
@@ -27,7 +53,12 @@ export default function BoardType() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
-  const settingOptions = ["Profile", "Account", "Dashboard", "Logout", "Help"];
+  const settingOptions = [
+    { label: "Account", icon: <PersonOutlineIcon className={icons} /> },
+    { label: "Dashboard", icon: <DashboardIcon className={icons} /> },
+    { label: "Help", icon: <HelpOutlineIcon className={icons} /> },
+    { label: "Logout", icon: <LogoutIcon className={icons} /> },
+  ];
 
   useEffect(() => {
     localStorage.setItem("board", JSON.stringify(boards));
@@ -62,165 +93,179 @@ export default function BoardType() {
 
   return (
     <div className="bg-linear-65 bg-[#19183B] overflow-hidden h-screen">
-      {/* header */}
-      <div className="w-screen relative py-5 bg-gray-600 flex flex-row justify-between items-center">
-        {/* board switcher */}
-        <h2 className="text-white ml-20 font-medium font-stretch-expanded flex flex-col items-center mt-3">
-          <div className="flex flex-row">
+      {more ? (
+        <div className={` ${divHeader}`}>
+          {/* board switcher */}
+          <h2 className={` ${header2} flex-col mt-3`}>
             <button
               onClick={() => setMore((prev) => !prev)}
-              className="cursor-pointer scale-140 mb-3"
+              className="cursor-pointer mb-3"
             >
-              <span className="ml-2 text-base">
-                {" "}
-                {boards[currentBoard].name}{" "}
-              </span>
-              {more ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              {boards[currentBoard].name}
+              <ExpandLessIcon className={expandIcon} />
             </button>
-          </div>
-          {more
-            ? boards.map((board, index) => (
-                <div
-                  key={index}
-                  className="relative w-full flex justify-center mt-2"
-                >
-                  {/* reserv space for buttons */}
-                  <div className="absolute inset-0 flex justify-between items-center px-5 pointer-events-none">
-                    <button className="opacity-0">
-                      <EditIcon />
-                    </button>
-                    <button className="opacity-0">
-                      <DeleteForeverIcon />
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => setCurrentBoard(index)}
-                    onMouseEnter={() => setHovered(index)}
-                    onMouseLeave={() => setHovered(null)}
-                    className={`w-50 h-11 rounded-sm font-semibold text-white text-base transition-all duration-300 flex justify-center items-center ${
-                      index === currentBoard ? "bg-gray-950" : ""
-                    } ${hovered === index ? "scale-115 bg-gray-700" : ""}`}
-                  >
-                    <span className="ml-1 w-full">
-                      {/* editing mode */}
-                      {editingIndex === index ? (
-                        <div className="flex flex-row items-center justify-between w-full">
-                          <input
-                            ref={(el) => {
-                              if (el) el.focus();
-                            }}
-                            value={editingNaming}
-                            onChange={(e) => setEditingNaming(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                if (editingNaming.trim() === "") return;
-                                const updatedCards = [...boards];
-                                updatedCards[index].name = editingNaming;
-                                setBoards(updatedCards);
-                                setEditingIndex(null);
-                              }
-                            }}
-                            className="text-lg font-medium w-full font-sans focus:outline-none text-zinc-300 underline px-2"
-                          />
-                        </div>
-                      ) : (
-                        // view mode
-                        <div className="flex flex-row items-center justify-between w-full">
-                          {hovered === index && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingIndex(index);
-                                setEditingNaming(boards[index].name);
-                              }}
-                            >
-                              <EditIcon className="scale-120 cursor-pointer ml-2" />
-                            </button>
-                          )}
-                          <span className="truncate flex-1 mx-3">
-                            {board.name}
-                          </span>
-                          {hovered === index && (
-                            <button
-                              className="hover:text-red-500 hover:underline cursor-pointer transition-all duration-300"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteBoard(index);
-                              }}
-                            >
-                              <DeleteForeverIcon className="scale-120 mr-2" />
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </span>
+            {boards.map((board, index) => (
+              <div
+                key={index}
+                className="relative w-full flex justify-center mt-2"
+              >
+                {/* reserv space for buttons */}
+                <div className="absolute inset-0 flex justify-between items-center px-5 pointer-events-none">
+                  <button className="opacity-0">
+                    <EditIcon />
+                  </button>
+                  <button className="opacity-0">
+                    <DeleteForeverIcon />
                   </button>
                 </div>
-              ))
-            : null}
-
-          {more ? (
+                {/* list of board name */}
+                <button
+                  onClick={() => setCurrentBoard(index)}
+                  onMouseEnter={() => setHovered(index)}
+                  onMouseLeave={() => setHovered(null)}
+                  className={`w-50 h-11 rounded-sm font-semibold text-white text-base transition-all duration-300 flex justify-center items-center ${
+                    index === currentBoard ? "bg-gray-950" : ""
+                  } ${hovered === index ? "scale-115 bg-gray-700" : ""}`}
+                >
+                  <span className="ml-1 w-full">
+                    {/* editing mode */}
+                    {editingIndex === index ? (
+                      <div className={boardNameDiv}>
+                        <input
+                          ref={(el) => {
+                            if (el) el.focus();
+                          }}
+                          value={editingNaming}
+                          onChange={(e) => setEditingNaming(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              if (editingNaming.trim() === "") return;
+                              const updatedCards = [...boards];
+                              updatedCards[index].name = editingNaming;
+                              setBoards(updatedCards);
+                              setEditingIndex(null);
+                            }
+                          }}
+                          className="text-lg font-medium w-full font-sans focus:outline-none text-zinc-300 underline px-2"
+                        />
+                      </div>
+                    ) : (
+                      // view mode
+                      <div className={boardNameDiv}>
+                        {hovered === index && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingIndex(index);
+                              setEditingNaming(boards[index].name);
+                            }}
+                          >
+                            <EditIcon className="scale-110 cursor-pointer ml-2" />
+                          </button>
+                        )}
+                        <span className="truncate flex-1 mx-3">
+                          {board.name}
+                        </span>
+                        {hovered === index && (
+                          <button
+                            className="hover:text-red-500 hover:underline cursor-pointer transition-all duration-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteBoard(index);
+                            }}
+                          >
+                            <DeleteForeverIcon className="scale-110 mr-2" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </span>
+                </button>
+              </div>
+            ))}
             <button
               onClick={addBoard}
-              className="flex items-center px-3 py-1.5 hover:bg-blue-800 text-white active:bg-blue-700 underline rounded-md hover:scale-110 transition-all mt-5"
+              className="flex items-center px-3 py-1.5 hover:bg-blue-900 text-white active:bg-blue-700 underline rounded-sm transition-all mt-3 scale-115 hover:scale-125 w-40 justify-center"
             >
-              <QueueIcon />
-              <span className="ml-1 text-lg">Add board</span>
+              <QueueIcon className="" />
+              {/* <span className="ml-1 text-lg">Add a board</span> */}
             </button>
-          ) : null}
-        </h2>
-        {/* namig */}
-        <div className="flex flex-col text-center">
-          <h1 className="text-2xl font-medium font-stretch-expanded mb-3 text-white mt-3">
-            My trello board
-          </h1>
-          {more ? (
+          </h2>
+          {/* description  */}
+          <div className="flex flex-col text-center">
+            <h1 className={header1}>My trello board</h1>
             <p className={`${textDec} w-100 italic font-medium text-lg`}>
               Trello is a web-based project management application that helps
               you organize work with boards, lists, and cards.
             </p>
-          ) : null}
-        </div>
-        {/* setitngs */}
-        <div className="mr-20 flex items-center flex-col mt-3">
-          <button onClick={() => setMore((prev) => !prev)}>
-            <SettingsIcon className="text-white scale-130 cursor-pointer mb-3" />
-          </button>
-          {more ? (
-            <ul className="flex items-center flex-col text-lg font-bold ">
+          </div>
+          {/* settings */}
+          <div className="mr-20 flex items-center flex-col mt-3">
+            <button onClick={() => setMore((prev) => !prev)}>
+              <SettingsIcon className={` ${setingIcon} mb-3`} />
+            </button>
+            <ul className="flex items-start flex-col text-lg font-bold ">
               {settingOptions.map((option, idx) => (
                 <li
                   key={idx}
-                  className={`${textDec} hover:underline-offset-3 hover:underline mt-1.5 hover:scale-105 cursor-not-allowed`}
+                  className={`${textDec} hover:underline-offset-3 hover:underline mt-4 hover:scale-105 cursor-not-allowed transition-all`}
                 >
-                  {option}
+                  {option.icon}
+                  {option.label}
                 </li>
               ))}
             </ul>
-          ) : null}
+          </div>
         </div>
-      </div>
+      ) : (
+        // preview
+        <div className={` ${divHeader}`}>
+          <h2 className={` ${header2} flex-row`}>
+            <button
+              onClick={() => setMore((prev) => !prev)}
+              className="cursor-pointer"
+            >
+              {boards[currentBoard].name}
+              <ExpandMoreIcon className={expandIcon} />
+            </button>
+          </h2>
+          <h1 className={header1}>My trello board</h1>
+          <button onClick={() => setMore((prev) => !prev)}>
+            <SettingsIcon className={` ${setingIcon} mr-20`} />
+          </button>
+        </div>
+      )}
+
       {/* Board Content */}
       <div className="overflow-x-auto h-screen">
-        <ColumnList
-          columns={boards[currentBoard].lists}
-          setColumns={(newColumns) => {
-            setBoards((boards) =>
-              boards.map((b, index) =>
-                index === currentBoard
-                  ? {
-                      ...b,
-                      lists:
-                        typeof newColumns === "function"
-                          ? newColumns(b.lists)
-                          : newColumns,
-                    }
-                  : b
-              )
-            );
-          }}
-        />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentBoard ? boards[currentBoard].name : null}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -10, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ColumnList
+              columns={boards[currentBoard].lists}
+              setColumns={(newColumns) => {
+                setBoards((boards) =>
+                  boards.map((b, index) =>
+                    index === currentBoard
+                      ? {
+                          ...b,
+                          lists:
+                            typeof newColumns === "function"
+                              ? newColumns(b.lists)
+                              : newColumns,
+                        }
+                      : b
+                  )
+                );
+              }}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
