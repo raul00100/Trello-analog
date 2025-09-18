@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 // import DoneIcon from "@mui/icons-material/Done";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 
-const todo = "bg-[#A1C2BD] text-black pl-3 rounded-lg text-sm mt-1.5 py-1 ";
+const todo = "bg-zinc-700 text-white pl-3 rounded-md text-sm mt-1.5 py-1 ";
 
 type CardType = {
   card: { text: string; done: boolean }[];
@@ -50,7 +50,7 @@ export default function Column({ card, setCard }: CardType) {
         <ul key={index} className={todo}>
           <li
             className={`py-[1px] ${
-              item.done ? "line-through text-gray-700" : ""
+              item.done ? "line-through text-zinc-400" : ""
             }`}
           >
             {item.text}
@@ -60,7 +60,7 @@ export default function Column({ card, setCard }: CardType) {
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        className="h-20 pt-1.5 mt-4 bg-gray-700 text-zinc-300 placeholder:text-gray-400 rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-gray-700 focus:border-blue-700 "
+        className="h-20 pt-1.5 mt-4 bg-zinc-600 text-zinc-300 placeholder:text-gray-400 text-base rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-zinc-600 focus:border-zinc-100"
         placeholder="Add a new card"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -70,19 +70,19 @@ export default function Column({ card, setCard }: CardType) {
           }
         }}
       />
-      <div className="flex flex-row mt-2">
+      <div className="flex flex-row mt-2 mb-4.5">
         <button
           onClick={() => {
             addTodo();
             setAdd(false);
           }}
-          className="bg-blue-800 text-white text-base gap-1.5 active:bg-blue-700 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer  active:scale-95 "
+          className="bg-zinc-100 text-black text-base gap-1.5 active:scale-90 hover:bg-zinc-300 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer "
         >
           Submit
         </button>
         <button
           onClick={() => setAdd(false)}
-          className="hover:bg-red-700 ml-1.5 px-1 rounded cursor-pointer"
+          className="hover:bg-red-700 ml-2.5 px-1 rounded cursor-pointer transition-all"
         >
           <CloseIcon sx={{ color: "white" }} />
         </button>
@@ -101,7 +101,10 @@ export default function Column({ card, setCard }: CardType) {
             {editingIndex === index ? (
               <div className="flex flex-row items-center justify-between">
                 <input
-                  className="bg-gray-700 text-white rounded border-none focus:outline-none pl-1.5"
+                  ref={(el) => {
+                    if (el) el.focus();
+                  }}
+                  className="text-black rounded border-none focus:outline-none pl-0.5"
                   value={editingValue}
                   onChange={(e) => setEditingValue(e.target.value)}
                   onBlur={() => {
@@ -136,12 +139,12 @@ export default function Column({ card, setCard }: CardType) {
                   />
                   <div
                     className={`w-[19px] h-[19px] rounded-full border-2 border-zinc-400 mr-2 flex items-center justify-center ${
-                      item.done ? "bg-emerald-500" : ""
+                      item.done ? "bg-lime-600" : ""
                     } transition-all`}
                   >
                     <DoneOutlineIcon
-                      className={`hidden scale-58 ${
-                        item.done ? "text-zinc-800" : "text-[#A1C2BD]"
+                      className={`hidden scale-53 ${
+                        item.done ? "text-zinc-800" : "text-zinc-700"
                       }`}
                     />
                   </div>
@@ -154,16 +157,16 @@ export default function Column({ card, setCard }: CardType) {
                     setEditingValue(item.text);
                   }}
                   className={`flex-1 cursor-pointer select-text ${
-                    item.done ? "line-through text-gray-600" : ""
+                    item.done ? "line-through text-gray-400" : ""
                   }`}
                 >
                   {item.text}
                 </span>
                 <button
                   onClick={() => removeTodo(index)}
-                  className={`hover:bg-red-600 px-2 rounded mr-2 cursor-pointer   ${
+                  className={`hover:text-red-700 px-2 rounded mr-2 cursor-pointer   ${
                     hovered === index ? "opacity-100" : "opacity-0"
-                  } transition-opacity duration-300`}
+                  } transition-all duration-300`}
                 >
                   <DeleteIcon />
                 </button>
@@ -174,7 +177,7 @@ export default function Column({ card, setCard }: CardType) {
       ))}
       <button
         onClick={() => setAdd(true)}
-        className="bg-blue-900 mt-2 text-gray-300 text-base flex items-center gap-1.5 active:bg-blue-800 w-full pl-2 rounded-lg py-1 active:text-white transition cursor-pointer mb-5 opacity-65 hover:opacity-100"
+        className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-zinc-800 active:bg-zinc-600 w-full pl-2 rounded-md py-1 transition cursor-pointer mb-5 opacity-60 hover:opacity-100"
       >
         <AddIcon />
         Add Card

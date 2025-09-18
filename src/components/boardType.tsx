@@ -14,15 +14,15 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { motion, AnimatePresence } from "framer-motion";
 
 const textDec =
-  " flex font-sans font-stretch-semi-expanded text-gray-300 antialiased";
+  " flex font-sans font-stretch-semi-expanded text-white antialiased";
 const header2 =
-  "text-white ml-20 font-medium font-stretch-expanded flex items-center text-xl";
+  "text-white ml-20 font-medium font-stretch-expanded flex items-center text-2xl transition-all";
 const divHeader =
-  "w-screen relative py-5 bg-gray-600 flex flex-row justify-between items-center";
+  "w-screen relative py-5 bg-neutral-900 text-white flex flex-row justify-between items-center";
 const expandIcon = "scale-140 ml-2";
 const setingIcon = "text-white scale-130 cursor-pointer";
 const header1 =
-  "text-2xl font-medium font-stretch-expanded mb-3 text-white mt-3";
+  "text-3xl font-medium font-stretch-expanded mb-3 text-white mt-3";
 const boardNameDiv = "flex flex-row items-center justify-between w-full";
 const icons = "mr-2 scale-105";
 
@@ -31,16 +31,6 @@ type ColumnCard = { name: string; todos: Todo[] };
 type BoardTypeProps = {
   name: string;
   lists: ColumnCard[];
-};
-
-const panelVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.05 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: -10 },
-  visible: { opacity: 1, y: 0 },
 };
 
 export default function BoardType() {
@@ -66,7 +56,7 @@ export default function BoardType() {
 
   const addBoard = () => {
     setBoards([...boards, { name: `Board ${boards.length + 1}`, lists: [] }]);
-    setCurrentBoard(boards.length); // switch to new board
+    setCurrentBoard(boards.length);
   };
 
   const deleteBoard = (index: number) => {
@@ -92,7 +82,7 @@ export default function BoardType() {
   }
 
   return (
-    <div className="bg-linear-65 bg-[#19183B] overflow-hidden h-screen">
+    <div className="bg-linear-65 from-indigo-900 to-rose-900 overflow-hidden h-screen">
       {more ? (
         <div className={` ${divHeader}`}>
           {/* board switcher */}
@@ -123,9 +113,11 @@ export default function BoardType() {
                   onClick={() => setCurrentBoard(index)}
                   onMouseEnter={() => setHovered(index)}
                   onMouseLeave={() => setHovered(null)}
-                  className={`w-50 h-11 rounded-sm font-semibold text-white text-base transition-all duration-300 flex justify-center items-center ${
-                    index === currentBoard ? "bg-gray-950" : ""
-                  } ${hovered === index ? "scale-115 bg-gray-700" : ""}`}
+                  className={`w-45 h-8 mt-1 font-semibold  text-base transition-all duration-300 flex justify-center items-center hover:scale-115 ${
+                    index === currentBoard
+                      ? "bg-zinc-100  text-black border-none rounded-sm"
+                      : " hover:border-2 hover:rounded-sm border-b-2 border-white"
+                  }`}
                 >
                   <span className="ml-1 w-full">
                     {/* editing mode */}
@@ -146,7 +138,7 @@ export default function BoardType() {
                               setEditingIndex(null);
                             }
                           }}
-                          className="text-lg font-medium w-full font-sans focus:outline-none text-zinc-300 underline px-2"
+                          className="text-base font-medium w-full font-sans focus:outline-none text-black underline px-2"
                         />
                       </div>
                     ) : (
@@ -183,12 +175,13 @@ export default function BoardType() {
                 </button>
               </div>
             ))}
+            {/* add another board */}
             <button
               onClick={addBoard}
-              className="flex items-center px-3 py-1.5 hover:bg-blue-900 text-white active:bg-blue-700 underline rounded-sm transition-all mt-3 scale-115 hover:scale-125 w-40 justify-center"
+              className="flex items-center py-1 hover:bg-white hover:text-black text-white active:scale-95 underline rounded-sm transition-all duration-300 mt-5 scale-115 w-40 justify-center cursor-pointer"
             >
-              <QueueIcon className="" />
-              {/* <span className="ml-1 text-lg">Add a board</span> */}
+              {/* Add a board */}
+              <QueueIcon />
             </button>
           </h2>
           {/* description  */}
@@ -208,7 +201,7 @@ export default function BoardType() {
               {settingOptions.map((option, idx) => (
                 <li
                   key={idx}
-                  className={`${textDec} hover:underline-offset-3 hover:underline mt-4 hover:scale-105 cursor-not-allowed transition-all`}
+                  className={`${textDec} hover:underline-offset-3 hover:underline mt-4 hover:scale-105 text-lg flex items-center cursor-not-allowed transition-all text-zinc-300 hover:text-white`}
                 >
                   {option.icon}
                   {option.label}
@@ -220,7 +213,7 @@ export default function BoardType() {
       ) : (
         // preview
         <div className={` ${divHeader}`}>
-          <h2 className={` ${header2} flex-row`}>
+          <h2 className={` ${header2} flex-row hover:text-gray-300`}>
             <button
               onClick={() => setMore((prev) => !prev)}
               className="cursor-pointer"
@@ -237,7 +230,7 @@ export default function BoardType() {
       )}
 
       {/* Board Content */}
-      <div className="overflow-x-auto h-screen">
+      <div className="overflow-x-auto h-screen" onClick={() => setMore(false)}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentBoard ? boards[currentBoard].name : null}

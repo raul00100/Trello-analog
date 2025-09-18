@@ -61,10 +61,13 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className="bg-[#708993] w-[272px] rounded-xl flex flex-col p-3 ml-10"
+                      className="bg-[#121212] text-white w-[272px] rounded-xl flex flex-col p-3 ml-10"
                     >
                       {editingIndex === index ? (
                         <input
+                          ref={(el) => {
+                            if (el) el.focus();
+                          }}
                           value={editingNaming}
                           onChange={(e) => setEditingNaming(e.target.value)}
                           onKeyDown={(e) => {
@@ -76,7 +79,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                               setEditingIndex(null);
                             }
                           }}
-                          className="text-lg font-medium font-sans bg-gray-700 rounded px-2 focus:outline-none focus:border-blue-700 border-2 border-gray-700 text-zinc-300"
+                          className="text-base font-medium font-sans bg-gray-700 rounded px-2 focus:outline-none focus:border-white border-2 border-gray-700 text-zinc-300 my-1.5"
                         />
                       ) : (
                         <div className="flex flex-row justify-between">
@@ -86,12 +89,15 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                               setEditingNaming(cards[index].name);
                             }}
                           >
-                            <h2 className="text-base font-medium font-sans text-black cursor-pointer py-0.5 mb-2">
+                            <h2 className="text-lg font-medium font-sans text-white cursor-pointer py-0.5 mb-2">
                               {cards[index].name}
                             </h2>
                           </span>
-                          <button onClick={() => deleteCard(index)}>
-                            <RemoveIcon className="text-black ml-2 cursor-pointer hover:text-rose-700 transform scale-120 hover:scale-140 transition-transform duration-500" />
+                          <button
+                            onClick={() => deleteCard(index)}
+                            className="transition-all cursor-pointer scale-130 hover:scale-150 text-white mr-2 hover:text-red-700"
+                          >
+                            <RemoveIcon />
                           </button>
                         </div>
                       )}
@@ -107,11 +113,14 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                           setCards(updatedCards);
                         }}
                       />
-                      <div
-                        className="flex justify-center rotate-90 cursor-grab"
-                        {...provided.dragHandleProps}
-                      >
-                        <DragIndicatorIcon />
+                      <div className="flex justify-center rotate-90">
+                        <span
+                          {...provided.dragHandleProps}
+                          className="cursor-grab"
+                        >
+                          {" "}
+                          <DragIndicatorIcon />{" "}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -121,7 +130,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
 
               <div
                 onClick={addEmptyCard}
-                className="bg-blue-900 active:bg-blue-800 text-white w-40 h-11 rounded-lg text-base flex items-center justify-center hover:animate-pulse cursor-pointer active:scale-95 transition-all ml-10 mr-10 flex-none"
+                className="bg-zinc-300/40 text-white hover:bg-zinc-300 hover:text-black font-semiold bg-opa active:scale-90  w-40 h-11 rounded-md text-base flex items-center justify-center cursor-pointer transition-all ml-10 mr-10 flex-none"
               >
                 <button className="mr-2">Add a column</button>
                 <AssignmentAddIcon />
@@ -133,3 +142,4 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
     </div>
   );
 }
+//сделать анимацию для добавление и удаление колонны
