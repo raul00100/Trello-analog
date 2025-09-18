@@ -44,67 +44,25 @@ export default function Column({ card, setCard }: CardType) {
     setCard(updated);
   };
 
-  return add ? (
+  return (
     <div className="flex flex-col">
       {card.map((item, index) => (
-        <ul key={index} className={todo}>
-          <li
-            className={`py-[1px] ${
-              item.done ? "line-through text-zinc-400" : ""
-            }`}
-          >
-            {item.text}
-          </li>
-        </ul>
-      ))}
-      <textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        className="h-20 pt-1.5 mt-4 bg-zinc-600 text-zinc-300 placeholder:text-gray-400 text-base rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-zinc-600 focus:border-zinc-100"
-        placeholder="Add a new card"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            addTodo();
-            setAdd(false);
-          }
-        }}
-      />
-      <div className="flex flex-row mt-2 mb-4.5">
-        <button
-          onClick={() => {
-            addTodo();
-            setAdd(false);
-          }}
-          className="bg-zinc-100 text-black text-base gap-1.5 active:scale-90 hover:bg-zinc-300 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer "
-        >
-          Submit
-        </button>
-        <button
-          onClick={() => setAdd(false)}
-          className="hover:bg-red-700 ml-2.5 px-1 rounded cursor-pointer transition-all"
-        >
-          <CloseIcon sx={{ color: "white" }} />
-        </button>
-      </div>
-    </div>
-  ) : (
-    <div>
-      {card.map((item, index) => (
+        // editing a card
         <ul
           key={index}
           className={todo}
           onMouseEnter={() => setHovered(index)}
           onMouseLeave={() => setHovered(null)}
+          onClick={() => setAdd(false)}
         >
           <li>
-            {editingIndex === index ? (
+            {editingIndex === index && add === false ? (
               <div className="flex flex-row items-center justify-between">
                 <input
                   ref={(el) => {
                     if (el) el.focus();
                   }}
-                  className="text-black rounded border-none focus:outline-none pl-0.5"
+                  className="text-white rounded border-none focus:outline-none pl-0.5"
                   value={editingValue}
                   onChange={(e) => setEditingValue(e.target.value)}
                   onBlur={() => {
@@ -129,6 +87,7 @@ export default function Column({ card, setCard }: CardType) {
                 <EditIcon sx={{ marginRight: 2 }} />
               </div>
             ) : (
+              //  viewing the list
               <div className=" flex flex-row items-center justify-between">
                 <label className="inline-flex items-center cursor-pointer">
                   <input
@@ -175,13 +134,49 @@ export default function Column({ card, setCard }: CardType) {
           </li>
         </ul>
       ))}
-      <button
-        onClick={() => setAdd(true)}
-        className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-zinc-800 active:bg-zinc-600 w-full pl-2 rounded-md py-1 transition cursor-pointer mb-5 opacity-60 hover:opacity-100"
-      >
-        <AddIcon />
-        Add Card
-      </button>
+      {/* adding a new card */}
+      {add ? (
+        <div>
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="h-20 pt-1.5 mt-4 bg-zinc-600 w-full text-zinc-300 placeholder:text-gray-400 text-base rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-zinc-600 focus:border-zinc-100"
+            placeholder="Add a new card"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addTodo();
+                setAdd(false);
+              }
+            }}
+          />
+          <div className="flex flex-row mt-2 mb-4.5">
+            <button
+              onClick={() => {
+                addTodo();
+                setAdd(false);
+              }}
+              className="bg-zinc-100 text-black text-base gap-1.5 active:scale-90 hover:bg-zinc-300 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer "
+            >
+              Submit
+            </button>
+            <button
+              onClick={() => setAdd(false)}
+              className="hover:bg-red-700 ml-2.5 px-1 rounded cursor-pointer transition-all"
+            >
+              <CloseIcon sx={{ color: "white" }} />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setAdd(true)}
+          className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-zinc-800 active:bg-zinc-600 w-full pl-2 rounded-md py-1 transition cursor-pointer mb-5 opacity-60 hover:opacity-100"
+        >
+          <AddIcon />
+          Add Card
+        </button>
+      )}
     </div>
   );
 }

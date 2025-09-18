@@ -143,3 +143,4 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
   );
 }
 //сделать анимацию для добавление и удаление колонны
+//улучшить структуру кода
