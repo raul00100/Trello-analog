@@ -3,7 +3,6 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-// import DoneIcon from "@mui/icons-material/Done";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 
 const todo = "bg-zinc-700 text-white pl-3 rounded-md text-sm mt-1.5 py-1 ";

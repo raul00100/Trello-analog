@@ -5,9 +5,10 @@ import AssignmentAddIcon from "@mui/icons-material/AssignmentAdd";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import { AnimatePresence, motion } from "motion/react";
 
 type Todo = { text: string; done: boolean };
-type ColumnCard = { name: string; todos: Todo[] };
+type ColumnCard = { id: string; name: string; todos: Todo[] };
 
 type ColumnListProps = {
   columns: ColumnCard[];
@@ -15,7 +16,6 @@ type ColumnListProps = {
 };
 
 export default function ColumnList({ columns, setColumns }: ColumnListProps) {
-  // Use columns directly as source of truth
   const cards = columns;
   const setCards = setColumns;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -26,7 +26,14 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
   }, [cards]);
 
   const addEmptyCard = () => {
-    setCards([...cards, { name: `Card ${cards.length + 1}`, todos: [] }]);
+    setCards([
+      ...cards,
+      {
+        id: Date.now().toString(),
+        name: `Card ${cards.length + 1}`,
+        todos: [],
+      },
+    ]);
   };
 
   const deleteCard = (index: number) => {
@@ -51,81 +58,89 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
               ref={provided.innerRef}
               className="flex flex-row items-start"
             >
-              {cards.map((card, index) => (
-                <Draggable
-                  key={index}
-                  draggableId={String(index)}
-                  index={index}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className="bg-[#121212] text-white w-[272px] rounded-xl flex flex-col p-3 ml-10"
-                    >
-                      {editingIndex === index ? (
-                        <input
-                          ref={(el) => {
-                            if (el) el.focus();
-                          }}
-                          value={editingNaming}
-                          onChange={(e) => setEditingNaming(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              if (editingNaming.trim() === "") return;
-                              const updatedCards = [...cards];
-                              updatedCards[index].name = editingNaming;
-                              setCards(updatedCards);
-                              setEditingIndex(null);
-                            }
-                          }}
-                          className="text-base font-medium font-sans bg-gray-700 rounded px-2 focus:outline-none focus:border-white border-2 border-gray-700 text-zinc-300 my-1.5"
-                        />
-                      ) : (
-                        <div className="flex flex-row justify-between">
-                          <span
-                            onDoubleClick={() => {
-                              setEditingIndex(index);
-                              setEditingNaming(cards[index].name);
+              <AnimatePresence>
+                {cards.map((card, index) => (
+                  <Draggable
+                    key={card.id}
+                    draggableId={String(card.id)}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <motion.div
+                        key={card.id}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="bg-[#121212] text-white w-[272px] rounded-xl flex flex-col p-3 ml-10"
+                      >
+                        {editingIndex === index ? (
+                          <input
+                            ref={(el) => {
+                              if (el) el.focus();
                             }}
+                            value={editingNaming}
+                            onChange={(e) => setEditingNaming(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                if (editingNaming.trim() === "") return;
+                                const updatedCards = [...cards];
+                                updatedCards[index].name = editingNaming;
+                                setCards(updatedCards);
+                                setEditingIndex(null);
+                              }
+                            }}
+                            className="text-base font-medium font-sans bg-gray-700 rounded px-2 focus:outline-none focus:border-white border-2 border-gray-700 text-zinc-300 my-1.5"
+                          />
+                        ) : (
+                          <div className="flex flex-row justify-between">
+                            <span
+                              onDoubleClick={() => {
+                                setEditingIndex(index);
+                                setEditingNaming(cards[index].name);
+                              }}
+                            >
+                              <h2 className="text-lg font-medium font-sans text-white cursor-pointer py-0.5 mb-2">
+                                {cards[index].name}
+                              </h2>
+                            </span>
+                            <button
+                              onClick={() => {
+                                deleteCard(index);
+                              }}
+                              className="transition-all cursor-pointer scale-130 hover:scale-150 text-white mr-2 hover:text-red-700"
+                            >
+                              <RemoveIcon />
+                            </button>
+                          </div>
+                        )}
+                        <Column
+                          card={card.todos}
+                          setCard={(newTodos) => {
+                            const updatedCards = [...cards];
+                            const resolvedTodos =
+                              typeof newTodos === "function"
+                                ? newTodos(updatedCards[index].todos)
+                                : newTodos;
+                            updatedCards[index].todos = resolvedTodos;
+                            setCards(updatedCards);
+                          }}
+                        />
+                        <div className="flex justify-center rotate-90">
+                          <span
+                            {...provided.dragHandleProps}
+                            className="cursor-grab"
                           >
-                            <h2 className="text-lg font-medium font-sans text-white cursor-pointer py-0.5 mb-2">
-                              {cards[index].name}
-                            </h2>
+                            {" "}
+                            <DragIndicatorIcon />{" "}
                           </span>
-                          <button
-                            onClick={() => deleteCard(index)}
-                            className="transition-all cursor-pointer scale-130 hover:scale-150 text-white mr-2 hover:text-red-700"
-                          >
-                            <RemoveIcon />
-                          </button>
                         </div>
-                      )}
-                      <Column
-                        card={card.todos}
-                        setCard={(newTodos) => {
-                          const updatedCards = [...cards];
-                          const resolvedTodos =
-                            typeof newTodos === "function"
-                              ? newTodos(updatedCards[index].todos)
-                              : newTodos;
-                          updatedCards[index].todos = resolvedTodos;
-                          setCards(updatedCards);
-                        }}
-                      />
-                      <div className="flex justify-center rotate-90">
-                        <span
-                          {...provided.dragHandleProps}
-                          className="cursor-grab"
-                        >
-                          {" "}
-                          <DragIndicatorIcon />{" "}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
+                      </motion.div>
+                    )}
+                  </Draggable>
+                ))}
+              </AnimatePresence>
               {provided.placeholder}
 
               <div
@@ -142,5 +157,3 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
     </div>
   );
 }
-//сделать анимацию для добавление и удаление колонны
-//улучшить структуру кода

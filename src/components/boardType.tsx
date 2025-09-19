@@ -10,7 +10,6 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
-//framer motion
 import { motion, AnimatePresence } from "framer-motion";
 
 const textDec =
@@ -27,7 +26,7 @@ const boardNameDiv = "flex flex-row items-center justify-between w-full";
 const icons = "mr-2 scale-105";
 
 type Todo = { text: string; done: boolean };
-type ColumnCard = { name: string; todos: Todo[] };
+type ColumnCard = { id: string; name: string; todos: Todo[] };
 type BoardTypeProps = {
   name: string;
   lists: ColumnCard[];
@@ -82,7 +81,7 @@ export default function BoardType() {
   }
 
   return (
-    <div className="bg-linear-65 from-indigo-900 to-rose-900 overflow-hidden h-screen">
+    <div className="bg-linear-65 from-blue-950 to-fuchsia-900 overflow-hidden h-screen">
       {more ? (
         <div className={` ${divHeader}`}>
           {/* board switcher */}
