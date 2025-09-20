@@ -81,7 +81,7 @@ export default function BoardType() {
   }
 
   return (
-    <div className="bg-linear-65 from-blue-950 to-fuchsia-900 overflow-hidden h-screen">
+    <div className="overflow-hidden h-screen">
       {more ? (
         <div className={` ${divHeader}`}>
           {/* board switcher */}

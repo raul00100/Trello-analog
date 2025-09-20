@@ -15,11 +15,16 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@mui/icons-material": "^7.3.0",
     "@mui/material": "^7.3.1",
+    "@react-three/fiber": "^9.3.0",
+    "@react-three/postprocessing": "^3.0.4",
     "@tailwindcss/vite": "^4.1.11",
     "motion": "^12.23.12",
+    "ogl": "^1.0.11",
+    "postprocessing": "^6.37.8",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
