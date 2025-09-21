@@ -21,7 +21,7 @@ type ColumnListProps = {
 
 const buttonActions = "px-4 py-2 text-left hover:bg-zinc-400 transition-all";
 const column =
-  "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-xl ml-10 relative";
+  "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-xl ml-10 flex";
 const grab = "flex justify-center rotate-90";
 
 export default function ColumnList({ columns, setColumns }: ColumnListProps) {
@@ -228,7 +228,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
 
               <div
                 onClick={addEmptyCard}
-                className="bg-zinc-300/40 text-white hover:bg-zinc-300 hover:text-black font-semiold bg-opa active:scale-90  w-40 h-11 rounded-md text-base flex items-center justify-center cursor-pointer transition-all ml-10 mr-10 flex-none"
+                className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semiold bg-opa active:scale-90  w-40 h-11 rounded-md text-base flex items-center justify-center cursor-pointer transition-all ml-10 mr-10 flex-none"
               >
                 <button className="mr-2">Add a column</button>
                 <AssignmentAddIcon />
@@ -240,3 +240,4 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
     </div>
   );
 }
+//save the choise of the board
