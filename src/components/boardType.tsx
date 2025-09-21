@@ -16,7 +16,7 @@ import gsap from "gsap";
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
 const divHeader =
-  "w-screen relative text-white flex flex-row mt-3 justify-between items-center";
+  "w-screen relative text-white flex flex-row mt-5 justify-between";
 const expandIcon = "scale-140 ml-2";
 const boardNameDiv = "flex flex-row items-center justify-between w-full";
 const icons = "mr-2 scale-105";
@@ -33,7 +33,10 @@ export default function BoardType() {
     const savedBoard = localStorage.getItem("board");
     return savedBoard ? JSON.parse(savedBoard) : [];
   });
-  const [currentBoard, setCurrentBoard] = useState(0);
+  const [currentBoard, setCurrentBoard] = useState(() => {
+    const savedCurrentBoard = localStorage.getItem("current");
+    return savedCurrentBoard ? JSON.parse(savedCurrentBoard) : 0;
+  });
   const [more, setMore] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -51,14 +54,13 @@ export default function BoardType() {
   useEffect(() => {
     if (!panelRef.current) return;
 
-    // закрываем по умолчанию
     gsap.set(panelRef.current, { overflow: "hidden" });
 
-    if (tlRef.current) tlRef.current.kill(); // 🟢 стопим прошлую анимацию
+    if (tlRef.current) tlRef.current.kill();
 
     if (more) {
       tlRef.current = gsap.to(panelRef.current, {
-        height: panelRef.current.scrollHeight,
+        height: 300,
         duration: 0.4,
         ease: "power3.out",
       });
@@ -74,6 +76,9 @@ export default function BoardType() {
   useEffect(() => {
     localStorage.setItem("board", JSON.stringify(boards));
   }, [boards]);
+  useEffect(() => {
+    localStorage.setItem("current", JSON.stringify(currentBoard));
+  });
 
   const addBoard = () => {
     setBoards([...boards, { name: `Board ${boards.length + 1}`, lists: [] }]);
@@ -108,6 +113,7 @@ export default function BoardType() {
       <div
         ref={panelRef}
         className="w-full bg-white/20 backdrop-blur-md border-b border-white"
+        onClick={() => setEditingIndex(null)}
       >
         {/* undisclosed panel  */}
         <div className={`${divHeader}`}>
@@ -141,7 +147,7 @@ export default function BoardType() {
           }`}
         >
           {/* board switcher */}
-          <div className="flex flex-col items-center ml-20">
+          <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55">
             {boards.map((board, index) => (
               <div
                 key={index}
@@ -161,9 +167,9 @@ export default function BoardType() {
                   onClick={() => setCurrentBoard(index)}
                   onMouseEnter={() => setHovered(index)}
                   onMouseLeave={() => setHovered(null)}
-                  className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 ${
+                  className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded ${
                     index === currentBoard
-                      ? "bg-zinc-100 text-black border-none"
+                      ? "bg-zinc-100 text-black border-none rounded"
                       : "hover:border-2 border-b-2 border-white"
                   }`}
                 >
@@ -226,14 +232,14 @@ export default function BoardType() {
             {/* add another board */}
             <button
               onClick={addBoard}
-              className="flex items-center py-1 hover:bg-white hover:text-black text-white active:scale-95 underline rounded-sm transition-all duration-300 mt-5 scale-115 w-40 justify-center cursor-pointer"
+              className="flex items-center py-1 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-40 justify-center scale-110 cursor-pointer"
             >
               <QueueIcon />
             </button>
           </div>
 
           {/* description */}
-          <div className="flex flex-col text-center ml-10">
+          <div className="flex flex-col text-center">
             <p className={`${textDec} w-100 italic font-medium text-lg`}>
               Trello is a web-based project management application that helps
               you organize work with boards, lists, and cards.
@@ -258,7 +264,13 @@ export default function BoardType() {
       </div>
 
       {/* Board Content */}
-      <div className="overflow-x-auto h-screen" onClick={() => setMore(false)}>
+      <div
+        className="overflow-x-auto h-screen"
+        onClick={() => {
+          setEditingIndex(null);
+          setMore(false);
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={currentBoard ? boards[currentBoard].name : null}

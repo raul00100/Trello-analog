@@ -5,8 +5,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 
-const todo = "bg-zinc-700 text-white pl-3 rounded-md text-sm mt-1.5 py-1 ";
-
 type CardType = {
   card: { text: string; done: boolean }[];
   setCard: React.Dispatch<
@@ -44,24 +42,24 @@ export default function Column({ card, setCard }: CardType) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" onClick={() => setEditingIndex(null)}>
       {card.map((item, index) => (
-        // editing a card
         <ul
           key={index}
-          className={todo}
+          className="bg-zinc-300 text-black pl-3 rounded-md text-sm mt-1.5 py-1"
           onMouseEnter={() => setHovered(index)}
           onMouseLeave={() => setHovered(null)}
           onClick={() => setAdd(false)}
         >
           <li>
+            {/* editing a todo */}
             {editingIndex === index && add === false ? (
               <div className="flex flex-row items-center justify-between">
                 <input
                   ref={(el) => {
                     if (el) el.focus();
                   }}
-                  className="text-white rounded border-none focus:outline-none pl-0.5"
+                  className="text-black rounded border-none focus:outline-none pl-0.5"
                   value={editingValue}
                   onChange={(e) => setEditingValue(e.target.value)}
                   onBlur={() => {
@@ -96,13 +94,13 @@ export default function Column({ card, setCard }: CardType) {
                     onChange={() => toggleDone(index)}
                   />
                   <div
-                    className={`w-[19px] h-[19px] rounded-full border-2 border-zinc-400 mr-2 flex items-center justify-center ${
-                      item.done ? "bg-lime-600" : ""
+                    className={`w-[19px] h-[19px] rounded-full border-2 mr-2 flex items-center justify-center ${
+                      item.done ? "bg-lime-600 border-none" : "border-black"
                     } transition-all`}
                   >
                     <DoneOutlineIcon
                       className={`hidden scale-53 ${
-                        item.done ? "text-zinc-800" : "text-zinc-700"
+                        item.done ? "text-black" : "text-zinc-300"
                       }`}
                     />
                   </div>
@@ -139,8 +137,11 @@ export default function Column({ card, setCard }: CardType) {
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="h-20 pt-1.5 mt-4 bg-zinc-600 w-full text-zinc-300 placeholder:text-gray-400 text-base rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-2 border-zinc-600 focus:border-zinc-100"
-            placeholder="Add a new card"
+            className="h-20 pt-1.5 mt-4 bg-black w-full text-white placeholder:text-gray-400 text-base rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-1 border-black focus:border-zinc-100"
+            placeholder="Add a new todo..."
+            ref={(el) => {
+              if (el) el.focus();
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -155,7 +156,7 @@ export default function Column({ card, setCard }: CardType) {
                 addTodo();
                 setAdd(false);
               }}
-              className="bg-zinc-100 text-black text-base gap-1.5 active:scale-90 hover:bg-zinc-300 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer "
+              className="bg-zinc-300 text-black text-base gap-1.5 active:scale-90 hover:bg-zinc-300 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer "
             >
               Submit
             </button>
@@ -170,7 +171,7 @@ export default function Column({ card, setCard }: CardType) {
       ) : (
         <button
           onClick={() => setAdd(true)}
-          className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-zinc-800 active:bg-zinc-600 w-full pl-2 rounded-md py-1 transition cursor-pointer mb-5 opacity-60 hover:opacity-100"
+          className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-black active:bg-zinc-800 pl-2 rounded-sm py-1 transition-all cursor-pointer mb-3 opacity-60 hover:opacity-100"
         >
           <AddIcon />
           Add Card

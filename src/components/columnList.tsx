@@ -21,7 +21,7 @@ type ColumnListProps = {
 
 const buttonActions = "px-4 py-2 text-left hover:bg-zinc-400 transition-all";
 const column =
-  "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-xl ml-10 flex";
+  "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-lg ml-10 flex";
 const grab = "flex justify-center rotate-90";
 
 export default function ColumnList({ columns, setColumns }: ColumnListProps) {
@@ -41,7 +41,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
       ...cards,
       {
         id: Date.now().toString(),
-        name: `Card ${cards.length + 1}`,
+        name: `Column ${cards.length + 1}`,
         todos: [],
       },
     ]);
@@ -60,7 +60,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
   };
 
   return (
-    <div className=" mt-10 flex flex-row">
+    <div className=" mt-10 flex flex-row" onClick={() => setEditingIndex(null)}>
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="cards" direction="horizontal">
           {(provided) => (
@@ -137,7 +137,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                       setEditingIndex(null);
                                     }
                                   }}
-                                  className="text-base font-medium font-sans bg-gray-700 rounded px-2 focus:outline-none focus:border-white border-2 border-gray-700 text-zinc-300 my-1.5"
+                                  className="text-base font-medium font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300 my-2"
                                 />
                               ) : (
                                 //defoolt mode view
@@ -240,4 +240,3 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
     </div>
   );
 }
-//save the choise of the board
