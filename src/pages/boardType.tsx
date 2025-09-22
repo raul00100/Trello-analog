@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import ColumnList from "./columnList";
+import ColumnList from "../components/columnList";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import QueueIcon from "@mui/icons-material/Queue";
@@ -12,11 +12,13 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
+import SpotlightCard from "../styles/SpotlightCard";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
 const divHeader =
-  "w-screen relative text-white flex flex-row mt-5 justify-between";
+  "w-screen relative text-white flex flex-row justify-between my-5";
 const expandIcon = "scale-140 ml-2";
 const boardNameDiv = "flex flex-row items-center justify-between w-full";
 const icons = "mr-2 scale-105";
@@ -51,6 +53,7 @@ export default function BoardType() {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Tween | null>(null);
 
+  // animation for a folding and unfolding panel
   useEffect(() => {
     if (!panelRef.current) return;
 
@@ -60,7 +63,7 @@ export default function BoardType() {
 
     if (more) {
       tlRef.current = gsap.to(panelRef.current, {
-        height: 300,
+        height: 270,
         duration: 0.4,
         ease: "power3.out",
       });
@@ -95,14 +98,26 @@ export default function BoardType() {
 
   if (boards.length === 0) {
     return (
-      <div className="bg-linear-65 bg-[#19183B] min-h-screen flex flex-col items-center justify-center">
-        <button
-          onClick={addBoard}
-          className="flex flex-col items-center bg-gray-600 text-white px-5 py-2 rounded-lg"
+      <div className="flex flex-col items-center justify-center h-screen text-white bg-white/20 backdrop-blur-md">
+        <SpotlightCard
+          className="custom-spotlight-card"
+          spotlightColor="rgba(255, 255, 255, 0.2)"
         >
-          <QueueIcon />
-          <span className="mt-2">Add your first board</span>
-        </button>
+          <div className="flex flex-col items-center px-5 py-2 text-2xl font-mono gap-4">
+            <p>
+              Is this your <span className="font-bold"> first time </span> here
+              ?{" "}
+            </p>
+            <span className="mt-5">Add your first board</span>
+            <ArrowDownwardIcon className="scale-140" />
+            <button
+              onClick={addBoard}
+              className="cursor-pointer hover:animate-pulse"
+            >
+              <QueueIcon className="scale-140 mb-2" />
+            </button>
+          </div>
+        </SpotlightCard>
       </div>
     );
   }
@@ -112,13 +127,13 @@ export default function BoardType() {
       {/* nav panel */}
       <div
         ref={panelRef}
-        className="w-full bg-white/20 backdrop-blur-md border-b border-white"
+        className="w-full bg-white/20 backdrop-blur-md border-b border-white h-60"
         onClick={() => setEditingIndex(null)}
       >
         {/* undisclosed panel  */}
         <div className={`${divHeader}`}>
           <h2
-            className={`text-white font-medium font-stretch-expanded flex items-center text-2xl transition-all ml-30 flex-row hover:text-gray-300`}
+            className={`text-white font-medium font-stretch-expanded flex items-center text-xl transition-all ml-30 flex-row hover:text-gray-300`}
           >
             <button
               onClick={() => setMore((prev) => !prev)}
@@ -132,7 +147,7 @@ export default function BoardType() {
               )}
             </button>
           </h2>
-          <h1 className="text-3xl font-medium font-stretch-expanded text-white">
+          <h1 className="text-2xl font-medium font-stretch-expanded text-white">
             My trello board
           </h1>
           <button onClick={() => setMore((prev) => !prev)} className={`mr-30`}>
@@ -153,7 +168,7 @@ export default function BoardType() {
                 key={index}
                 className="relative w-full flex justify-center mt-2"
               >
-                {/* reserv space for buttons */}
+                {/* reserved space for buttons */}
                 <div className="absolute inset-0 flex justify-between items-center px-5 pointer-events-none">
                   <button className="opacity-0">
                     <EditIcon />
@@ -167,7 +182,7 @@ export default function BoardType() {
                   onClick={() => setCurrentBoard(index)}
                   onMouseEnter={() => setHovered(index)}
                   onMouseLeave={() => setHovered(null)}
-                  className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded ${
+                  className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded ${
                     index === currentBoard
                       ? "bg-zinc-100 text-black border-none rounded"
                       : "hover:border-2 border-b-2 border-white"
@@ -191,6 +206,7 @@ export default function BoardType() {
                               setEditingIndex(null);
                             }
                           }}
+                          onFocus={(e) => e.target.select()}
                           className={`text-base font-medium w-full font-sans focus:outline-none px-2 ${
                             index === currentBoard ? "text-black" : "text-white"
                           }`}
@@ -206,7 +222,7 @@ export default function BoardType() {
                               setEditingNaming(boards[index].name);
                             }}
                           >
-                            <EditIcon className="scale-110 cursor-pointer ml-2" />
+                            <EditIcon className="scale-105 cursor-pointer ml-2" />
                           </button>
                         )}
                         <span className="truncate flex-1 mx-3">
@@ -220,7 +236,7 @@ export default function BoardType() {
                               deleteBoard(index);
                             }}
                           >
-                            <DeleteForeverIcon className="scale-110 mr-2" />
+                            <DeleteForeverIcon className="scale-105 mr-2" />
                           </button>
                         )}
                       </div>
@@ -232,7 +248,7 @@ export default function BoardType() {
             {/* add another board */}
             <button
               onClick={addBoard}
-              className="flex items-center py-1 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-40 justify-center scale-110 cursor-pointer"
+              className="flex items-center py-1 mb-5 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-41.5 justify-center scale-110 cursor-pointer"
             >
               <QueueIcon />
             </button>
@@ -240,14 +256,14 @@ export default function BoardType() {
 
           {/* description */}
           <div className="flex flex-col text-center">
-            <p className={`${textDec} w-100 italic font-medium text-lg`}>
+            <p className={`${textDec} w-100 font-mono font-medium text-lg`}>
               Trello is a web-based project management application that helps
               you organize work with boards, lists, and cards.
             </p>
           </div>
 
-          {/* settings list */}
-          <div className="flex flex-col mr-15 pb-7">
+          {/* settings list - coming soon... */}
+          <div className="flex flex-col mr-15">
             <ul className="flex items-start flex-col text-lg font-bold gap-4">
               {settingOptions.map((option, idx) => (
                 <li
@@ -303,3 +319,5 @@ export default function BoardType() {
     </div>
   );
 }
+
+//fix a bug with a nav panel after creating a first board

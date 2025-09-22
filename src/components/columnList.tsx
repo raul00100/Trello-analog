@@ -29,12 +29,19 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
   const setCards = setColumns;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
-  const [compress, setCompress] = useState<string[]>([]);
+  const [compress, setCompress] = useState<string[]>(() => {
+    const savedCompress = localStorage.getItem("compress");
+    return savedCompress ? JSON.parse(savedCompress) : [];
+  });
   const [showSetting, setShowSetting] = useState<string | null>("");
 
   useEffect(() => {
     localStorage.setItem("cards", JSON.stringify(cards));
   }, [cards]);
+
+  useEffect(() => {
+    localStorage.setItem("compress", JSON.stringify(compress));
+  }, [compress]);
 
   const addEmptyCard = () => {
     setCards([
@@ -51,6 +58,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
     setCards(cards.filter((_, i) => i !== index));
   };
 
+  // drag and drop functionality
   const handleOnDragEnd = (result: import("@hello-pangea/dnd").DropResult) => {
     if (!result.destination) return;
     const items = Array.from(cards);
@@ -90,7 +98,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                           {/* compress mode */}
                           {compress.includes(card.id) ? (
                             <div
-                              className={`${column} w-20 h-59 flex-col justify-center gap-15`}
+                              className={`${column} w-20 h-59 flex-col justify-between py-3.5`}
                             >
                               <button
                                 onClick={() =>
@@ -98,10 +106,11 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                     compress.filter((i) => i !== card.id)
                                   )
                                 }
+                                className="transition-all"
                               >
-                                <UnfoldMoreIcon className="scale-120 hover:scale-150 avtive:scale-120 rotate-45 cursor-pointer" />
+                                <UnfoldMoreIcon className="scale-120 hover:scale-150 active:scale-120 rotate-45 cursor-pointer" />
                               </button>
-                              <span className="rotate-90 inline-block text-2xl truncate">
+                              <span className="rotate-90 inline-block text-xl font-medium truncate">
                                 {card.name}
                               </span>
                               <div className={grab}>
@@ -115,7 +124,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                               </div>
                             </div>
                           ) : (
-                            // defolt mode editing
+                            // default mode - editing
                             <div
                               className={` ${column} w-[272px] flex-col p-3`}
                             >
@@ -137,10 +146,11 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                       setEditingIndex(null);
                                     }
                                   }}
+                                  onFocus={(e) => e.target.select()}
                                   className="text-base font-medium font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300 my-2"
                                 />
                               ) : (
-                                //defoolt mode view
+                                //default mode - view
                                 <div className="flex flex-row justify-between items-center">
                                   <span
                                     onDoubleClick={() => {
@@ -157,7 +167,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                   >
                                     <MoreVertIcon className="cursor-pointer" />
                                   </button>
-                                  {/* actions */}
+                                  {/* actions with a column*/}
                                   {showSetting === card.id && (
                                     <div className="absolute left-3 top-13 mt-2 w-60 bg-zinc-200 text-black rounded shadow-lg flex flex-col z-50 text-sm">
                                       <div className="flex flex-row">
@@ -195,6 +205,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                   )}
                                 </div>
                               )}
+                              {/* list of columns  */}
                               <Column
                                 card={card.todos}
                                 setCard={(newTodos) => {
@@ -228,7 +239,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
 
               <div
                 onClick={addEmptyCard}
-                className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semiold bg-opa active:scale-90  w-40 h-11 rounded-md text-base flex items-center justify-center cursor-pointer transition-all ml-10 mr-10 flex-none"
+                className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semibold bg-opa active:scale-90  w-40 h-11 rounded-md text-base flex items-center justify-center cursor-pointer transition-all ml-10 mr-10 flex-none"
               >
                 <button className="mr-2">Add a column</button>
                 <AssignmentAddIcon />

@@ -1,7 +1,7 @@
 import React from "react";
-import BoardType from "./components/boardType";
+import BoardType from "./pages/boardType";
 import "./index.css";
-import Dither from "./components/styles/Dither";
+import Dither from "./styles/Dither";
 
 export default function App() {
   return (

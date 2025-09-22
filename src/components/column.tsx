@@ -85,6 +85,7 @@ export default function Column({ card, setCard }: CardType) {
               </div>
             ) : (
               //  viewing the list
+              //checkbox thing
               <div className=" flex flex-row items-center justify-between">
                 <label className="inline-flex items-center cursor-pointer">
                   <input
@@ -105,7 +106,7 @@ export default function Column({ card, setCard }: CardType) {
                     />
                   </div>
                 </label>
-
+                {/* todo text */}
                 <span
                   onDoubleClick={() => {
                     if (item.done) return;
