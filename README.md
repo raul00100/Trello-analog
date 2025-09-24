@@ -25,24 +25,26 @@ A modern web application for task management using the Kanban methodology. Creat
 - **Styling:** Tailwind CSS
 - **Drag & Drop:** @dnd-kit
 - **Icons:** Material UI
-- **Backgroung:** React Bits 
+- **Background:** React Bits
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 16+ 
+- Node.js 16+
 - npm or yarn
 
 ### Installation & Running
 
 1. **Clone the repository:**
+
 ```bash
 git clone https://github.com/raul00100/Trello-analog.git
 cd Trello-analog
 ```
 
 2. **Install dependencies:**
+
 ```bash
 npm install
 # or
@@ -50,6 +52,7 @@ yarn install
 ```
 
 3. **Start development server:**
+
 ```bash
 npm run dev
 # or

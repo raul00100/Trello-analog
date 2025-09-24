@@ -68,7 +68,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
   };
 
   return (
-    <div className=" mt-10 flex flex-row" onClick={() => setEditingIndex(null)}>
+    <div className="mt-10 flex flex-row" onClick={() => setEditingIndex(null)}>
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="cards" direction="horizontal">
           {(provided) => (

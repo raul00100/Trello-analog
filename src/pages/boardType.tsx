@@ -6,19 +6,20 @@ import QueueIcon from "@mui/icons-material/Queue";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
-import SpotlightCard from "../styles/SpotlightCard";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ThemeSelector from "../components/themeSelector";
+import PaletteIcon from "@mui/icons-material/Palette";
+import HomeIcon from "@mui/icons-material/Home";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import Card from "../components/card";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
 const divHeader =
-  "w-screen relative text-white flex flex-row justify-between my-5";
+  "w-screen relative text-white flex flex-row justify-between items-start pt-5";
 const expandIcon = "scale-140 ml-2";
 const boardNameDiv = "flex flex-row items-center justify-between w-full";
 const icons = "mr-2 scale-105";
@@ -30,7 +31,11 @@ type BoardTypeProps = {
   lists: ColumnCard[];
 };
 
-export default function BoardType() {
+type ThemeSelectorProps = {
+  setCurrentTheme: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
   const [boards, setBoards] = useState<BoardTypeProps[]>(() => {
     const savedBoard = localStorage.getItem("board");
     return savedBoard ? JSON.parse(savedBoard) : [];
@@ -44,11 +49,15 @@ export default function BoardType() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
   const settingOptions = [
-    { label: "Account", icon: <PersonOutlineIcon className={icons} /> },
-    { label: "Dashboard", icon: <DashboardIcon className={icons} /> },
+    { label: "Home", icon: <HomeIcon className={icons} /> },
+    { label: "Theme", icon: <PaletteIcon className={icons} /> },
     { label: "Help", icon: <HelpOutlineIcon className={icons} /> },
     { label: "Logout", icon: <LogoutIcon className={icons} /> },
   ];
+  const [setting, setSetting] = useState<string | null>(() => {
+    const savedSetting = localStorage.getItem("setting");
+    return savedSetting ? JSON.parse(savedSetting) : null;
+  });
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Tween | null>(null);
@@ -82,6 +91,9 @@ export default function BoardType() {
   useEffect(() => {
     localStorage.setItem("current", JSON.stringify(currentBoard));
   });
+  useEffect(() => {
+    localStorage.setItem("setting", JSON.stringify(setting));
+  });
 
   const addBoard = () => {
     setBoards([...boards, { name: `Board ${boards.length + 1}`, lists: [] }]);
@@ -98,26 +110,8 @@ export default function BoardType() {
 
   if (boards.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen text-white bg-white/20 backdrop-blur-md">
-        <SpotlightCard
-          className="custom-spotlight-card"
-          spotlightColor="rgba(255, 255, 255, 0.2)"
-        >
-          <div className="flex flex-col items-center px-5 py-2 text-2xl font-mono gap-4">
-            <p>
-              Is this your <span className="font-bold"> first time </span> here
-              ?{" "}
-            </p>
-            <span className="mt-5">Add your first board</span>
-            <ArrowDownwardIcon className="scale-140" />
-            <button
-              onClick={addBoard}
-              className="cursor-pointer hover:animate-pulse"
-            >
-              <QueueIcon className="scale-140 mb-2" />
-            </button>
-          </div>
-        </SpotlightCard>
+      <div className="flex flex-col items-center justify-center h-screen text-white bg-white/40 backdrop-blur-md">
+        <Card addBoard={addBoard} />
       </div>
     );
   }
@@ -127,26 +121,40 @@ export default function BoardType() {
       {/* nav panel */}
       <div
         ref={panelRef}
-        className="w-full bg-white/20 backdrop-blur-md border-b border-white h-60"
+        className="w-full bg-white/20 backdrop-blur-md border-b border-white h-65"
         onClick={() => setEditingIndex(null)}
       >
         {/* undisclosed panel  */}
         <div className={`${divHeader}`}>
-          <h2
-            className={`text-white font-medium font-stretch-expanded flex items-center text-xl transition-all ml-30 flex-row hover:text-gray-300`}
-          >
-            <button
-              onClick={() => setMore((prev) => !prev)}
-              className="cursor-pointer"
+          {setting === "Home" ? (
+            <h2
+              className={`text-white font-medium font-stretch-expanded flex items-center text-xl transition-all ml-30 flex-row hover:text-gray-300`}
             >
-              {boards[currentBoard].name}
-              {more ? (
-                <ExpandLessIcon className={expandIcon} />
-              ) : (
-                <ExpandMoreIcon className={expandIcon} />
-              )}
-            </button>
-          </h2>
+              <button
+                onClick={() => setMore((prev) => !prev)}
+                className="cursor-pointer"
+              >
+                {boards[currentBoard].name}
+                {more ? (
+                  <ExpandLessIcon className={expandIcon} />
+                ) : (
+                  <ExpandMoreIcon className={expandIcon} />
+                )}
+              </button>
+            </h2>
+          ) : (
+            <h2
+              className={`text-white font-medium font-stretch-expanded text-xl transition-all ml-30 flex-row hover:text-gray-300`}
+            >
+              <button
+                onClick={() => setSetting("Home")}
+                className="cursor-pointer flex items-center"
+              >
+                <ArrowBackIosIcon />
+                Go Home
+              </button>
+            </h2>
+          )}
           <h1 className="text-2xl font-medium font-stretch-expanded text-white">
             My trello board
           </h1>
@@ -162,97 +170,103 @@ export default function BoardType() {
           }`}
         >
           {/* board switcher */}
-          <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55">
-            {boards.map((board, index) => (
-              <div
-                key={index}
-                className="relative w-full flex justify-center mt-2"
-              >
-                {/* reserved space for buttons */}
-                <div className="absolute inset-0 flex justify-between items-center px-5 pointer-events-none">
-                  <button className="opacity-0">
-                    <EditIcon />
-                  </button>
-                  <button className="opacity-0">
-                    <DeleteForeverIcon />
+          {setting === "Home" ? (
+            <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55">
+              {boards.map((board, index) => (
+                <div
+                  key={index}
+                  className="relative w-full flex justify-center mt-2"
+                >
+                  {/* reserved space for buttons */}
+                  <div className="absolute inset-0 flex justify-between items-center px-5 pointer-events-none">
+                    <button className="opacity-0">
+                      <EditIcon />
+                    </button>
+                    <button className="opacity-0">
+                      <DeleteForeverIcon />
+                    </button>
+                  </div>
+                  {/* list of board name */}
+                  <button
+                    onClick={() => setCurrentBoard(index)}
+                    onMouseEnter={() => setHovered(index)}
+                    onMouseLeave={() => setHovered(null)}
+                    className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded ${
+                      index === currentBoard
+                        ? "bg-zinc-100 text-black border-none rounded"
+                        : "hover:border-2 border-b-2 border-white"
+                    }`}
+                  >
+                    <span className="ml-1 w-full">
+                      {editingIndex === index ? (
+                        <div className={boardNameDiv}>
+                          <input
+                            ref={(el) => {
+                              if (el) el.focus();
+                            }}
+                            value={editingNaming}
+                            onChange={(e) => setEditingNaming(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                if (editingNaming.trim() === "") return;
+                                const updatedCards = [...boards];
+                                updatedCards[index].name = editingNaming;
+                                setBoards(updatedCards);
+                                setEditingIndex(null);
+                              }
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            className={`text-base font-medium w-full font-sans focus:outline-none px-2 ${
+                              index === currentBoard
+                                ? "text-black"
+                                : "text-white"
+                            }`}
+                          />
+                        </div>
+                      ) : (
+                        <div className={boardNameDiv}>
+                          {hovered === index && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingIndex(index);
+                                setEditingNaming(boards[index].name);
+                              }}
+                            >
+                              <EditIcon className="scale-105 cursor-pointer ml-2" />
+                            </button>
+                          )}
+                          <span className="truncate flex-1 mx-3">
+                            {board.name}
+                          </span>
+                          {hovered === index && (
+                            <button
+                              className="hover:text-red-500 hover:underline cursor-pointer transition-all duration-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteBoard(index);
+                              }}
+                            >
+                              <DeleteForeverIcon className="scale-105 mr-2" />
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </span>
                   </button>
                 </div>
-                {/* list of board name */}
-                <button
-                  onClick={() => setCurrentBoard(index)}
-                  onMouseEnter={() => setHovered(index)}
-                  onMouseLeave={() => setHovered(null)}
-                  className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded ${
-                    index === currentBoard
-                      ? "bg-zinc-100 text-black border-none rounded"
-                      : "hover:border-2 border-b-2 border-white"
-                  }`}
-                >
-                  <span className="ml-1 w-full">
-                    {editingIndex === index ? (
-                      <div className={boardNameDiv}>
-                        <input
-                          ref={(el) => {
-                            if (el) el.focus();
-                          }}
-                          value={editingNaming}
-                          onChange={(e) => setEditingNaming(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              if (editingNaming.trim() === "") return;
-                              const updatedCards = [...boards];
-                              updatedCards[index].name = editingNaming;
-                              setBoards(updatedCards);
-                              setEditingIndex(null);
-                            }
-                          }}
-                          onFocus={(e) => e.target.select()}
-                          className={`text-base font-medium w-full font-sans focus:outline-none px-2 ${
-                            index === currentBoard ? "text-black" : "text-white"
-                          }`}
-                        />
-                      </div>
-                    ) : (
-                      <div className={boardNameDiv}>
-                        {hovered === index && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingIndex(index);
-                              setEditingNaming(boards[index].name);
-                            }}
-                          >
-                            <EditIcon className="scale-105 cursor-pointer ml-2" />
-                          </button>
-                        )}
-                        <span className="truncate flex-1 mx-3">
-                          {board.name}
-                        </span>
-                        {hovered === index && (
-                          <button
-                            className="hover:text-red-500 hover:underline cursor-pointer transition-all duration-300"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteBoard(index);
-                            }}
-                          >
-                            <DeleteForeverIcon className="scale-105 mr-2" />
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </span>
-                </button>
-              </div>
-            ))}
-            {/* add another board */}
-            <button
-              onClick={addBoard}
-              className="flex items-center py-1 mb-5 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-41.5 justify-center scale-110 cursor-pointer"
-            >
-              <QueueIcon />
-            </button>
-          </div>
+              ))}
+              {/* add another board */}
+              <button
+                onClick={addBoard}
+                className="flex items-center py-1 mb-5 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-41.5 justify-center scale-110 cursor-pointer"
+              >
+                <QueueIcon />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55" />
+          )}
 
           {/* description */}
           <div className="flex flex-col text-center">
@@ -263,12 +277,13 @@ export default function BoardType() {
           </div>
 
           {/* settings list - coming soon... */}
-          <div className="flex flex-col mr-15">
+          <div className="flex flex-col mr-20">
             <ul className="flex items-start flex-col text-lg font-bold gap-4">
               {settingOptions.map((option, idx) => (
                 <li
                   key={idx}
-                  className={`${textDec} hover:underline-offset-3 hover:underline hover:scale-105 text-lg flex items-center cursor-not-allowed transition-all text-zinc-300 hover:text-white`}
+                  className={`${textDec} hover:underline-offset-3 hover:underline hover:scale-105 text-lg flex items-center cursor-pointer transition-all text-zinc-300 hover:text-white`}
+                  onClick={() => setSetting(option.label)}
                 >
                   {option.icon}
                   {option.label}
@@ -279,45 +294,50 @@ export default function BoardType() {
         </div>
       </div>
 
-      {/* Board Content */}
-      <div
-        className="overflow-x-auto h-screen"
-        onClick={() => {
-          setEditingIndex(null);
-          setMore(false);
-        }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentBoard ? boards[currentBoard].name : null}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+      {/* main  content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={setting === "Home" ? boards[currentBoard].name : setting}
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -10, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div
+            onClick={() => {
+              setEditingIndex(null);
+              setMore(false);
+            }}
           >
-            <ColumnList
-              columns={boards[currentBoard].lists}
-              setColumns={(newColumns) => {
-                setBoards((boards) =>
-                  boards.map((b, index) =>
-                    index === currentBoard
-                      ? {
-                          ...b,
-                          lists:
-                            typeof newColumns === "function"
-                              ? newColumns(b.lists)
-                              : newColumns,
-                        }
-                      : b
-                  )
-                );
-              }}
-            />
-          </motion.div>
-        </AnimatePresence>
-      </div>
+            {setting === "Home" ? (
+              <div className="overflow-x-auto h-screen">
+                <ColumnList
+                  columns={boards[currentBoard].lists}
+                  setColumns={(newColumns) => {
+                    setBoards((boards) =>
+                      boards.map((b, index) =>
+                        index === currentBoard
+                          ? {
+                              ...b,
+                              lists:
+                                typeof newColumns === "function"
+                                  ? newColumns(b.lists)
+                                  : newColumns,
+                            }
+                          : b
+                      )
+                    );
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="overflow-x-auto h-screen w-screen">
+                <ThemeSelector setCurrentTheme={setCurrentTheme} />
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
-
-//fix a bug with a nav panel after creating a first board
