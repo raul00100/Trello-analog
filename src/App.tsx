@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BoardType from "./pages/boardType";
 import "./index.css";
 import PrismaticBurst from "./background/PrismaticBurst";
