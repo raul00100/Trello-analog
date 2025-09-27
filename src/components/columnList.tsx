@@ -11,6 +11,7 @@ import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import SharedInput from "./sharedInput";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
@@ -45,14 +46,14 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
   }, [compress]);
 
   const addEmptyCard = () => {
-    setCards([
-      ...cards,
-      {
-        id: Date.now().toString(),
-        name: `Column ${cards.length + 1}`,
-        todos: [],
-      },
-    ]);
+    const newCard = {
+      id: Date.now().toString(),
+      name: "",
+      todos: [],
+    };
+    setCards([...cards, newCard]);
+    setEditingIndex(cards.length);
+    setEditingNaming(`Column ${cards.length + 1}`);
   };
 
   const deleteCard = (index: number) => {
@@ -130,27 +131,6 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                               className={` ${column} w-[272px] flex-col p-3`}
                             >
                               {editingIndex === index ? (
-                                // <input
-                                //   ref={(el) => {
-                                //     if (el) el.focus();
-                                //   }}
-                                //   type="text"
-                                //   value={editingNaming}
-                                //   onChange={(e) =>
-                                //     setEditingNaming(e.target.value)
-                                //   }
-                                //   onKeyDown={(e) => {
-                                //     if (e.key === "Enter") {
-                                //       if (editingNaming.trim() === "") return;
-                                //       const updatedCards = [...cards];
-                                //       updatedCards[index].name = editingNaming;
-                                //       setCards(updatedCards);
-                                //       setEditingIndex(null);
-                                //     }
-                                //   }}
-                                //   onFocus={(e) => e.target.select()}
-                                //   className="text-base font-medium font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300 my-2"
-                                // />
                                 <SharedInput
                                   value={editingNaming}
                                   onChange={setEditingNaming}
@@ -160,7 +140,8 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                     setCards(updatedCards);
                                     setEditingIndex(null);
                                   }}
-                                  className="text-base font-medium font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300 my-2"
+                                  onFocus={() => {}}
+                                  className="text-base font-medium font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300 my-[7px]"
                                 />
                               ) : (
                                 //default mode - view
@@ -194,6 +175,17 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                           <CloseIcon />
                                         </button>
                                       </div>
+                                      <button
+                                        onClick={() => {
+                                          setEditingIndex(index);
+                                          setEditingNaming(cards[index].name);
+                                          setShowSetting(null);
+                                        }}
+                                        className={buttonActions}
+                                      >
+                                        <DriveFileRenameOutlineIcon className="mr-2" />
+                                        Rename
+                                      </button>
                                       <button
                                         onClick={() => {
                                           deleteCard(index);
@@ -249,14 +241,13 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                 ))}
               </AnimatePresence>
               {provided.placeholder}
-
-              <div
+              <button
                 onClick={addEmptyCard}
                 className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semibold bg-opa active:scale-90  w-40 h-11 rounded-md text-base flex items-center justify-center cursor-pointer transition-all ml-10 mr-10 flex-none"
               >
-                <button className="mr-2">Add a column</button>
+                <span className="mr-2"> Add a column </span>
                 <AssignmentAddIcon />
-              </div>
+              </button>
             </section>
           )}
         </Droppable>

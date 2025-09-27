@@ -61,7 +61,7 @@ export default function BoardType({
   ];
   const [setting, setSetting] = useState<string | null>(() => {
     const savedSetting = localStorage.getItem("setting");
-    return savedSetting ? JSON.parse(savedSetting) : null;
+    return savedSetting ? JSON.parse(savedSetting) : "Home";
   });
 
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -101,8 +101,16 @@ export default function BoardType({
   });
 
   const addBoard = () => {
-    setBoards([...boards, { name: `Board ${boards.length + 1}`, lists: [] }]);
-    setCurrentBoard(boards.length);
+    if (boards.length === 0) {
+      const firstBard = { name: "Board 1", lists: [] };
+      setBoards([firstBard]);
+    } else {
+      const newBoard = { name: "", lists: [] };
+      setBoards([...boards, newBoard]);
+      setEditingIndex(boards.length);
+      setEditingNaming(`Board ${boards.length + 1}`);
+      setCurrentBoard(boards.length);
+    }
   };
 
   const deleteBoard = (index: number) => {
@@ -218,34 +226,53 @@ export default function BoardType({
                               setBoards(updatedBoards);
                               setEditingIndex(null);
                             }}
+                            onFocus={() => {}}
                           />
                         </div>
                       ) : (
                         <div className={boardNameDiv}>
                           {hovered === index && (
-                            <button
+                            <span
+                              role="button"
+                              tabIndex={0}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setEditingIndex(index);
                                 setEditingNaming(boards[index].name);
                               }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setEditingIndex(index);
+                                  setEditingNaming(boards[index].name);
+                                }
+                              }}
+                              className="inline-flex items-center scale-105 cursor-pointer ml-2 focus:outline-none"
                             >
-                              <EditIcon className="scale-105 cursor-pointer ml-2" />
-                            </button>
+                              <EditIcon />
+                            </span>
                           )}
                           <span className="truncate flex-1 mx-3">
                             {board.name}
                           </span>
                           {hovered === index && (
-                            <button
-                              className="hover:text-red-500 hover:underline cursor-pointer transition-all duration-300"
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              className="hover:text-red-500 hover:underline cursor-pointer transition-all duration-300 inline-flex items-center focus:outline-none"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 deleteBoard(index);
                               }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  deleteBoard(index);
+                                }
+                              }}
                             >
                               <DeleteForeverIcon className="scale-105 mr-2" />
-                            </button>
+                            </span>
                           )}
                         </div>
                       )}
@@ -279,7 +306,17 @@ export default function BoardType({
               {settingOptions.map((option, idx) => (
                 <li
                   key={idx}
-                  className={`${textDec} hover:underline-offset-3 hover:underline hover:scale-105 text-lg flex items-center cursor-pointer transition-all text-zinc-300 hover:text-white`}
+                  className={`${textDec} text-lg flex items-center transition-all 
+                  ${
+                    ["Help", "Logout"].includes(option.label)
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer"
+                  } 
+                  ${
+                    setting === option.label
+                      ? "underline scale-105 text-white underline-offset-3 hover:animate-pulse"
+                      : "hover:underline hover:scale-105  text-zinc-300  hover:text-white hover:underline-offset-3"
+                  }`}
                   onClick={() => setSetting(option.label)}
                 >
                   {option.icon}

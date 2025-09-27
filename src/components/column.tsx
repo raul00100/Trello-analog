@@ -56,33 +56,6 @@ export default function Column({ card, setCard }: CardType) {
             {/* editing a todo */}
             {editingIndex === index && add === false ? (
               <div className="flex flex-row items-center justify-between">
-                {/* <input
-                  ref={(el) => {
-                    if (el) el.focus();
-                  }}
-                  type="text"
-                  className="text-black rounded border-none focus:outline-none pl-0.5"
-                  value={editingValue}
-                  onChange={(e) => setEditingValue(e.target.value)}
-                  onBlur={() => {
-                    if (editingValue.trim() === "") {
-                      removeTodo(index);
-                    } else {
-                      handleEdit(index, editingValue);
-                    }
-                    setEditingIndex(null);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      if (editingValue.trim() === "") {
-                        removeTodo(index);
-                      } else {
-                        handleEdit(index, editingValue);
-                      }
-                      setEditingIndex(null);
-                    }
-                  }}
-                /> */}
                 <SharedInput
                   value={editingValue}
                   onChange={setEditingValue}
@@ -190,7 +163,7 @@ export default function Column({ card, setCard }: CardType) {
           className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-black active:bg-zinc-800 pl-2 rounded-sm py-1 transition-all cursor-pointer mb-3 opacity-60 hover:opacity-100"
         >
           <AddIcon />
-          Add Card
+          Add Todo
         </button>
       )}
     </div>
