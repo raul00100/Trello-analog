@@ -15,6 +15,7 @@ import PaletteIcon from "@mui/icons-material/Palette";
 import HomeIcon from "@mui/icons-material/Home";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Card from "../components/card";
+import SharedInput from "../components/sharedInput";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
@@ -32,10 +33,14 @@ type BoardTypeProps = {
 };
 
 type ThemeSelectorProps = {
+  currentTheme: string;
   setCurrentTheme: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
+export default function BoardType({
+  currentTheme,
+  setCurrentTheme,
+}: ThemeSelectorProps) {
   const [boards, setBoards] = useState<BoardTypeProps[]>(() => {
     const savedBoard = localStorage.getItem("board");
     return savedBoard ? JSON.parse(savedBoard) : [];
@@ -119,10 +124,9 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
   return (
     <div className="overflow-hidden h-screen">
       {/* nav panel */}
-      <div
+      <header
         ref={panelRef}
         className="w-full bg-white/20 backdrop-blur-md border-b border-white h-65"
-        onClick={() => setEditingIndex(null)}
       >
         {/* undisclosed panel  */}
         <div className={`${divHeader}`}>
@@ -171,7 +175,7 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
         >
           {/* board switcher */}
           {setting === "Home" ? (
-            <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55">
+            <nav className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55">
               {boards.map((board, index) => (
                 <div
                   key={index}
@@ -200,27 +204,20 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
                     <span className="ml-1 w-full">
                       {editingIndex === index ? (
                         <div className={boardNameDiv}>
-                          <input
-                            ref={(el) => {
-                              if (el) el.focus();
-                            }}
+                          <SharedInput
                             value={editingNaming}
-                            onChange={(e) => setEditingNaming(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                if (editingNaming.trim() === "") return;
-                                const updatedCards = [...boards];
-                                updatedCards[index].name = editingNaming;
-                                setBoards(updatedCards);
-                                setEditingIndex(null);
-                              }
-                            }}
-                            onFocus={(e) => e.target.select()}
+                            onChange={setEditingNaming}
                             className={`text-base font-medium w-full font-sans focus:outline-none px-2 ${
                               index === currentBoard
                                 ? "text-black"
                                 : "text-white"
                             }`}
+                            onSubmit={(newValue) => {
+                              const updatedBoards = [...boards];
+                              updatedBoards[index].name = newValue;
+                              setBoards(updatedBoards);
+                              setEditingIndex(null);
+                            }}
                           />
                         </div>
                       ) : (
@@ -263,7 +260,7 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
               >
                 <QueueIcon />
               </button>
-            </div>
+            </nav>
           ) : (
             <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55" />
           )}
@@ -277,7 +274,7 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
           </div>
 
           {/* settings list - coming soon... */}
-          <div className="flex flex-col mr-20">
+          <nav className="flex flex-col mr-20">
             <ul className="flex items-start flex-col text-lg font-bold gap-4">
               {settingOptions.map((option, idx) => (
                 <li
@@ -290,9 +287,9 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
         </div>
-      </div>
+      </header>
 
       {/* main  content */}
       <AnimatePresence mode="wait">
@@ -303,7 +300,7 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
           exit={{ y: -10, opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <div
+          <main
             onClick={() => {
               setEditingIndex(null);
               setMore(false);
@@ -332,10 +329,13 @@ export default function BoardType({ setCurrentTheme }: ThemeSelectorProps) {
               </div>
             ) : (
               <div className="overflow-x-auto h-screen w-screen">
-                <ThemeSelector setCurrentTheme={setCurrentTheme} />
+                <ThemeSelector
+                  currentTheme={currentTheme}
+                  setCurrentTheme={setCurrentTheme}
+                />
               </div>
             )}
-          </div>
+          </main>
         </motion.div>
       </AnimatePresence>
     </div>

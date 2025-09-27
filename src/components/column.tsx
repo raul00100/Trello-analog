@@ -4,6 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
+import SharedInput from "./sharedInput";
 
 type CardType = {
   card: { text: string; done: boolean }[];
@@ -55,10 +56,11 @@ export default function Column({ card, setCard }: CardType) {
             {/* editing a todo */}
             {editingIndex === index && add === false ? (
               <div className="flex flex-row items-center justify-between">
-                <input
+                {/* <input
                   ref={(el) => {
                     if (el) el.focus();
                   }}
+                  type="text"
                   className="text-black rounded border-none focus:outline-none pl-0.5"
                   value={editingValue}
                   onChange={(e) => setEditingValue(e.target.value)}
@@ -80,6 +82,19 @@ export default function Column({ card, setCard }: CardType) {
                       setEditingIndex(null);
                     }
                   }}
+                /> */}
+                <SharedInput
+                  value={editingValue}
+                  onChange={setEditingValue}
+                  onSubmit={(newValue) => {
+                    if (newValue.trim() === "") {
+                      removeTodo(index);
+                    } else {
+                      handleEdit(index, newValue);
+                    }
+                    setEditingIndex(null);
+                  }}
+                  className="text-black rounded border-none focus:outline-none pl-0.5"
                 />
                 <EditIcon sx={{ marginRight: 2 }} />
               </div>

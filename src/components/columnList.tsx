@@ -10,6 +10,7 @@ import CompressIcon from "@mui/icons-material/Compress";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
+import SharedInput from "./sharedInput";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
@@ -68,11 +69,11 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
   };
 
   return (
-    <div className="mt-10 flex flex-row" onClick={() => setEditingIndex(null)}>
+    <div className="mt-10 flex flex-row">
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="cards" direction="horizontal">
           {(provided) => (
-            <div
+            <section
               {...provided.droppableProps}
               ref={provided.innerRef}
               className="flex flex-row items-start"
@@ -129,24 +130,36 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                               className={` ${column} w-[272px] flex-col p-3`}
                             >
                               {editingIndex === index ? (
-                                <input
-                                  ref={(el) => {
-                                    if (el) el.focus();
-                                  }}
+                                // <input
+                                //   ref={(el) => {
+                                //     if (el) el.focus();
+                                //   }}
+                                //   type="text"
+                                //   value={editingNaming}
+                                //   onChange={(e) =>
+                                //     setEditingNaming(e.target.value)
+                                //   }
+                                //   onKeyDown={(e) => {
+                                //     if (e.key === "Enter") {
+                                //       if (editingNaming.trim() === "") return;
+                                //       const updatedCards = [...cards];
+                                //       updatedCards[index].name = editingNaming;
+                                //       setCards(updatedCards);
+                                //       setEditingIndex(null);
+                                //     }
+                                //   }}
+                                //   onFocus={(e) => e.target.select()}
+                                //   className="text-base font-medium font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300 my-2"
+                                // />
+                                <SharedInput
                                   value={editingNaming}
-                                  onChange={(e) =>
-                                    setEditingNaming(e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      if (editingNaming.trim() === "") return;
-                                      const updatedCards = [...cards];
-                                      updatedCards[index].name = editingNaming;
-                                      setCards(updatedCards);
-                                      setEditingIndex(null);
-                                    }
+                                  onChange={setEditingNaming}
+                                  onSubmit={(newValue) => {
+                                    const updatedCards = [...cards];
+                                    updatedCards[index].name = newValue;
+                                    setCards(updatedCards);
+                                    setEditingIndex(null);
                                   }}
-                                  onFocus={(e) => e.target.select()}
                                   className="text-base font-medium font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300 my-2"
                                 />
                               ) : (
@@ -171,9 +184,9 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                   {showSetting === card.id && (
                                     <div className="absolute left-3 top-13 mt-2 w-60 bg-zinc-200 text-black rounded shadow-lg flex flex-col z-50 text-sm">
                                       <div className="flex flex-row">
-                                        <h1 className="py-2 px-4 rounded-t font-medium mx-auto ml-9">
+                                        <h4 className="py-2 px-4 rounded-t font-medium mx-auto ml-9">
                                           Actions with the list
-                                        </h1>
+                                        </h4>
                                         <button
                                           onClick={() => setShowSetting(null)}
                                           className="mr-2 cursor-pointer hover:bg-zinc-400 my-1.5 rounded-md p-0.5"
@@ -244,7 +257,7 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                 <button className="mr-2">Add a column</button>
                 <AssignmentAddIcon />
               </div>
-            </div>
+            </section>
           )}
         </Droppable>
       </DragDropContext>

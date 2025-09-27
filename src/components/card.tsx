@@ -14,7 +14,7 @@ export default function Card({ addBoard }: CardProp) {
       </div>
 
       <h1>
-        Is this your <span className="font-bold"> first time </span> here ?
+        Are you here for the<span className="font-bold"> first time </span> ?
       </h1>
       <div className="flex flex-col items-center gap-1.5 text-[#daf4ed]">
         <p className="mt-9 font-semibold">Add your first board!</p>
