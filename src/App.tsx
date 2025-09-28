@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BoardType from "./pages/boardType";
 import "./index.css";
-import PrismaticBurst from "./background/PrismaticBurst";
 import Dither from "./background/Dither";
 import LiquidEther from "./background/LiquidEther";
 import Aurora from "./background/Aurora";
@@ -50,18 +49,6 @@ export default function App() {
             waveAmplitude={0.3}
             waveFrequency={3}
             waveSpeed={0.05}
-          />
-        )}
-
-        {currentTheme === "PrismaticBurst" && (
-          <PrismaticBurst
-            animationType="rotate3d"
-            intensity={2}
-            speed={0.5}
-            distort={1.0}
-            paused={false}
-            rayCount={24}
-            colors={["#ff007a", "#4d3dff", "#ffffff"]}
           />
         )}
 

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import SharedInput from "./sharedInput";
+import EditIcon from "@mui/icons-material/Edit";
 
 type CardType = {
   card: { text: string; done: boolean }[];
@@ -43,46 +43,24 @@ export default function Column({ card, setCard }: CardType) {
   };
 
   return (
-    <div className="flex flex-col" onClick={() => setEditingIndex(null)}>
+    <div className="flex flex-col">
       {card.map((item, index) => (
         <ul
           key={index}
-          className="bg-zinc-300 text-black pl-3 rounded-md text-sm mt-1.5 py-1"
+          className="bg-zinc-300 text-black pl-3 rounded-md text-sm mt-1.5 py-1 h-7.5 flex items-center"
           onMouseEnter={() => setHovered(index)}
           onMouseLeave={() => setHovered(null)}
           onClick={() => setAdd(false)}
+          onDoubleClick={() => {
+            if (item.done) return;
+            setEditingIndex(index);
+            setEditingValue(item.text);
+          }}
         >
           <li>
             {/* editing a todo */}
             {editingIndex === index && add === false ? (
               <div className="flex flex-row items-center justify-between">
-                {/* <input
-                  ref={(el) => {
-                    if (el) el.focus();
-                  }}
-                  type="text"
-                  className="text-black rounded border-none focus:outline-none pl-0.5"
-                  value={editingValue}
-                  onChange={(e) => setEditingValue(e.target.value)}
-                  onBlur={() => {
-                    if (editingValue.trim() === "") {
-                      removeTodo(index);
-                    } else {
-                      handleEdit(index, editingValue);
-                    }
-                    setEditingIndex(null);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      if (editingValue.trim() === "") {
-                        removeTodo(index);
-                      } else {
-                        handleEdit(index, editingValue);
-                      }
-                      setEditingIndex(null);
-                    }
-                  }}
-                /> */}
                 <SharedInput
                   value={editingValue}
                   onChange={setEditingValue}
@@ -94,9 +72,9 @@ export default function Column({ card, setCard }: CardType) {
                     }
                     setEditingIndex(null);
                   }}
-                  className="text-black rounded border-none focus:outline-none pl-0.5"
+                  className="text-black text-base rounded border-none focus:outline-none w-51"
                 />
-                <EditIcon sx={{ marginRight: 2 }} />
+                <EditIcon />
               </div>
             ) : (
               //  viewing the list
@@ -123,12 +101,7 @@ export default function Column({ card, setCard }: CardType) {
                 </label>
                 {/* todo text */}
                 <span
-                  onDoubleClick={() => {
-                    if (item.done) return;
-                    setEditingIndex(index);
-                    setEditingValue(item.text);
-                  }}
-                  className={`flex-1 cursor-pointer select-text ${
+                  className={`flex-1 cursor-pointer text-base truncate w-42 ${
                     item.done ? "line-through text-gray-400" : ""
                   }`}
                 >
@@ -136,7 +109,7 @@ export default function Column({ card, setCard }: CardType) {
                 </span>
                 <button
                   onClick={() => removeTodo(index)}
-                  className={`hover:text-red-700 px-2 rounded mr-2 cursor-pointer   ${
+                  className={`hover:text-red-700 px-2.5 rounded cursor-pointer   ${
                     hovered === index ? "opacity-100" : "opacity-0"
                   } transition-all duration-300`}
                 >
@@ -190,7 +163,7 @@ export default function Column({ card, setCard }: CardType) {
           className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-black active:bg-zinc-800 pl-2 rounded-sm py-1 transition-all cursor-pointer mb-3 opacity-60 hover:opacity-100"
         >
           <AddIcon />
-          Add Card
+          Add Todo
         </button>
       )}
     </div>

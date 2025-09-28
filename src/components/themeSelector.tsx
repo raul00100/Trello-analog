@@ -1,5 +1,4 @@
 import React from "react";
-import PrismaticBurst from "../background/PrismaticBurst";
 import Dither from "../background/Dither";
 import LiquidEther from "../background/LiquidEther";
 import Aurora from "../background/Aurora";
@@ -18,7 +17,7 @@ function getSecondMainDivClass(theme: string, target: string) {
 }
 function headerStyle(theme: string, target: string) {
   return [
-    "text-xl font-semibold text-white border-2 w-100 h-10 flex justify-center items-center",
+    "text-xl font-semibold text-white border-2 w-100 h-10 flex justify-between items-center px-5",
     theme === target ? "border-blue-500" : "border-zinc-400",
   ].join(" ");
 }
@@ -81,29 +80,6 @@ export default function ThemeSelector({
             waveAmplitude={0.3}
             waveFrequency={3}
             waveSpeed={0.05}
-          />
-        </div>
-      </div>
-
-      <div
-        className={getSecondMainDivClass(currentTheme, "PrismaticBurst")}
-        onClick={() => setCurrentTheme("PrismaticBurst")}
-      >
-        <h3 className={headerStyle(currentTheme, "PrismaticBurst")}>
-          PrismaticBurst
-        </h3>
-        <div className={divStyle(currentTheme, "PrismaticBurst")}>
-          <PrismaticBurst
-            animationType="rotate3d"
-            intensity={2}
-            speed={0.5}
-            distort={1.0}
-            paused={false}
-            offset={{ x: 0, y: 0 }}
-            hoverDampness={0.25}
-            rayCount={24}
-            mixBlendMode="lighten"
-            colors={["#ff007a", "#4d3dff", "#ffffff"]}
           />
         </div>
       </div>

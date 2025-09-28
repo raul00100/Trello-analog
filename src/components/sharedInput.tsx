@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 type InputProp = {
   value: string;
   onChange: (value: string) => void;
-  onSubmit?: (value: string) => void;
+  onSubmit: (value: string) => void;
   className: string;
+  onFocus?: () => void;
 };
 
 export default function SharedInput({
@@ -12,6 +13,7 @@ export default function SharedInput({
   onChange,
   onSubmit,
   className = "",
+  onFocus,
 }: InputProp) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +25,14 @@ export default function SharedInput({
 
   const handleSubmit = () => {
     if (value.trim() === "") return;
-    onSubmit?.(value);
+    onSubmit(value);
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (onFocus) {
+      onFocus();
+      e.target.select();
+    }
   };
 
   return (
@@ -37,9 +46,9 @@ export default function SharedInput({
           handleSubmit();
         }
       }}
-      onFocus={(e) => e.target.select()}
       onBlur={handleSubmit}
       className={`text-base font-medium font-sans focus:outline-none px-2 ${className}`}
+      onFocus={handleFocus}
     />
   );
 }
