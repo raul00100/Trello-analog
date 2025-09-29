@@ -6,7 +6,6 @@ import QueueIcon from "@mui/icons-material/Queue";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
@@ -16,6 +15,8 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Card from "../components/card";
 import SharedInput from "../components/sharedInput";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
+import SearchIcon from "@mui/icons-material/Search";
+import Search from "../components/search";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
@@ -56,7 +57,7 @@ export default function BoardType({
   const settingOptions = [
     { label: "Home", icon: <HomeIcon className={icons} /> },
     { label: "Theme", icon: <FormatPaintIcon className={icons} /> },
-    { label: "Help", icon: <HelpOutlineIcon className={icons} /> },
+    { label: "Search", icon: <SearchIcon className={icons} /> },
     { label: "Logout", icon: <LogoutIcon className={icons} /> },
   ];
   const [setting, setSetting] = useState<string | null>(() => {
@@ -102,8 +103,8 @@ export default function BoardType({
 
   const addBoard = () => {
     if (boards.length === 0) {
-      const firstBard = { name: "Board 1", lists: [] };
-      setBoards([firstBard]);
+      const firstBoard = { name: "Board 1", lists: [] };
+      setBoards([firstBoard]);
     } else {
       const newBoard = { name: "", lists: [] };
       setBoards([...boards, newBoard]);
@@ -296,7 +297,7 @@ export default function BoardType({
           <div className="flex flex-col text-center">
             <p className={`${textDec} w-100 font-mono font-medium text-lg`}>
               Trello is a web-based project management application that helps
-              you organize work with boards, lists, and cards.
+              you organize work
             </p>
           </div>
 
@@ -304,7 +305,7 @@ export default function BoardType({
           <nav className="flex flex-col mr-20">
             <ul className="flex items-start flex-col text-lg font-bold gap-4">
               {settingOptions.map((option, idx) => {
-                const isDisabled = ["Help", "Logout"].includes(option.label);
+                const isDisabled = "Logout".includes(option.label);
                 return (
                   <li
                     key={idx}
@@ -322,8 +323,6 @@ export default function BoardType({
                     onClick={
                       isDisabled ? undefined : () => setSetting(option.label)
                     }
-                    // tabIndex={isDisabled ? -1 : 0}
-                    // aria-disabled={isDisabled}
                   >
                     {option.icon}
                     {option.label}
@@ -371,12 +370,16 @@ export default function BoardType({
                   }}
                 />
               </div>
-            ) : (
+            ) : setting === "Theme" ? (
               <div className="overflow-x-auto h-screen w-screen">
                 <ThemeSelector
                   currentTheme={currentTheme}
                   setCurrentTheme={setCurrentTheme}
                 />
+              </div>
+            ) : (
+              <div className="w-screen h-screen">
+                <Search boards={boards} />
               </div>
             )}
           </main>

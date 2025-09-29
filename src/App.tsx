@@ -5,6 +5,8 @@ import Dither from "./background/Dither";
 import LiquidEther from "./background/LiquidEther";
 import Aurora from "./background/Aurora";
 import Squares from "./background/Squares";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 
 export default function App() {
   const [currentTheme, setCurrentTheme] = useState(() => {
