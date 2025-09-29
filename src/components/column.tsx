@@ -3,7 +3,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
-import SharedInput from "./sharedInput";
+import SharedInput from "../shared/sharedInput";
 import EditIcon from "@mui/icons-material/Edit";
 
 type CardType = {

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import SharedInput from "./sharedInput";
+import { useState } from "react";
+import SharedInput from "../shared/sharedInput";
 import ErrorIcon from "@mui/icons-material/Error";
 
 type Todo = { text: string; done: boolean };
@@ -58,13 +58,13 @@ export default function Search({ boards }: SearchProp) {
       <SharedInput
         value={searchText}
         onChange={setSearchText}
-        className=" bg-white/20 backdrop-blur-md border-2 border-white text-white rounded h-10 mt-10 mb-3"
+        className=" bg-white/20 backdrop-blur-md border-2 border-white text-white rounded h-12 mt-10 mb-3 w-60 text-lg"
         placeholder="Search..."
       />
       {searchText.trim() !== "" && (
         <ul
           className={`text-black bg-white rounded p-3 ${
-            filtered().length > 0 ? "w-150" : "w-55"
+            filtered().length > 0 ? "w-150" : "w-60"
           }`}
         >
           {filtered().length > 0 ? (

@@ -10,7 +10,7 @@ import CompressIcon from "@mui/icons-material/Compress";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
-import SharedInput from "./sharedInput";
+import SharedInput from "../shared/sharedInput";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 
 type Todo = { text: string; done: boolean };

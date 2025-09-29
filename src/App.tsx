@@ -1,32 +1,133 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import BoardType from "./pages/boardType";
+import NavPanel from "./components/navPanel";
+import Card from "./components/card";
+import Search from "./pages/search";
+import ThemeSelector from "./pages/themeSelector";
 import "./index.css";
+//background
 import Dither from "./background/Dither";
 import LiquidEther from "./background/LiquidEther";
 import Aurora from "./background/Aurora";
 import Squares from "./background/Squares";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+type Todo = { text: string; done: boolean };
+type ColumnCard = { id: string; name: string; todos: Todo[] };
+type BoardTypeProps = {
+  name: string;
+  lists: ColumnCard[];
+};
 
 export default function App() {
+  const [boards, setBoards] = useState<BoardTypeProps[]>(() => {
+    const savedBoard = localStorage.getItem("board");
+    return savedBoard ? JSON.parse(savedBoard) : [];
+  });
+  const [currentBoard, setCurrentBoard] = useState(() => {
+    const savedCurrentBoard = localStorage.getItem("current");
+    return savedCurrentBoard ? JSON.parse(savedCurrentBoard) : 0;
+  });
   const [currentTheme, setCurrentTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme ? savedTheme : "Aurora";
   });
+  const [more, setMore] = useState(false);
+
+  const addBoard = () => {
+    if (boards.length === 0) {
+      setBoards([{ name: "Board 1", lists: [] }]);
+    } else {
+      setBoards([...boards, { name: "", lists: [] }]);
+      setCurrentBoard(boards.length);
+    }
+  };
 
   useEffect(() => {
+    localStorage.setItem("board", JSON.stringify(boards));
+  }, [boards]);
+  useEffect(() => {
+    localStorage.setItem("current", JSON.stringify(currentBoard));
+  }, [currentBoard]);
+  useEffect(() => {
     localStorage.setItem("theme", currentTheme);
-  });
+  }, [currentTheme]);
 
+  if (boards.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-white bg-white/40 backdrop-blur-md">
+        <Card addBoard={addBoard} />
+      </div>
+    );
+  }
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <>
+          <NavPanel
+            boards={boards}
+            setBoards={setBoards}
+            currentBoard={currentBoard}
+            setCurrentBoard={setCurrentBoard}
+            addBoard={addBoard}
+            more={more}
+            setMore={setMore}
+          />
+          <BoardType
+            boards={boards}
+            setBoards={setBoards}
+            currentBoard={currentBoard}
+          />
+        </>
+      ),
+    },
+    {
+      path: "/theme",
+      element: (
+        <>
+          <NavPanel
+            boards={boards}
+            setBoards={setBoards}
+            currentBoard={currentBoard}
+            setCurrentBoard={setCurrentBoard}
+            addBoard={addBoard}
+            more={more}
+            setMore={setMore}
+          />
+          <ThemeSelector
+            currentTheme={currentTheme}
+            setCurrentTheme={setCurrentTheme}
+          />
+        </>
+      ),
+    },
+    {
+      path: "/search",
+      element: (
+        <>
+          <NavPanel
+            boards={boards}
+            setBoards={setBoards}
+            currentBoard={currentBoard}
+            setCurrentBoard={setCurrentBoard}
+            addBoard={addBoard}
+            more={more}
+            setMore={setMore}
+          />
+          <Search boards={boards} />
+        </>
+      ),
+    },
+  ]);
   return (
-    <div>
+    <main>
       <div className="absolute inset-0 z-0 pointer-events-auto">
-        {/* choose background */}
         {currentTheme === "Squares" && (
           <Squares
             speed={0.5}
             squareSize={40}
-            direction="diagonal" // up, down, left, right, diagonal
+            direction="diagonal"
             borderColor="#fff"
             hoverFillColor="#222"
           />
@@ -78,16 +179,8 @@ export default function App() {
         )}
       </div>
       <div className="relative z-10">
-        <BoardType
-          currentTheme={currentTheme}
-          setCurrentTheme={setCurrentTheme}
-        />
+        <RouterProvider router={router} />
       </div>
-    </div>
+    </main>
   );
 }
-// add more themes
-//add history of deleted todos
-//made an archive
-//maybe add an importance level
-// and maybe add a deadline ( no bruh )
