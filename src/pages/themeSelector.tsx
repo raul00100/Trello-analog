@@ -33,7 +33,7 @@ export default function ThemeSelector({
   setCurrentTheme,
 }: ThemeSelectorProps) {
   return (
-    <div className="flex flex-row pt-10 gap-10 ml-10 w-screen">
+    <div className="flex flex-row pt-10 gap-10 ml-10">
       <div
         className={getSecondMainDivClass(currentTheme, "Squares")}
         onClick={() => setCurrentTheme("Squares")}

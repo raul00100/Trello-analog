@@ -17,7 +17,7 @@ export default function Card({ addBoard }: CardProp) {
         Are you here for the<span className="font-bold"> first time </span> ?
       </h1>
       <div className="flex flex-col items-center gap-1.5 text-white">
-        <p className="mt-9 font-semibold">Add your first board!</p>
+        <p className="mt-9 font-medium">Add your first board !</p>
         <ArrowDownwardIcon className="animate-bounce" />
 
         <button onClick={addBoard} className="cursor-pointer">

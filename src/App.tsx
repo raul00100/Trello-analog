@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import BoardType from "./pages/boardType";
-import NavPanel from "./components/navPanel";
+// import NavPanel from "./components/navPanel";
 import Card from "./components/card";
 import Search from "./pages/search";
 import ThemeSelector from "./pages/themeSelector";
@@ -11,6 +11,7 @@ import LiquidEther from "./background/LiquidEther";
 import Aurora from "./background/Aurora";
 import Squares from "./background/Squares";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Layout from "./layout/Layout";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
@@ -32,7 +33,10 @@ export default function App() {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme ? savedTheme : "Aurora";
   });
-  const [more, setMore] = useState(false);
+  const [more, setMore] = useState(() => {
+    const savedMore = localStorage.getItem("more");
+    return savedMore ? JSON.parse(savedMore) : false;
+  });
 
   const addBoard = () => {
     if (boards.length === 0) {
@@ -52,76 +56,86 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("theme", currentTheme);
   }, [currentTheme]);
+  useEffect(() => {
+    localStorage.setItem("more", JSON.stringify(more));
+  }, [more]);
 
-  if (boards.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen text-white bg-white/40 backdrop-blur-md">
-        <Card addBoard={addBoard} />
-      </div>
-    );
-  }
   const router = createBrowserRouter([
     {
       path: "/",
       element: (
-        <>
-          <NavPanel
-            boards={boards}
-            setBoards={setBoards}
-            currentBoard={currentBoard}
-            setCurrentBoard={setCurrentBoard}
-            addBoard={addBoard}
-            more={more}
-            setMore={setMore}
-          />
-          <BoardType
-            boards={boards}
-            setBoards={setBoards}
-            currentBoard={currentBoard}
-          />
-        </>
+        <Layout
+          boards={boards}
+          setBoards={setBoards}
+          currentBoard={currentBoard}
+          setCurrentBoard={setCurrentBoard}
+          addBoard={addBoard}
+          more={more}
+          setMore={setMore}
+        />
       ),
-    },
-    {
-      path: "/theme",
-      element: (
-        <>
-          <NavPanel
-            boards={boards}
-            setBoards={setBoards}
-            currentBoard={currentBoard}
-            setCurrentBoard={setCurrentBoard}
-            addBoard={addBoard}
-            more={more}
-            setMore={setMore}
-          />
-          <ThemeSelector
-            currentTheme={currentTheme}
-            setCurrentTheme={setCurrentTheme}
-          />
-        </>
-      ),
-    },
-    {
-      path: "/search",
-      element: (
-        <>
-          <NavPanel
-            boards={boards}
-            setBoards={setBoards}
-            currentBoard={currentBoard}
-            setCurrentBoard={setCurrentBoard}
-            addBoard={addBoard}
-            more={more}
-            setMore={setMore}
-          />
-          <Search boards={boards} />
-        </>
-      ),
+      children: [
+        {
+          index: true,
+          element: (
+            <div onClick={() => setMore(false)}>
+              <BoardType
+                boards={boards}
+                setBoards={setBoards}
+                currentBoard={currentBoard}
+              />
+            </div>
+          ),
+        },
+        {
+          path: "theme",
+          element: (
+            <div
+              className="overflow-x-auto h-screen w-screen"
+              onClick={() => setMore(false)}
+            >
+              <ThemeSelector
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+              />
+            </div>
+          ),
+        },
+        {
+          path: "search",
+          element: (
+            <div
+              className="h-screen w-screen overflow-hidden"
+              onClick={() => setMore(false)}
+            >
+              <Search boards={boards} />
+            </div>
+          ),
+        },
+      ],
     },
   ]);
+
+  if (boards.length === 0) {
+    return (
+      <div>
+        <div className="absolute inset-0 z-0">
+          <Aurora
+            colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
+            blend={0.5}
+            amplitude={1.0}
+            speed={0.5}
+          />
+        </div>
+        <div className="flex items-center justify-center h-screen relative z-10">
+          <Card addBoard={addBoard} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main>
+    <div>
       <div className="absolute inset-0 z-0 pointer-events-auto">
         {currentTheme === "Squares" && (
           <Squares
@@ -181,6 +195,12 @@ export default function App() {
       <div className="relative z-10">
         <RouterProvider router={router} />
       </div>
-    </main>
+    </div>
   );
 }
+
+//сократить код ✅
+//добавить анимацию ✅
+//сделать роутер для поиска
+//в конце анализ кода (если не заебусь)
+//добавить usememo

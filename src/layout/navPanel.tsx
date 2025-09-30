@@ -17,12 +17,15 @@ const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
 const divHeader =
   "w-screen relative text-white flex flex-row justify-between items-start pt-5";
-const expandIcon = "scale-140 ml-2";
+const expandIcon = "scale-140 mr-2";
 const boardNameDiv = "flex flex-row items-center justify-between w-full";
 const icons = "mr-2 scale-105";
 const settingStyle =
   "text-lg flex items-center transition-all hover:underline hover:scale-110 text-zinc-300 hover:text-white hover:underline-offset-3";
 const buttonStyle = "cursor-pointer";
+const headerStyle =
+  " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 ml-30";
+const buttonHeader = "flex items-center cursor-pointer ";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
@@ -30,7 +33,8 @@ type BoardTypeProps = {
   name: string;
   lists: ColumnCard[];
 };
-type GeneralProp = {
+
+export type GeneralProp = {
   boards: BoardTypeProps[];
   setBoards: React.Dispatch<React.SetStateAction<BoardTypeProps[]>>;
   currentBoard: number;
@@ -91,7 +95,7 @@ export default function NavPanel({
   });
   useEffect(() => {
     localStorage.setItem("setting", JSON.stringify(setting));
-  });
+  }, [setting]);
 
   const handleAddBoard = () => {
     addBoard();
@@ -118,31 +122,30 @@ export default function NavPanel({
         className="w-full bg-white/20 backdrop-blur-md border-b border-white h-65"
       >
         {/* undisclosed panel  */}
-        <div className={`${divHeader}`}>
+        <div className={divHeader}>
           {setting === "Home" ? (
-            <h2
-              className={`text-white font-medium font-stretch-expanded flex items-center text-xl transition-all ml-30 flex-row hover:text-gray-300`}
-            >
+            <h2 className={`${headerStyle}`}>
               <button
                 onClick={() => setMore((prev) => !prev)}
-                className="cursor-pointer"
+                className={buttonHeader}
               >
-                {boards[currentBoard].name}
                 {more ? (
                   <ExpandLessIcon className={expandIcon} />
                 ) : (
                   <ExpandMoreIcon className={expandIcon} />
                 )}
+                <span className="inline-block truncate max-w-60">
+                  {" "}
+                  {boards[currentBoard].name}{" "}
+                </span>
               </button>
             </h2>
           ) : (
-            <h2
-              className={`text-white font-medium font-stretch-expanded text-xl transition-all ml-30 flex-row hover:text-gray-300`}
-            >
+            <h2 className={`${headerStyle}`}>
               <Link to="/">
                 <button
                   onClick={() => setSetting("Home")}
-                  className="cursor-pointer flex items-center"
+                  className={buttonHeader}
                 >
                   <ArrowBackIosIcon />
                   Go Home
@@ -150,10 +153,10 @@ export default function NavPanel({
               </Link>
             </h2>
           )}
-          <h1 className="text-2xl font-medium font-stretch-expanded text-white">
+          <h1 className="text-2xl font-medium font-stretch-expanded text-white absolute left-1/2 -translate-x-1/8">
             My trello board
           </h1>
-          <button onClick={() => setMore((prev) => !prev)} className={`mr-30`}>
+          <button onClick={() => setMore((prev) => !prev)} className="mr-30">
             <SettingsIcon
               className={`text-white scale-130 cursor-pointer ${
                 more ? "animate-spin" : ""
@@ -171,7 +174,7 @@ export default function NavPanel({
         >
           {/* board switcher */}
           {setting === "Home" ? (
-            <nav className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55">
+            <nav className="flex flex-col items-center ml-25 overflow-y-auto max-h-50 w-55">
               {boards.map((board, index) => (
                 <div
                   key={index}
@@ -191,7 +194,7 @@ export default function NavPanel({
                     onClick={() => setCurrentBoard(index)}
                     onMouseEnter={() => setHovered(index)}
                     onMouseLeave={() => setHovered(null)}
-                    className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded ${
+                    className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded cursor-pointer ${
                       index === currentBoard
                         ? "bg-zinc-100 text-black border-none rounded"
                         : "hover:border-2 border-b-2 border-white"
@@ -281,7 +284,7 @@ export default function NavPanel({
           )}
 
           {/* description */}
-          <div className="flex flex-col text-center">
+          <div className="flex flex-col text-center absolute left-1/2 -translate-x-1/3 mt-2">
             <p className={`${textDec} w-100 font-mono font-medium text-lg`}>
               Trello is a web-based project management application that helps
               you organize work
@@ -290,7 +293,7 @@ export default function NavPanel({
 
           {/* settings list - coming soon... */}
           <nav className="flex flex-col mr-20">
-            <ul className="flex items-start flex-col text-lg font-bold gap-4.5">
+            <ul className="flex items-start flex-col text-lg font-bold gap-4.5 mt-2">
               <li className={`${textDec} ${settingStyle}`}>
                 <Link to="/">
                   <button
