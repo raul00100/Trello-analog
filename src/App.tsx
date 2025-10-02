@@ -10,8 +10,13 @@ import Dither from "./background/Dither";
 import LiquidEther from "./background/LiquidEther";
 import Aurora from "./background/Aurora";
 import Squares from "./background/Squares";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import Layout from "./layout/Layout";
+import Error from "./components/error404";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
@@ -38,13 +43,16 @@ export default function App() {
     return savedMore ? JSON.parse(savedMore) : false;
   });
 
-  const addBoard = () => {
+  const addBoard = (navigateFn?: (path: string) => void) => {
+    let newIndex = 0;
     if (boards.length === 0) {
       setBoards([{ name: "Board 1", lists: [] }]);
     } else {
+      newIndex = boards.length;
       setBoards([...boards, { name: "", lists: [] }]);
-      setCurrentBoard(boards.length);
     }
+    setCurrentBoard(newIndex);
+    if (navigateFn) navigateFn(`/board/${newIndex}`);
   };
 
   useEffect(() => {
@@ -77,15 +85,11 @@ export default function App() {
       children: [
         {
           index: true,
-          element: (
-            <div onClick={() => setMore(false)}>
-              <BoardType
-                boards={boards}
-                setBoards={setBoards}
-                currentBoard={currentBoard}
-              />
-            </div>
-          ),
+          element: <Navigate to="/board/:id" replace />,
+        },
+        {
+          path: "board/:id",
+          element: <BoardType boards={boards} setBoards={setBoards} />,
         },
         {
           path: "theme",
@@ -114,6 +118,7 @@ export default function App() {
         },
       ],
     },
+    { path: "*", element: <Error /> },
   ]);
 
   if (boards.length === 0) {
@@ -198,9 +203,3 @@ export default function App() {
     </div>
   );
 }
-
-//сократить код ✅
-//добавить анимацию ✅
-//сделать роутер для поиска
-//в конце анализ кода (если не заебусь)
-//добавить usememo

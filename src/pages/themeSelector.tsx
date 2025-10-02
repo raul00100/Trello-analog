@@ -3,6 +3,8 @@ import Dither from "../background/Dither";
 import LiquidEther from "../background/LiquidEther";
 import Aurora from "../background/Aurora";
 import Squares from "../background/Squares";
+import { AnimatePresence, motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 type ThemeSelectorProps = {
   currentTheme: string;
@@ -32,94 +34,107 @@ export default function ThemeSelector({
   currentTheme,
   setCurrentTheme,
 }: ThemeSelectorProps) {
+  const location = useLocation();
   return (
-    <div className="flex flex-row pt-10 gap-10 ml-10">
-      <div
-        className={getSecondMainDivClass(currentTheme, "Squares")}
-        onClick={() => setCurrentTheme("Squares")}
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -10, opacity: 0 }}
+        transition={{ duration: 0.2 }}
       >
-        <h3 className={headerStyle(currentTheme, "Squares")}>Squares</h3>
-        <div className={divStyle(currentTheme, "Squares")}>
-          <Squares
-            speed={0.5}
-            squareSize={40}
-            direction="diagonal"
-            borderColor="#fff"
-            hoverFillColor="#222"
-          />
-        </div>
-      </div>
+        <div className="flex flex-row pt-10 gap-10 ml-10">
+          <div
+            className={getSecondMainDivClass(currentTheme, "Squares")}
+            onClick={() => setCurrentTheme("Squares")}
+          >
+            <h3 className={headerStyle(currentTheme, "Squares")}>Squares</h3>
+            <div className={divStyle(currentTheme, "Squares")}>
+              <Squares
+                speed={0.5}
+                squareSize={40}
+                direction="diagonal"
+                borderColor="#fff"
+                hoverFillColor="#222"
+              />
+            </div>
+          </div>
 
-      <div
-        className={getSecondMainDivClass(currentTheme, "Aurora")}
-        onClick={() => setCurrentTheme("Aurora")}
-      >
-        <h3 className={headerStyle(currentTheme, "Aurora")}>Aurora</h3>
-        <div className={divStyle(currentTheme, "Aurora")}>
-          <Aurora
-            colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
-            blend={0.5}
-            amplitude={1.0}
-            speed={0.5}
-          />
-        </div>
-      </div>
+          <div
+            className={getSecondMainDivClass(currentTheme, "Aurora")}
+            onClick={() => setCurrentTheme("Aurora")}
+          >
+            <h3 className={headerStyle(currentTheme, "Aurora")}>Aurora</h3>
+            <div className={divStyle(currentTheme, "Aurora")}>
+              <Aurora
+                colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
+                blend={0.5}
+                amplitude={1.0}
+                speed={0.5}
+              />
+            </div>
+          </div>
 
-      <div
-        className={getSecondMainDivClass(currentTheme, "Dither")}
-        onClick={() => setCurrentTheme("Dither")}
-      >
-        <h3 className={headerStyle(currentTheme, "Dither")}>Dither</h3>
-        <div className={divStyle(currentTheme, "Dither")}>
-          <Dither
-            waveColor={[0.5, 0.5, 0.5]}
-            disableAnimation={false}
-            enableMouseInteraction={true}
-            mouseRadius={0.3}
-            colorNum={4}
-            waveAmplitude={0.3}
-            waveFrequency={3}
-            waveSpeed={0.05}
-          />
-        </div>
-      </div>
+          <div
+            className={getSecondMainDivClass(currentTheme, "Dither")}
+            onClick={() => setCurrentTheme("Dither")}
+          >
+            <h3 className={headerStyle(currentTheme, "Dither")}>Dither</h3>
+            <div className={divStyle(currentTheme, "Dither")}>
+              <Dither
+                waveColor={[0.5, 0.5, 0.5]}
+                disableAnimation={false}
+                enableMouseInteraction={true}
+                mouseRadius={0.3}
+                colorNum={4}
+                waveAmplitude={0.3}
+                waveFrequency={3}
+                waveSpeed={0.05}
+              />
+            </div>
+          </div>
 
-      <div
-        className={getSecondMainDivClass(currentTheme, "LiquidEther")}
-        onClick={() => setCurrentTheme("LiquidEther")}
-      >
-        <h3 className={headerStyle(currentTheme, "LiquidEther")}>
-          LiquidEther
-        </h3>
-        <div className={divStyle(currentTheme, "LiquidEther")}>
-          <LiquidEther
-            colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
-            mouseForce={20}
-            cursorSize={100}
-            isViscous={false}
-            viscous={30}
-            iterationsViscous={32}
-            iterationsPoisson={32}
-            resolution={0.5}
-            isBounce={false}
-            autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={2.2}
-            takeoverDuration={0.25}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
-          />
-        </div>
-      </div>
+          <div
+            className={getSecondMainDivClass(currentTheme, "LiquidEther")}
+            onClick={() => setCurrentTheme("LiquidEther")}
+          >
+            <h3 className={headerStyle(currentTheme, "LiquidEther")}>
+              LiquidEther
+            </h3>
+            <div className={divStyle(currentTheme, "LiquidEther")}>
+              <LiquidEther
+                colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
+                mouseForce={20}
+                cursorSize={100}
+                isViscous={false}
+                viscous={30}
+                iterationsViscous={32}
+                iterationsPoisson={32}
+                resolution={0.5}
+                isBounce={false}
+                autoDemo={true}
+                autoSpeed={0.5}
+                autoIntensity={2.2}
+                takeoverDuration={0.25}
+                autoResumeDelay={3000}
+                autoRampDuration={0.6}
+              />
+            </div>
+          </div>
 
-      <div
-        className={getSecondMainDivClass(currentTheme, "Black")}
-        onClick={() => setCurrentTheme("Black")}
-      >
-        <h3 className={headerStyle(currentTheme, "Black")}>Default Black</h3>
-        <div className={`${divStyle(currentTheme, "Black")} bg-black`} />
-      </div>
-      <div className="pr-1" />
-    </div>
+          <div
+            className={getSecondMainDivClass(currentTheme, "Black")}
+            onClick={() => setCurrentTheme("Black")}
+          >
+            <h3 className={headerStyle(currentTheme, "Black")}>
+              Default Black
+            </h3>
+            <div className={`${divStyle(currentTheme, "Black")} bg-black`} />
+          </div>
+          <div className="pr-1" />
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

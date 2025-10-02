@@ -11,7 +11,8 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import SharedInput from "../shared/sharedInput";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import SearchIcon from "@mui/icons-material/Search";
-import { Link } from "react-router-dom";
+import { useLocation, useMatch, Link, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
@@ -20,9 +21,6 @@ const divHeader =
 const expandIcon = "scale-140 mr-2";
 const boardNameDiv = "flex flex-row items-center justify-between w-full";
 const icons = "mr-2 scale-105";
-const settingStyle =
-  "text-lg flex items-center transition-all hover:underline hover:scale-110 text-zinc-300 hover:text-white hover:underline-offset-3";
-const buttonStyle = "cursor-pointer";
 const headerStyle =
   " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 ml-30";
 const buttonHeader = "flex items-center cursor-pointer ";
@@ -56,10 +54,29 @@ export default function NavPanel({
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
-  const [setting, setSetting] = useState<string | null>(() => {
-    const savedSetting = localStorage.getItem("setting");
-    return savedSetting ? JSON.parse(savedSetting) : "Home";
-  });
+  const settingOptions = [
+    { label: "Home", icon: <HomeIcon className={icons} />, path: "/" },
+    {
+      label: "Theme",
+      icon: <FormatPaintIcon className={icons} />,
+      path: "/theme",
+    },
+    {
+      label: "Search",
+      icon: <SearchIcon className={icons} />,
+      path: "/search",
+    },
+  ];
+  const location = useLocation();
+  const isBoard = !!useMatch("/board/:id");
+  const params = useParams();
+  const boardId =
+    params.id && !isNaN(Number(params.id))
+      ? Number(params.id)
+      : currentBoard !== undefined
+      ? currentBoard
+      : 0;
+  const navigate = useNavigate();
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Tween | null>(null);
@@ -93,9 +110,6 @@ export default function NavPanel({
   useEffect(() => {
     localStorage.setItem("current", JSON.stringify(currentBoard));
   });
-  useEffect(() => {
-    localStorage.setItem("setting", JSON.stringify(setting));
-  }, [setting]);
 
   const handleAddBoard = () => {
     addBoard();
@@ -123,7 +137,7 @@ export default function NavPanel({
       >
         {/* undisclosed panel  */}
         <div className={divHeader}>
-          {setting === "Home" ? (
+          {location.pathname === "/" || isBoard ? (
             <h2 className={`${headerStyle}`}>
               <button
                 onClick={() => setMore((prev) => !prev)}
@@ -136,17 +150,14 @@ export default function NavPanel({
                 )}
                 <span className="inline-block truncate max-w-60">
                   {" "}
-                  {boards[currentBoard].name}{" "}
+                  {boards[boardId].name}{" "}
                 </span>
               </button>
             </h2>
           ) : (
             <h2 className={`${headerStyle}`}>
               <Link to="/">
-                <button
-                  onClick={() => setSetting("Home")}
-                  className={buttonHeader}
-                >
+                <button className={buttonHeader}>
                   <ArrowBackIosIcon />
                   Go Home
                 </button>
@@ -173,7 +184,7 @@ export default function NavPanel({
           }`}
         >
           {/* board switcher */}
-          {setting === "Home" ? (
+          {location.pathname === "/" || isBoard ? (
             <nav className="flex flex-col items-center ml-25 overflow-y-auto max-h-50 w-55">
               {boards.map((board, index) => (
                 <div
@@ -191,11 +202,14 @@ export default function NavPanel({
                   </div>
                   {/* list of board name */}
                   <button
-                    onClick={() => setCurrentBoard(index)}
+                    onClick={() => {
+                      setCurrentBoard(index);
+                      navigate(`/board/${index}`);
+                    }}
                     onMouseEnter={() => setHovered(index)}
                     onMouseLeave={() => setHovered(null)}
                     className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded cursor-pointer ${
-                      index === currentBoard
+                      index === boardId
                         ? "bg-zinc-100 text-black border-none rounded"
                         : "hover:border-2 border-b-2 border-white"
                     }`}
@@ -207,9 +221,7 @@ export default function NavPanel({
                             value={editingNaming}
                             onChange={setEditingNaming}
                             className={`text-base font-medium w-full font-sans focus:outline-none px-2${
-                              index === currentBoard
-                                ? "text-black"
-                                : "text-white"
+                              index === boardId ? "text-black" : "text-white"
                             }`}
                             onSubmit={(newValue) => {
                               const updatedBoards = [...boards];
@@ -294,37 +306,27 @@ export default function NavPanel({
           {/* settings list - coming soon... */}
           <nav className="flex flex-col mr-20">
             <ul className="flex items-start flex-col text-lg font-bold gap-4.5 mt-2">
-              <li className={`${textDec} ${settingStyle}`}>
-                <Link to="/">
-                  <button
-                    onClick={() => setSetting("Home")}
-                    className={buttonStyle}
+              {settingOptions.map((option, idx) => {
+                return (
+                  <li
+                    key={idx}
+                    className={`font-sans font-stretch-semi-expanded antialiased text-lg transition-all cursor-pointer 
+                      ${
+                        location.pathname === option.path
+                          ? " underline scale-105 text-white underline-offset-3 hover:animate-pulse"
+                          : " hover:underline hover:scale-105 text-zinc-300 hover:text-white hover:underline-offset-3"
+                      }
+                        `}
                   >
-                    <HomeIcon className={icons} />
-                    Home
-                  </button>
-                </Link>
-              </li>
-              <li className={`${textDec} ${settingStyle}`}>
-                <Link to="/theme">
-                  <button
-                    onClick={() => setSetting("Theme")}
-                    className={buttonStyle}
-                  >
-                    <FormatPaintIcon className={icons} /> Theme
-                  </button>
-                </Link>
-              </li>
-              <li className={`${textDec} ${settingStyle}`}>
-                <Link to="/search">
-                  <button
-                    onClick={() => setSetting("Search")}
-                    className={buttonStyle}
-                  >
-                    <SearchIcon className={icons} /> Search
-                  </button>
-                </Link>
-              </li>
+                    <Link to={option.path}>
+                      <span className="flex items-center ">
+                        {option.icon}
+                        {option.label}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>
