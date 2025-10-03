@@ -26,7 +26,7 @@ const column =
   "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-lg ml-10 flex";
 const grab = "flex justify-center rotate-90";
 
-export default function ColumnList({ columns, setColumns }: ColumnListProps) {
+const ColumnList = React.memo(function ColumnList({ columns, setColumns }: ColumnListProps) {
   const cards = columns;
   const setCards = setColumns;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -215,11 +215,10 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
                                 card={card.todos}
                                 setCard={(newTodos) => {
                                   const updatedCards = [...cards];
-                                  const resolvedTodos =
+                                  updatedCards[index].todos =
                                     typeof newTodos === "function"
                                       ? newTodos(updatedCards[index].todos)
                                       : newTodos;
-                                  updatedCards[index].todos = resolvedTodos;
                                   setCards(updatedCards);
                                 }}
                               />
@@ -254,4 +253,6 @@ export default function ColumnList({ columns, setColumns }: ColumnListProps) {
       </DragDropContext>
     </div>
   );
-}
+})
+export default ColumnList;
+

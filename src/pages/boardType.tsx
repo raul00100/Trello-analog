@@ -1,7 +1,7 @@
-import React from "react";
+import React, {useCallback, useEffect} from "react";
 import ColumnList from "../components/columnList";
 import { AnimatePresence, motion } from "framer-motion";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
@@ -20,12 +20,44 @@ function getBoardId(id: string | undefined) {
 export default function BoardType({ boards, setBoards }: BoardTypeProps) {
   const { id } = useParams<{ id: string }>();
   const boardId = getBoardId(id);
+  const navigate = useNavigate();
+
+
+    useEffect(() => {
+        if (!boards[boardId]) {
+            if (boards.length > 0 ) {
+                navigate(`/board/${boardId -1}`)
+            } else {
+                navigate("/")
+            }
+        }
+    }, [boards, boardId, navigate]);
+
+    const handleColumns = useCallback((newColumns: ColumnCard[] | ((prev: ColumnCard[]) => ColumnCard[]) ) => {
+      setBoards((boards) =>
+          boards.map((b, index) =>
+              index === boardId
+                  ? {
+                      ...b,
+                      lists:
+                          typeof newColumns === "function"
+                              ? newColumns(b.lists)
+                              : newColumns,
+                  }
+                  : b
+          )
+      );
+  }, [setBoards, boardId]);
+
+    if (!boards[boardId]) {
+        return null;
+    }
 
   return (
     <div className="overflow-x-auto h-screen ">
       <AnimatePresence mode="wait">
         <motion.div
-          key={boards[boardId].name}
+          key={boardId}
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
@@ -33,21 +65,7 @@ export default function BoardType({ boards, setBoards }: BoardTypeProps) {
         >
           <ColumnList
             columns={boards[boardId].lists}
-            setColumns={(newColumns) => {
-              setBoards((boards) =>
-                boards.map((b, index) =>
-                  index === boardId
-                    ? {
-                        ...b,
-                        lists:
-                          typeof newColumns === "function"
-                            ? newColumns(b.lists)
-                            : newColumns,
-                      }
-                    : b
-                )
-              );
-            }}
+            setColumns={handleColumns}
           />
         </motion.div>
       </AnimatePresence>

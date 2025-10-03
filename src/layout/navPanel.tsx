@@ -282,12 +282,14 @@ export default function NavPanel({
                 </div>
               ))}
               {/* add another board */}
+              <Link to={`/board/${boards.length}`}>
               <button
                 onClick={handleAddBoard}
                 className="flex items-center py-1 mb-5 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-41.5 justify-center scale-110 cursor-pointer"
               >
                 <QueueIcon />
               </button>
+            </Link>
             </nav>
           ) : (
             <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55" />
