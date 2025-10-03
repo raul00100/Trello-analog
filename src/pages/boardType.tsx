@@ -3,42 +3,26 @@ import ColumnList from "../components/columnList";
 import { AnimatePresence, motion } from "framer-motion";
 import { useParams } from "react-router-dom";
 
-// Типы
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
 type Board = { name: string; lists: ColumnCard[] };
 
 type BoardTypeProps = {
-  boards?: Board[];
-  setBoards?: React.Dispatch<React.SetStateAction<Board[]>>;
-  currentBoard?: number;
+  boards: Board[];
+  setBoards: React.Dispatch<React.SetStateAction<Board[]>>;
 };
 
-function getBoardId(id: string | undefined, currentBoard?: number) {
+function getBoardId(id: string | undefined) {
   if (id && !isNaN(Number(id))) return Number(id);
-  if (currentBoard !== undefined) return currentBoard;
   return 0;
 }
 
-export default function BoardType({
-  boards,
-  setBoards,
-  currentBoard,
-}: BoardTypeProps) {
+export default function BoardType({ boards, setBoards }: BoardTypeProps) {
   const { id } = useParams<{ id: string }>();
-  const boardId = getBoardId(id, currentBoard);
-
-  if (
-    !boards ||
-    boards.length === 0 ||
-    boardId < 0 ||
-    boardId >= boards.length
-  ) {
-    return <div className="overflow-hidden h-screen" />;
-  }
+  const boardId = getBoardId(id);
 
   return (
-    <div className="overflow-x-auto h-screen">
+    <div className="overflow-x-auto h-screen ">
       <AnimatePresence mode="wait">
         <motion.div
           key={boards[boardId].name}
@@ -50,7 +34,6 @@ export default function BoardType({
           <ColumnList
             columns={boards[boardId].lists}
             setColumns={(newColumns) => {
-              if (!setBoards) return;
               setBoards((boards) =>
                 boards.map((b, index) =>
                   index === boardId

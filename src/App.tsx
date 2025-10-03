@@ -30,10 +30,6 @@ export default function App() {
     const savedBoard = localStorage.getItem("board");
     return savedBoard ? JSON.parse(savedBoard) : [];
   });
-  const [currentBoard, setCurrentBoard] = useState(() => {
-    const savedCurrentBoard = localStorage.getItem("current");
-    return savedCurrentBoard ? JSON.parse(savedCurrentBoard) : 0;
-  });
   const [currentTheme, setCurrentTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme ? savedTheme : "Aurora";
@@ -42,25 +38,22 @@ export default function App() {
     const savedMore = localStorage.getItem("more");
     return savedMore ? JSON.parse(savedMore) : false;
   });
+  const savedBoardId = localStorage.getItem("boardId");
+  const homeBoardId = Number(savedBoardId);
 
-  const addBoard = (navigateFn?: (path: string) => void) => {
-    let newIndex = 0;
+  const addBoard = (navigate?: (path: string) => void) => {
+    // let newIndex = 0;
     if (boards.length === 0) {
       setBoards([{ name: "Board 1", lists: [] }]);
     } else {
-      newIndex = boards.length;
       setBoards([...boards, { name: "", lists: [] }]);
     }
-    setCurrentBoard(newIndex);
-    if (navigateFn) navigateFn(`/board/${newIndex}`);
+    if (navigate) navigate(`/board/${boards.length}`);
   };
 
   useEffect(() => {
     localStorage.setItem("board", JSON.stringify(boards));
   }, [boards]);
-  useEffect(() => {
-    localStorage.setItem("current", JSON.stringify(currentBoard));
-  }, [currentBoard]);
   useEffect(() => {
     localStorage.setItem("theme", currentTheme);
   }, [currentTheme]);
@@ -75,8 +68,6 @@ export default function App() {
         <Layout
           boards={boards}
           setBoards={setBoards}
-          currentBoard={currentBoard}
-          setCurrentBoard={setCurrentBoard}
           addBoard={addBoard}
           more={more}
           setMore={setMore}
@@ -85,11 +76,18 @@ export default function App() {
       children: [
         {
           index: true,
-          element: <Navigate to="/board/:id" replace />,
+          element: <Navigate to={`/board/${homeBoardId}`} replace />,
         },
         {
           path: "board/:id",
-          element: <BoardType boards={boards} setBoards={setBoards} />,
+          element: (
+            <div
+              className="overflow-x-auto h-screen w-screen"
+              onClick={() => setMore(false)}
+            >
+              <BoardType boards={boards} setBoards={setBoards} />
+            </div>
+          ),
         },
         {
           path: "theme",
@@ -197,9 +195,17 @@ export default function App() {
           <div className="bg-black w-screen h-screen" />
         )}
       </div>
-      <div className="relative z-10">
+      <div className="relative z-10 overflow-y-hidden h-screen ">
         <RouterProvider router={router} />
       </div>
     </div>
   );
 }
+
+//сократить код ✅
+//добавить анимацию ✅
+//сделать роутер для поиска✅
+//проработать мемоизацию
+//оптимизировать под моб устройства
+//проработать дизайн настроек в нав панели - хом не работает ✅
+//избавиться от currentBoard и перейти на navlink ✅

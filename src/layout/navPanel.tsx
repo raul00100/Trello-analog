@@ -11,8 +11,13 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import SharedInput from "../shared/sharedInput";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import SearchIcon from "@mui/icons-material/Search";
-import { useLocation, useMatch, Link, useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  useMatch,
+  Link,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
@@ -35,8 +40,6 @@ type BoardTypeProps = {
 export type GeneralProp = {
   boards: BoardTypeProps[];
   setBoards: React.Dispatch<React.SetStateAction<BoardTypeProps[]>>;
-  currentBoard: number;
-  setCurrentBoard: React.Dispatch<React.SetStateAction<number>>;
   addBoard: () => void;
   more: boolean;
   setMore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -45,8 +48,6 @@ export type GeneralProp = {
 export default function NavPanel({
   boards,
   setBoards,
-  currentBoard,
-  setCurrentBoard,
   addBoard,
   more,
   setMore,
@@ -54,8 +55,22 @@ export default function NavPanel({
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
+  const location = useLocation();
+  const isBoard = !!useMatch("/board/:id");
+  const params = useParams();
+  const savedBoardId = localStorage.getItem("boardId");
+  const homeBoardId = Number(savedBoardId);
+  const boardId =
+    isBoard && params.id && !isNaN(Number(params.id))
+      ? Number(params.id)
+      : homeBoardId;
+  const navigate = useNavigate();
   const settingOptions = [
-    { label: "Home", icon: <HomeIcon className={icons} />, path: "/" },
+    {
+      label: "Home",
+      icon: <HomeIcon className={icons} />,
+      path: `/board/${homeBoardId}`,
+    },
     {
       label: "Theme",
       icon: <FormatPaintIcon className={icons} />,
@@ -67,21 +82,10 @@ export default function NavPanel({
       path: "/search",
     },
   ];
-  const location = useLocation();
-  const isBoard = !!useMatch("/board/:id");
-  const params = useParams();
-  const boardId =
-    params.id && !isNaN(Number(params.id))
-      ? Number(params.id)
-      : currentBoard !== undefined
-      ? currentBoard
-      : 0;
-  const navigate = useNavigate();
-
-  const panelRef = useRef<HTMLDivElement | null>(null);
-  const tlRef = useRef<gsap.core.Tween | null>(null);
 
   // animation for a folding and unfolding panel
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const tlRef = useRef<gsap.core.Tween | null>(null);
   useEffect(() => {
     if (!panelRef.current) return;
 
@@ -105,11 +109,10 @@ export default function NavPanel({
   }, [more]);
 
   useEffect(() => {
-    localStorage.setItem("board", JSON.stringify(boards));
-  }, [boards]);
-  useEffect(() => {
-    localStorage.setItem("current", JSON.stringify(currentBoard));
-  });
+    if (isBoard && params.id && !isNaN(Number(params.id))) {
+      localStorage.setItem("boardId", boardId.toString());
+    }
+  }, [isBoard, params.id, boardId]);
 
   const handleAddBoard = () => {
     addBoard();
@@ -123,9 +126,6 @@ export default function NavPanel({
   const deleteBoard = (index: number) => {
     const newBoards = boards.filter((_, i) => i !== index);
     setBoards(newBoards);
-    if (currentBoard >= newBoards.length) {
-      setCurrentBoard(Math.max(0, newBoards.length - 1));
-    }
   };
 
   return (
@@ -137,7 +137,7 @@ export default function NavPanel({
       >
         {/* undisclosed panel  */}
         <div className={divHeader}>
-          {location.pathname === "/" || isBoard ? (
+          {isBoard ? (
             <h2 className={`${headerStyle}`}>
               <button
                 onClick={() => setMore((prev) => !prev)}
@@ -149,14 +149,13 @@ export default function NavPanel({
                   <ExpandMoreIcon className={expandIcon} />
                 )}
                 <span className="inline-block truncate max-w-60">
-                  {" "}
-                  {boards[boardId].name}{" "}
+                  {boards[boardId] ? boards[boardId].name : "No board"}
                 </span>
               </button>
             </h2>
           ) : (
             <h2 className={`${headerStyle}`}>
-              <Link to="/">
+              <Link to={`/board/${homeBoardId}`}>
                 <button className={buttonHeader}>
                   <ArrowBackIosIcon />
                   Go Home
@@ -184,7 +183,7 @@ export default function NavPanel({
           }`}
         >
           {/* board switcher */}
-          {location.pathname === "/" || isBoard ? (
+          {isBoard ? (
             <nav className="flex flex-col items-center ml-25 overflow-y-auto max-h-50 w-55">
               {boards.map((board, index) => (
                 <div
@@ -203,7 +202,6 @@ export default function NavPanel({
                   {/* list of board name */}
                   <button
                     onClick={() => {
-                      setCurrentBoard(index);
                       navigate(`/board/${index}`);
                     }}
                     onMouseEnter={() => setHovered(index)}
