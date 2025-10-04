@@ -23,11 +23,11 @@ const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
 const divHeader =
   "w-screen relative text-white flex flex-row justify-between items-start pt-5";
-const expandIcon = "scale-140 mr-2";
-const boardNameDiv = "flex flex-row items-center justify-between w-full";
-const icons = "mr-2 scale-105";
+const expandIcon = "lg:scale-140 lg:mr-2 mr-0.5 scale-140";
+const boardNameDiv = "flex flex-row items-center justify-between w-full ";
+const icons = "mr-2 lg:scale-105 scale-95";
 const headerStyle =
-  " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 ml-30";
+  " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 lg:ml-30 ml-8";
 const buttonHeader = "flex items-center cursor-pointer ";
 
 type Todo = { text: string; done: boolean };
@@ -94,8 +94,9 @@ export default function NavPanel({
     if (tlRef.current) tlRef.current.kill();
 
     if (more) {
+      const height = window.innerWidth >= 1024 ? 270 : 210; // 1024px — breakpoint lg в Tailwind
       tlRef.current = gsap.to(panelRef.current, {
-        height: 270,
+        height,
         duration: 0.4,
         ease: "power3.out",
       });
@@ -148,7 +149,7 @@ export default function NavPanel({
                 ) : (
                   <ExpandMoreIcon className={expandIcon} />
                 )}
-                <span className="inline-block truncate max-w-60">
+                <span className="truncate max-w-60 hidden lg:inline-block">
                   {boards[boardId] ? boards[boardId].name : "No board"}
                 </span>
               </button>
@@ -158,17 +159,20 @@ export default function NavPanel({
               <Link to={`/board/${homeBoardId}`}>
                 <button className={buttonHeader}>
                   <ArrowBackIosIcon />
-                  Go Home
+                  <span className="hidden lg:block"> Go Home</span>
                 </button>
               </Link>
             </h2>
           )}
-          <h1 className="text-2xl font-medium font-stretch-expanded text-white absolute left-1/2 -translate-x-1/8">
+          <h1 className="text-lg lg:text-2xl font-medium font-stretch-expanded text-white lg:absolute lg:left-1/2 lg:-translate-x-1/8">
             My trello board
           </h1>
-          <button onClick={() => setMore((prev) => !prev)} className="mr-30">
+          <button
+            onClick={() => setMore((prev) => !prev)}
+            className="mr-8 lg:mr-30"
+          >
             <SettingsIcon
-              className={`text-white scale-130 cursor-pointer ${
+              className={`text-white lg:scale-130 cursor-pointer ${
                 more ? "animate-spin" : ""
               }`}
               style={{ animationDuration: "5s" }}
@@ -184,7 +188,7 @@ export default function NavPanel({
         >
           {/* board switcher */}
           {isBoard ? (
-            <nav className="flex flex-col items-center ml-25 overflow-y-auto max-h-50 w-55">
+            <nav className="flex flex-col items-center lg:ml-25 overflow-y-auto lg:max-h-50 max-h-37 lg:w-55 ml-3">
               {boards.map((board, index) => (
                 <div
                   key={index}
@@ -206,7 +210,7 @@ export default function NavPanel({
                     }}
                     onMouseEnter={() => setHovered(index)}
                     onMouseLeave={() => setHovered(null)}
-                    className={`w-45 h-8 mt-1 font-semibold text-base transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded cursor-pointer ${
+                    className={`lg:w-45 lg:h-8 w-35 h-6 mt-1.5 font-semibold lg:text-base text-xs transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded cursor-pointer ${
                       index === boardId
                         ? "bg-zinc-100 text-black border-none rounded"
                         : "hover:border-2 border-b-2 border-white"
@@ -248,12 +252,12 @@ export default function NavPanel({
                                   setEditingNaming(boards[index].name);
                                 }
                               }}
-                              className="inline-flex items-center scale-105 cursor-pointer ml-2 focus:outline-none"
+                              className="inline-flex items-center lg:scale-105 scale-90 cursor-pointer ml-2 focus:outline-none"
                             >
                               <EditIcon />
                             </span>
                           )}
-                          <span className="truncate flex-1 mx-3">
+                          <span className="truncate flex-1 mx-3 text-base">
                             {board.name}
                           </span>
                           {hovered === index && (
@@ -272,7 +276,7 @@ export default function NavPanel({
                                 }
                               }}
                             >
-                              <DeleteForeverIcon className="scale-105 mr-2" />
+                              <DeleteForeverIcon className="lg:scale-105 scale-90 mr-2" />
                             </span>
                           )}
                         </div>
@@ -283,20 +287,20 @@ export default function NavPanel({
               ))}
               {/* add another board */}
               <Link to={`/board/${boards.length}`}>
-              <button
-                onClick={handleAddBoard}
-                className="flex items-center py-1 mb-5 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-41.5 justify-center scale-110 cursor-pointer"
-              >
-                <QueueIcon />
-              </button>
-            </Link>
+                <button
+                  onClick={handleAddBoard}
+                  className="flex items-center py-1 mb-5 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-41.5 justify-center lg:scale-110 scale-95 cursor-pointer"
+                >
+                  <QueueIcon />
+                </button>
+              </Link>
             </nav>
           ) : (
             <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55" />
           )}
 
           {/* description */}
-          <div className="flex flex-col text-center absolute left-1/2 -translate-x-1/3 mt-2">
+          <div className="flex-col text-center absolute left-1/2 -translate-x-1/3 mt-2 hidden md:flex">
             <p className={`${textDec} w-100 font-mono font-medium text-lg`}>
               Trello is a web-based project management application that helps
               you organize work
@@ -304,13 +308,13 @@ export default function NavPanel({
           </div>
 
           {/* settings list - coming soon... */}
-          <nav className="flex flex-col mr-20">
+          <nav className="flex flex-col lg:mr-20 mr-5">
             <ul className="flex items-start flex-col text-lg font-bold gap-4.5 mt-2">
               {settingOptions.map((option, idx) => {
                 return (
                   <li
                     key={idx}
-                    className={`font-sans font-stretch-semi-expanded antialiased text-lg transition-all cursor-pointer 
+                    className={`font-sans font-stretch-semi-expanded antialiased lg:text-lg text-sm transition-all cursor-pointer 
                       ${
                         location.pathname === option.path
                           ? " underline scale-105 text-white underline-offset-3 hover:animate-pulse"

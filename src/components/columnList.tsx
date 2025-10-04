@@ -23,10 +23,13 @@ type ColumnListProps = {
 
 const buttonActions = "px-4 py-2 text-left hover:bg-zinc-400 transition-all";
 const column =
-  "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-lg ml-10 flex";
+  "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-lg lg:ml-10 ml-5 flex ";
 const grab = "flex justify-center rotate-90";
 
-const ColumnList = React.memo(function ColumnList({ columns, setColumns }: ColumnListProps) {
+const ColumnList = React.memo(function ColumnList({
+  columns,
+  setColumns,
+}: ColumnListProps) {
   const cards = columns;
   const setCards = setColumns;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -70,7 +73,7 @@ const ColumnList = React.memo(function ColumnList({ columns, setColumns }: Colum
   };
 
   return (
-    <div className="mt-10 flex flex-row">
+    <div className="lg:mt-10 mt-7 flex flex-row">
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="cards" direction="horizontal">
           {(provided) => (
@@ -128,7 +131,7 @@ const ColumnList = React.memo(function ColumnList({ columns, setColumns }: Colum
                           ) : (
                             // default mode - editing
                             <div
-                              className={` ${column} w-[272px] flex-col p-3`}
+                              className={` ${column} lg:w-[272px] w-[220px] flex-col p-3`}
                             >
                               {editingIndex === index ? (
                                 <SharedInput
@@ -152,14 +155,15 @@ const ColumnList = React.memo(function ColumnList({ columns, setColumns }: Colum
                                       setEditingNaming(cards[index].name);
                                     }}
                                   >
-                                    <h2 className="text-lg font-medium font-sans text-white cursor-pointer py-0.5 mb-2">
+                                    <h2 className="lg:text-lg text-base font-medium font-sans text-white cursor-pointer py-0.5 mb-2">
                                       {cards[index].name}
                                     </h2>
                                   </span>
                                   <button
                                     onClick={() => setShowSetting(card.id)}
+                                    className="mb-2"
                                   >
-                                    <MoreVertIcon className="cursor-pointer" />
+                                    <MoreVertIcon className="cursor-pointer lg:scale-100 scale-90" />
                                   </button>
                                   {/* actions with a column*/}
                                   {showSetting === card.id && (
@@ -242,10 +246,10 @@ const ColumnList = React.memo(function ColumnList({ columns, setColumns }: Colum
               {provided.placeholder}
               <button
                 onClick={addEmptyCard}
-                className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semibold bg-opa active:scale-90  w-40 h-11 rounded-md text-base flex items-center justify-center cursor-pointer transition-all ml-10 mr-10 flex-none"
+                className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semibold bg-opa active:scale-90 lg:w-40 lg:h-11 w-34 h-9 rounded-md lg:text-base text-sm flex items-center justify-center cursor-pointer transition-all lg:mx-10 mx-5 flex-none"
               >
                 <span className="mr-2"> Add a column </span>
-                <AssignmentAddIcon />
+                <AssignmentAddIcon className="scale-90 lg:scale-100" />
               </button>
             </section>
           )}
@@ -253,6 +257,5 @@ const ColumnList = React.memo(function ColumnList({ columns, setColumns }: Colum
       </DragDropContext>
     </div>
   );
-})
+});
 export default ColumnList;
-

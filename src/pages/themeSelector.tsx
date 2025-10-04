@@ -19,13 +19,13 @@ function getSecondMainDivClass(theme: string, target: string) {
 }
 function headerStyle(theme: string, target: string) {
   return [
-    "text-xl font-semibold text-white border-2 w-100 h-10 flex justify-between items-center px-5",
+    "lg:text-xl text-base font-semibold text-white border-2 lg:w-100 w-60 h-7 lg:h-10 flex justify-between items-center px-5",
     theme === target ? "border-blue-500" : "border-zinc-400",
   ].join(" ");
 }
 function divStyle(theme: string, target: string) {
   return [
-    "border-b-2 border-x-2 w-100 h-80 flex-none z-10 ",
+    "border-b-2 border-x-2 lg:w-100 w-60 lg:h-80 h-60 flex-none z-10 ",
     theme === target ? "border-blue-500" : "border-zinc-400",
   ].join(" ");
 }
@@ -44,7 +44,7 @@ export default function ThemeSelector({
         exit={{ y: -10, opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex flex-row pt-10 gap-10 ml-10">
+        <div className="flex lg:flex-row flex-col lg:pt-10 pt-5 lg:gap-10 gap-5 lg:ml-10 justify-center items-center lg:justify-between lg:items-start">
           <div
             className={getSecondMainDivClass(currentTheme, "Squares")}
             onClick={() => setCurrentTheme("Squares")}
@@ -132,7 +132,8 @@ export default function ThemeSelector({
             </h3>
             <div className={`${divStyle(currentTheme, "Black")} bg-black`} />
           </div>
-          <div className="pr-1" />
+
+          <div className="w-1 h-20 flex-none z-10 " />
         </div>
       </motion.div>
     </AnimatePresence>

@@ -25,6 +25,8 @@ type BoardTypeProps = {
   lists: ColumnCard[];
 };
 
+const divStyle = "w-screen h-screen overflow-auto";
+
 export default function App() {
   const [boards, setBoards] = useState<BoardTypeProps[]>(() => {
     const savedBoard = localStorage.getItem("board");
@@ -81,10 +83,7 @@ export default function App() {
         {
           path: "board/:id",
           element: (
-            <div
-              className="overflow-x-auto h-screen w-screen"
-              onClick={() => setMore(false)}
-            >
+            <div className={divStyle} onClick={() => setMore(false)}>
               <BoardType boards={boards} setBoards={setBoards} />
             </div>
           ),
@@ -92,10 +91,7 @@ export default function App() {
         {
           path: "theme",
           element: (
-            <div
-              className="overflow-x-auto h-screen w-screen"
-              onClick={() => setMore(false)}
-            >
+            <div className={divStyle} onClick={() => setMore(false)}>
               <ThemeSelector
                 currentTheme={currentTheme}
                 setCurrentTheme={setCurrentTheme}
@@ -106,10 +102,7 @@ export default function App() {
         {
           path: "search",
           element: (
-            <div
-              className="h-screen w-screen overflow-hidden"
-              onClick={() => setMore(false)}
-            >
+            <div className={divStyle} onClick={() => setMore(false)}>
               <Search boards={boards} />
             </div>
           ),
@@ -201,11 +194,3 @@ export default function App() {
     </div>
   );
 }
-
-//сократить код ✅
-//добавить анимацию ✅
-//сделать роутер для поиска✅
-//проработать мемоизацию ✅
-//оптимизировать под моб устройства
-//проработать дизайн настроек в нав панели - хом не работает ✅
-//избавиться от currentBoard и перейти на navlink ✅

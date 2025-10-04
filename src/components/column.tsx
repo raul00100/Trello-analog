@@ -47,7 +47,7 @@ export default function Column({ card, setCard }: CardType) {
       {card.map((item, index) => (
         <ul
           key={index}
-          className="bg-zinc-300 text-black pl-3 rounded-md text-sm mt-1.5 py-1 h-7.5 flex items-center"
+          className="bg-zinc-300 text-black pl-3 rounded-md mt-1.5 py-1 h-7.5 flex items-center"
           onMouseEnter={() => setHovered(index)}
           onMouseLeave={() => setHovered(null)}
           onClick={() => setAdd(false)}
@@ -79,7 +79,7 @@ export default function Column({ card, setCard }: CardType) {
             ) : (
               //  viewing the list
               //checkbox thing
-              <div className=" flex flex-row items-center justify-between">
+              <div className=" flex flex-row items-center justify-between lg:w-full w-[185px]">
                 <label className="inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -101,7 +101,7 @@ export default function Column({ card, setCard }: CardType) {
                 </label>
                 {/* todo text */}
                 <span
-                  className={`flex-1 cursor-pointer text-base truncate w-42 ${
+                  className={`flex-1 cursor-pointer lg:text-base text-sm truncate w-42 ${
                     item.done ? "line-through text-gray-400" : ""
                   }`}
                 >
@@ -113,7 +113,7 @@ export default function Column({ card, setCard }: CardType) {
                     hovered === index ? "opacity-100" : "opacity-0"
                   } transition-all duration-300`}
                 >
-                  <DeleteIcon />
+                  <DeleteIcon className="scale-90 lg:scale-100" />
                 </button>
               </div>
             )}

@@ -1,7 +1,7 @@
-import React, {useCallback, useEffect} from "react";
+import React, { useCallback, useEffect } from "react";
 import ColumnList from "../components/columnList";
 import { AnimatePresence, motion } from "framer-motion";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 type Todo = { text: string; done: boolean };
 type ColumnCard = { id: string; name: string; todos: Todo[] };
@@ -22,39 +22,41 @@ export default function BoardType({ boards, setBoards }: BoardTypeProps) {
   const boardId = getBoardId(id);
   const navigate = useNavigate();
 
-
-    useEffect(() => {
-        if (!boards[boardId]) {
-            if (boards.length > 0 ) {
-                navigate(`/board/${boardId -1}`)
-            } else {
-                navigate("/")
-            }
-        }
-    }, [boards, boardId, navigate]);
-
-    const handleColumns = useCallback((newColumns: ColumnCard[] | ((prev: ColumnCard[]) => ColumnCard[]) ) => {
-      setBoards((boards) =>
-          boards.map((b, index) =>
-              index === boardId
-                  ? {
-                      ...b,
-                      lists:
-                          typeof newColumns === "function"
-                              ? newColumns(b.lists)
-                              : newColumns,
-                  }
-                  : b
-          )
-      );
-  }, [setBoards, boardId]);
-
+  useEffect(() => {
     if (!boards[boardId]) {
-        return null;
+      if (boards.length > 0) {
+        navigate(`/board/${boardId - 1}`);
+      } else {
+        navigate("/");
+      }
     }
+  }, [boards, boardId, navigate]);
+
+  const handleColumns = useCallback(
+    (newColumns: ColumnCard[] | ((prev: ColumnCard[]) => ColumnCard[])) => {
+      setBoards((boards) =>
+        boards.map((b, index) =>
+          index === boardId
+            ? {
+                ...b,
+                lists:
+                  typeof newColumns === "function"
+                    ? newColumns(b.lists)
+                    : newColumns,
+              }
+            : b
+        )
+      );
+    },
+    [setBoards, boardId]
+  );
+
+  if (!boards[boardId]) {
+    return null;
+  }
 
   return (
-    <div className="overflow-x-auto h-screen ">
+    <div className="pb-30">
       <AnimatePresence mode="wait">
         <motion.div
           key={boardId}

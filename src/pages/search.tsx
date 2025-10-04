@@ -66,17 +66,17 @@ export default function Search({ boards }: SearchProp) {
         exit={{ y: -10, opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="ml-20">
+        <div className="lg:ml-20 ml-4 flex items-start flex-col pb-0">
           <SharedInput
             value={searchText}
             onChange={setSearchText}
-            className=" bg-white/20 backdrop-blur-md border-2 border-white text-white rounded h-12 mt-10 mb-3 w-60 text-lg"
+            className=" bg-white/20 backdrop-blur-md border-2 border-white text-white rounded lg:h-12 h-10 mt-10 mb-3 w-60 text-lg"
             placeholder="Search..."
           />
           {searchText.trim() !== "" && (
             <ul
               className={`text-black bg-white rounded p-3 ${
-                filtered.length > 0 ? "w-150" : "w-60"
+                filtered.length > 0 ? "lg:w-150 w-90" : "w-60"
               }`}
             >
               {filtered.length > 0 ? (
@@ -89,7 +89,7 @@ export default function Search({ boards }: SearchProp) {
                       <Link key={idx} to={`/board/${boardIdx}`}>
                         <li
                           key={idx}
-                          className="m-3 border-b-2 border-black pb-2 hover:scale-103 transition-all w-138 cursor-pointer"
+                          className="mt-4 lg:m-3 border-b-2 border-black pb-4 hover:scale-105 transition-all lg:w-138 w-80 cursor-pointer text-base"
                         >
                           Board: {item.boardName}
                           {item.colName && ` > Column: ${item.colName}`}
@@ -100,7 +100,7 @@ export default function Search({ boards }: SearchProp) {
                   })}
                 </ul>
               ) : (
-                <div className="flex flex-row">
+                <div className="flex flex-row justify-between">
                   <p className="text-gray-500 mr-1">No results found</p>
                   <ErrorIcon className="animate-pulse" />
                 </div>
