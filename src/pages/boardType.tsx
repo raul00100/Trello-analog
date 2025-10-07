@@ -1,23 +1,17 @@
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import ColumnList from "../components/columnList";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
-
-type Todo = { text: string; done: boolean };
-type ColumnCard = { id: string; name: string; todos: Todo[] };
-type Board = { name: string; lists: ColumnCard[] };
-
-type BoardTypeProps = {
-  boards: Board[];
-  setBoards: React.Dispatch<React.SetStateAction<Board[]>>;
-};
+import { useSharedProvider } from "../shared/context/useSharedProvider";
+import type { ColumnCard } from "../components/exportType";
 
 function getBoardId(id: string | undefined) {
   if (id && !isNaN(Number(id))) return Number(id);
   return 0;
 }
 
-export default function BoardType({ boards, setBoards }: BoardTypeProps) {
+export default function BoardType() {
+  const { boards, setBoards } = useSharedProvider();
   const { id } = useParams<{ id: string }>();
   const boardId = getBoardId(id);
   const navigate = useNavigate();

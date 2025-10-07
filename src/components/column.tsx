@@ -60,7 +60,20 @@ export default function Column({ card, setCard }: CardType) {
           <li>
             {/* editing a todo */}
             {editingIndex === index && add === false ? (
-              <div className="flex flex-row items-center justify-between">
+              <div
+                className="flex flex-row items-center justify-between"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (editingValue.trim() === "") {
+                      removeTodo(index);
+                    } else {
+                      handleEdit(index, editingValue);
+                    }
+                    setEditingIndex(null);
+                  }
+                }}
+              >
                 <SharedInput
                   value={editingValue}
                   onChange={setEditingValue}

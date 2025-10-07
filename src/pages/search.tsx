@@ -4,19 +4,10 @@ import ErrorIcon from "@mui/icons-material/Error";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useSharedProvider } from "../shared/context/useSharedProvider";
 
-type Todo = { text: string; done: boolean };
-type ColumnCard = { id: string; name: string; todos: Todo[] };
-type BoardType = {
-  name: string;
-  lists: ColumnCard[];
-};
-
-type SearchProp = {
-  boards: BoardType[];
-};
-
-export default function Search({ boards }: SearchProp) {
+export default function Search() {
+  const { boards } = useSharedProvider();
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
 

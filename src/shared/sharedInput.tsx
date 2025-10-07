@@ -45,6 +45,8 @@ export default function SharedInput({
       ref={inputRef}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
+          if (value.trim() === "") return;
+          e.preventDefault();
           handleSubmit();
         }
       }}

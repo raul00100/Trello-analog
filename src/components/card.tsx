@@ -1,10 +1,10 @@
 import "../styles/card.css";
 import QueueIcon from "@mui/icons-material/Queue";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { useSharedProvider } from "../shared/context/useSharedProvider";
 
-type CardProp = { addBoard: () => void };
-
-export default function Card({ addBoard }: CardProp) {
+export default function Card() {
+  const { addBoard } = useSharedProvider();
   return (
     <div className="card">
       <div className="align">

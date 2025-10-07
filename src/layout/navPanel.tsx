@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import QueueIcon from "@mui/icons-material/Queue";
@@ -18,6 +18,7 @@ import {
   useParams,
   useNavigate,
 } from "react-router-dom";
+import { useSharedProvider } from "../shared/context/useSharedProvider";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
@@ -30,28 +31,8 @@ const headerStyle =
   " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 lg:ml-30 ml-8";
 const buttonHeader = "flex items-center cursor-pointer ";
 
-type Todo = { text: string; done: boolean };
-type ColumnCard = { id: string; name: string; todos: Todo[] };
-type BoardTypeProps = {
-  name: string;
-  lists: ColumnCard[];
-};
-
-export type GeneralProp = {
-  boards: BoardTypeProps[];
-  setBoards: React.Dispatch<React.SetStateAction<BoardTypeProps[]>>;
-  addBoard: () => void;
-  more: boolean;
-  setMore: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-export default function NavPanel({
-  boards,
-  setBoards,
-  addBoard,
-  more,
-  setMore,
-}: GeneralProp) {
+export default function NavPanel() {
+  const { boards, setBoards, more, setMore, addBoard } = useSharedProvider();
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");

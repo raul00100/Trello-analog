@@ -12,9 +12,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import SharedInput from "../shared/sharedInput";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-
-type Todo = { text: string; done: boolean };
-type ColumnCard = { id: string; name: string; todos: Todo[] };
+import type { ColumnCard } from "../components/exportType";
 
 type ColumnListProps = {
   columns: ColumnCard[];
@@ -103,7 +101,7 @@ const ColumnList = React.memo(function ColumnList({
                           {/* compress mode */}
                           {compress.includes(card.id) ? (
                             <div
-                              className={`${column} w-20 h-59 flex-col justify-between py-3.5`}
+                              className={`${column} w-20 h-60 flex-col justify-between py-3.5`}
                             >
                               <button
                                 onClick={() =>
@@ -115,7 +113,7 @@ const ColumnList = React.memo(function ColumnList({
                               >
                                 <UnfoldMoreIcon className="scale-120 hover:scale-150 active:scale-120 rotate-45 cursor-pointer" />
                               </button>
-                              <span className="rotate-90 inline-block text-xl font-medium truncate">
+                              <span className="rotate-270 inline-block lg:text-xl text-lg font-medium truncate">
                                 {card.name}
                               </span>
                               <div className={grab}>
@@ -155,7 +153,7 @@ const ColumnList = React.memo(function ColumnList({
                                       setEditingNaming(cards[index].name);
                                     }}
                                   >
-                                    <h2 className="lg:text-lg text-base font-medium font-sans text-white cursor-pointer py-0.5 mb-2">
+                                    <h2 className="lg:text-lg text-base font-medium font-sans text-white cursor-pointer py-0.5 mb-2 truncate lg:w-50 w-35">
                                       {cards[index].name}
                                     </h2>
                                   </span>
@@ -167,7 +165,7 @@ const ColumnList = React.memo(function ColumnList({
                                   </button>
                                   {/* actions with a column*/}
                                   {showSetting === card.id && (
-                                    <div className="absolute left-3 top-13 mt-2 w-60 bg-zinc-200 text-black rounded shadow-lg flex flex-col z-50 text-sm">
+                                    <div className="absolute lg:left-3 top-13 left-0 mt-2 w-60 bg-zinc-200 text-black rounded shadow-lg flex flex-col z-50 text-sm">
                                       <div className="flex flex-row">
                                         <h4 className="py-2 px-4 rounded-t font-medium mx-auto ml-9">
                                           Actions with the list
