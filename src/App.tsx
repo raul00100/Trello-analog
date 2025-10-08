@@ -17,9 +17,9 @@ const divStyle = "w-screen h-screen overflow-auto";
 
 export default function App() {
   const { boards, setMore } = useSharedProvider();
+  const { currentTheme, themesOptions } = useThemes();
   const savedBoardId = localStorage.getItem("boardId");
   const homeBoardId = Number(savedBoardId);
-  const { currentTheme, themesOptions } = useThemes();
 
   const router = createBrowserRouter([
     {

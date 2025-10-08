@@ -1,4 +1,4 @@
-import NavPanel from "../layout/navPanel";
+import NavPanel from "./panel/navPanel";
 import { Outlet } from "react-router-dom";
 
 export default function Layout() {

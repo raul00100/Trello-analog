@@ -1,4 +1,4 @@
-import type { Board } from "../../components/exportType";
+import type { Board } from "../exportType";
 import { createContext } from "react";
 
 type ContextType = {
@@ -7,6 +7,8 @@ type ContextType = {
   more: boolean;
   setMore: React.Dispatch<React.SetStateAction<boolean>>;
   addBoard: () => void;
+  searchColumn: string | undefined;
+  setSearchColumn: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 export const SharedContext = createContext<ContextType | undefined>(undefined);

@@ -33,7 +33,7 @@ export default function Error() {
         />
         <Link to="/" className="text-2xl flex items-center gap-1.5 mt-7">
           <ArrowBackIosNewIcon className="animate-pulse scale-110" />
-          <span className="hover:underline hover:sclale-102 semibold ">
+          <span className="hover:underline hover:scale-105 active:scale-95 transition-all semibold ">
             Home Page
           </span>
         </Link>

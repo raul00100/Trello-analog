@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
 
 export default function Search() {
-  const { boards } = useSharedProvider();
+  const { boards, setSearchColumn } = useSharedProvider();
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
 
@@ -81,6 +81,11 @@ export default function Search() {
                         <li
                           key={idx}
                           className="mt-4 lg:m-3 border-b-2 border-black pb-4 hover:scale-105 transition-all lg:w-138 w-80 cursor-pointer text-base"
+                          onClick={() =>
+                            setSearchColumn(
+                              item.colName ? item.colName : undefined
+                            )
+                          }
                         >
                           Board: {item.boardName}
                           {item.colName && ` > Column: ${item.colName}`}

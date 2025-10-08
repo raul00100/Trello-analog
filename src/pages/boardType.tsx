@@ -3,7 +3,7 @@ import ColumnList from "../components/columnList";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
-import type { ColumnCard } from "../components/exportType";
+import type { ColumnCard } from "../shared/exportType";
 
 function getBoardId(id: string | undefined) {
   if (id && !isNaN(Number(id))) return Number(id);

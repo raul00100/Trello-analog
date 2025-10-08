@@ -12,7 +12,9 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import SharedInput from "../shared/sharedInput";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import type { ColumnCard } from "../components/exportType";
+import type { ColumnCard } from "../shared/exportType";
+import { useSharedProvider } from "../shared/context/useSharedProvider";
+import "../index.css";
 
 type ColumnListProps = {
   columns: ColumnCard[];
@@ -28,6 +30,7 @@ const ColumnList = React.memo(function ColumnList({
   columns,
   setColumns,
 }: ColumnListProps) {
+  const { searchColumn } = useSharedProvider();
   const cards = columns;
   const setCards = setColumns;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -129,7 +132,11 @@ const ColumnList = React.memo(function ColumnList({
                           ) : (
                             // default mode - editing
                             <div
-                              className={` ${column} lg:w-[272px] w-[220px] flex-col p-3`}
+                              className={` ${column} lg:w-[272px] w-[220px] flex-col p-3 ${
+                                card.name && card.name === searchColumn
+                                  ? "bounce"
+                                  : ""
+                              }`}
                             >
                               {editingIndex === index ? (
                                 <SharedInput
