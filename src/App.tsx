@@ -33,7 +33,7 @@ export default function App() {
         {
           path: "board/:id",
           element: (
-            <div className={divStyle} onClick={() => setMore(false)}>
+            <div className={` ${divStyle} `} onClick={() => setMore(false)}>
               <BoardType />
             </div>
           ),
@@ -71,10 +71,10 @@ export default function App() {
 
   return (
     <div>
-      <div className="absolute inset-0 z-0 pointer-events-auto">
+      <div className={`absolute inset-0 z-0 pointer-events-auto`}>
         {themesOptions.find((el) => el.name === currentTheme)?.theme}
       </div>
-      <div className="relative z-10 overflow-y-hidden h-screen ">
+      <div className={`relative z-10 overflow-y-hidden h-screen `}>
         <RouterProvider router={router} />
       </div>
     </div>

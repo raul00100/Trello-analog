@@ -1,28 +1,31 @@
-// Column.tsx
 import React, { useState, useEffect } from "react";
-import Column from "./column";
-import AssignmentAddIcon from "@mui/icons-material/AssignmentAdd";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { AnimatePresence, motion } from "motion/react";
+//icons
 import CompressIcon from "@mui/icons-material/Compress";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
-import SharedInput from "../shared/sharedInput";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import AssignmentAddIcon from "@mui/icons-material/AssignmentAdd";
+import RemoveIcon from "@mui/icons-material/Remove";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import type { ColumnCard } from "../shared/exportType";
+//components
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import Column from "./column";
+import SharedInput from "../shared/sharedInput";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
+import type { ColumnCard } from "../shared/exportType";
+// import OpenTodo from "../pages/openTodo";
+//animation and design
+import { AnimatePresence, motion } from "framer-motion";
 import "../index.css";
 
-type ColumnListProps = {
+export type ColumnListProps = {
   columns: ColumnCard[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnCard[]>>;
 };
 
 const buttonActions = "px-4 py-2 text-left hover:bg-zinc-400 transition-all";
-const column =
+const columnStyle =
   "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-lg lg:ml-10 ml-5 flex ";
 const grab = "flex justify-center rotate-90";
 
@@ -31,8 +34,6 @@ const ColumnList = React.memo(function ColumnList({
   setColumns,
 }: ColumnListProps) {
   const { searchColumn } = useSharedProvider();
-  const cards = columns;
-  const setCards = setColumns;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
   const [compress, setCompress] = useState<string[]>(() => {
@@ -42,8 +43,8 @@ const ColumnList = React.memo(function ColumnList({
   const [showSetting, setShowSetting] = useState<string | null>("");
 
   useEffect(() => {
-    localStorage.setItem("cards", JSON.stringify(cards));
-  }, [cards]);
+    localStorage.setItem("column", JSON.stringify(columns));
+  }, [columns]);
 
   useEffect(() => {
     localStorage.setItem("compress", JSON.stringify(compress));
@@ -55,36 +56,36 @@ const ColumnList = React.memo(function ColumnList({
       name: "",
       todos: [],
     };
-    setCards([...cards, newCard]);
-    setEditingIndex(cards.length);
-    setEditingNaming(`Column ${cards.length + 1}`);
+    setColumns([...columns, newCard]);
+    setEditingIndex(columns.length);
+    setEditingNaming(`Column ${columns.length + 1}`);
   };
 
   const deleteCard = (index: number) => {
-    setCards(cards.filter((_, i) => i !== index));
+    setColumns(columns.filter((_, i) => i !== index));
   };
 
   // drag and drop functionality
   const handleOnDragEnd = (result: import("@hello-pangea/dnd").DropResult) => {
     if (!result.destination) return;
-    const items = Array.from(cards);
+    const items = Array.from(columns);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-    setCards(items);
+    setColumns(items);
   };
 
   return (
     <div className="lg:mt-10 mt-7 flex flex-row">
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <Droppable droppableId="cards" direction="horizontal">
+        <Droppable droppableId="column" direction="horizontal">
           {(provided) => (
             <section
               {...provided.droppableProps}
               ref={provided.innerRef}
-              className="flex flex-row items-start"
+              className="flex flex-row items-start overflow-visible"
             >
               <AnimatePresence>
-                {cards.map((card, index) => (
+                {columns.map((card, index) => (
                   <Draggable
                     key={card.id}
                     draggableId={String(card.id)}
@@ -104,7 +105,7 @@ const ColumnList = React.memo(function ColumnList({
                           {/* compress mode */}
                           {compress.includes(card.id) ? (
                             <div
-                              className={`${column} w-20 h-60 flex-col justify-between py-3.5`}
+                              className={`${columnStyle} w-20 h-60 flex-col justify-between py-3.5 relative z-10`}
                             >
                               <button
                                 onClick={() =>
@@ -132,7 +133,7 @@ const ColumnList = React.memo(function ColumnList({
                           ) : (
                             // default mode - editing
                             <div
-                              className={` ${column} lg:w-[272px] w-[220px] flex-col p-3 ${
+                              className={` ${columnStyle} lg:w-[272px] w-[220px] flex-col p-3 ${
                                 card.name && card.name === searchColumn
                                   ? "bounce"
                                   : ""
@@ -143,9 +144,9 @@ const ColumnList = React.memo(function ColumnList({
                                   value={editingNaming}
                                   onChange={setEditingNaming}
                                   onSubmit={(newValue) => {
-                                    const updatedCards = [...cards];
-                                    updatedCards[index].name = newValue;
-                                    setCards(updatedCards);
+                                    const updatedColumn = [...columns];
+                                    updatedColumn[index].name = newValue;
+                                    setColumns(updatedColumn);
                                     setEditingIndex(null);
                                   }}
                                   onFocus={() => {}}
@@ -157,11 +158,11 @@ const ColumnList = React.memo(function ColumnList({
                                   <span
                                     onDoubleClick={() => {
                                       setEditingIndex(index);
-                                      setEditingNaming(cards[index].name);
+                                      setEditingNaming(columns[index].name);
                                     }}
                                   >
                                     <h2 className="lg:text-lg text-base font-medium font-sans text-white cursor-pointer py-0.5 mb-2 truncate lg:w-50 w-35">
-                                      {cards[index].name}
+                                      {columns[index].name}
                                     </h2>
                                   </span>
                                   <button
@@ -187,7 +188,7 @@ const ColumnList = React.memo(function ColumnList({
                                       <button
                                         onClick={() => {
                                           setEditingIndex(index);
-                                          setEditingNaming(cards[index].name);
+                                          setEditingNaming(columns[index].name);
                                           setShowSetting(null);
                                         }}
                                         className={buttonActions}
@@ -219,16 +220,16 @@ const ColumnList = React.memo(function ColumnList({
                                   )}
                                 </div>
                               )}
-                              {/* list of columns  */}
+                              {/* list of column  */}
                               <Column
-                                card={card.todos}
-                                setCard={(newTodos) => {
-                                  const updatedCards = [...cards];
-                                  updatedCards[index].todos =
+                                cards={card.todos}
+                                setCards={(newTodos) => {
+                                  const updatedColumn = [...columns];
+                                  updatedColumn[index].todos =
                                     typeof newTodos === "function"
-                                      ? newTodos(updatedCards[index].todos)
+                                      ? newTodos(updatedColumn[index].todos)
                                       : newTodos;
-                                  setCards(updatedCards);
+                                  setColumns(updatedColumn);
                                 }}
                               />
                               <div className={grab}>
@@ -251,7 +252,7 @@ const ColumnList = React.memo(function ColumnList({
               {provided.placeholder}
               <button
                 onClick={addEmptyCard}
-                className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semibold bg-opa active:scale-90 lg:w-40 lg:h-11 w-34 h-9 rounded-md lg:text-base text-sm flex items-center justify-center cursor-pointer transition-all lg:mx-10 mx-5 flex-none"
+                className="bg-white/20 backdrop-blur-md border-1 border-zinc-400 text-white font-semibold bg-opa active:scale-90 lg:w-40 lg:h-11 w-34 h-9 rounded-md lg:text-base text-sm flex items-center justify-center cursor-pointer transition-all lg:mx-10 mx-5 flex-none z-0"
               >
                 <span className="mr-2"> Add a column </span>
                 <AssignmentAddIcon className="scale-90 lg:scale-100" />

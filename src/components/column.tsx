@@ -1,53 +1,58 @@
 import React, { useState } from "react";
+//icons
+import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
+// components
 import SharedInput from "../shared/sharedInput";
-import EditIcon from "@mui/icons-material/Edit";
 
-type CardType = {
-  card: { text: string; done: boolean }[];
-  setCard: React.Dispatch<
-    React.SetStateAction<{ text: string; done: boolean }[]>
+type CardsType = {
+  cards: { id: string; text: string; done: boolean }[];
+  setCards: React.Dispatch<
+    React.SetStateAction<{ id: string; text: string; done: boolean }[]>
   >;
 };
 
-export default function Column({ card, setCard }: CardType) {
+export default function Column({ cards, setCards }: CardsType) {
+  const [editingValue, setEditingValue] = useState("");
   const [input, setInput] = useState("");
   const [add, setAdd] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingValue, setEditingValue] = useState("");
 
   const addTodo = () => {
     if (input.trim() === "") return;
-    setCard([...card, { text: input, done: false }]);
+    setCards([
+      ...cards,
+      { id: Date.now().toString(), text: input, done: false },
+    ]);
     setInput("");
   };
 
   const removeTodo = (index: number) => {
-    setCard(card.filter((_, i) => i !== index));
+    setCards(cards.filter((_, i) => i !== index));
   };
 
   const handleEdit = (index: number, value: string) => {
-    const updated = [...card];
+    const updated = [...cards];
     updated[index].text = value;
-    setCard(updated);
+    setCards(updated);
   };
 
   const toggleDone = (index: number) => {
-    const updated = [...card];
+    const updated = [...cards];
     updated[index].done = !updated[index].done;
-    setCard(updated);
+    setCards(updated);
   };
 
   return (
     <div className="flex flex-col">
-      {card.map((item, index) => (
+      {cards.map((item, index) => (
         <ul
           key={index}
-          className="bg-zinc-300 text-black pl-3 rounded-md mt-1.5 py-1 h-7.5 flex items-center"
+          className="bg-zinc-300 text-black pl-3 rounded-md mt-1.5 py-1 h-7.5 flex items-center relative z-0"
           onMouseEnter={() => setHovered(index)}
           onMouseLeave={() => setHovered(null)}
           onClick={() => setAdd(false)}
@@ -91,8 +96,8 @@ export default function Column({ card, setCard }: CardType) {
               </div>
             ) : (
               //  viewing the list
-              //checkbox thing
               <div className=" flex flex-row items-center justify-between lg:w-full w-[185px]">
+                {/* checkbox thing */}
                 <label className="inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -133,7 +138,7 @@ export default function Column({ card, setCard }: CardType) {
           </li>
         </ul>
       ))}
-      {/* adding a new card */}
+      {/* adding a new cards */}
       {add ? (
         <div>
           <textarea

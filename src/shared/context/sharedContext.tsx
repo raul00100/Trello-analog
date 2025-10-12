@@ -1,5 +1,5 @@
 import type { Board } from "../exportType";
-import { createContext } from "react";
+import React, { createContext } from "react";
 
 type ContextType = {
   boards: Board[];

@@ -7,7 +7,9 @@ export const SharedProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [boards, setBoards] = useState<Board[]>(() => {
     const savedBoard = localStorage.getItem("board");
-    return savedBoard ? JSON.parse(savedBoard) : [];
+    return savedBoard && savedBoard !== "undefined"
+      ? JSON.parse(savedBoard)
+      : [];
   });
   const [more, setMore] = useState(() => {
     const savedMore = localStorage.getItem("more");
