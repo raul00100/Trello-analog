@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+//components and context
 import { useSharedProvider } from "../../shared/context/useSharedProvider";
 import SharedInput from "../../shared/sharedInput";
+//icons
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import QueueIcon from "@mui/icons-material/Queue";
 import EditIcon from "@mui/icons-material/Edit";

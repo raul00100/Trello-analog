@@ -8,13 +8,12 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import AssignmentAddIcon from "@mui/icons-material/AssignmentAdd";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-//components
+//components and shared elements
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import Column from "./column";
 import SharedInput from "../shared/sharedInput";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
 import type { ColumnCard } from "../shared/exportType";
-// import OpenTodo from "../pages/openTodo";
 //animation and design
 import { AnimatePresence, motion } from "framer-motion";
 import "../index.css";
@@ -75,7 +74,7 @@ const ColumnList = React.memo(function ColumnList({
   };
 
   return (
-    <div className="lg:mt-10 mt-7 flex flex-row">
+    <div className="lg:mt-10 mt-10 flex flex-row">
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="column" direction="horizontal">
           {(provided) => (

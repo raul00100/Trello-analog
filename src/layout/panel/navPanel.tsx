@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { useMatch, Link, useParams } from "react-router-dom";
+//icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-
 import SettingsIcon from "@mui/icons-material/Settings";
-import gsap from "gsap";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useMatch, Link, useParams } from "react-router-dom";
+//components and context
 import { useSharedProvider } from "../../shared/context/useSharedProvider";
 import PanelSetting from "./panelSetting";
 import Switcher from "./switcher";

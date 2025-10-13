@@ -1,8 +1,9 @@
 import { useCallback, useEffect } from "react";
-import ColumnList from "../components/columnList";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
+//components and shared elements
 import { useSharedProvider } from "../shared/context/useSharedProvider";
+import ColumnList from "../components/columnList";
 import type { ColumnCard } from "../shared/exportType";
 
 function getBoardId(id: string | undefined) {
