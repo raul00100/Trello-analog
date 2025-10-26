@@ -1,7 +1,7 @@
-import "../styles/card.css";
+import { useSharedProvider } from "../shared/context/useSharedProvider";
 import QueueIcon from "@mui/icons-material/Queue";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { useSharedProvider } from "../shared/context/useSharedProvider";
+import "../styles/card.css";
 
 export default function Card() {
   const { addBoard } = useSharedProvider();

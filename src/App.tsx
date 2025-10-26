@@ -1,17 +1,19 @@
-import BoardType from "./pages/boardType";
-import Card from "./components/card";
-import Search from "./pages/search";
-import ThemeSelector from "./pages/themeSelector";
 import "./index.css";
 import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import Layout from "./layout/Layout";
-import Error from "./components/error404";
+//context and shared elements
 import { useThemes } from "./components/themesList.tsx";
 import { useSharedProvider } from "./shared/context/useSharedProvider.tsx";
+//components
+import BoardType from "./pages/boardType";
+import Card from "./components/card";
+import Search from "./pages/search";
+import ThemeSelector from "./pages/themeSelector";
+import Layout from "./layout/Layout";
+import Error from "./components/error404";
 
 const divStyle = "w-screen h-screen overflow-auto";
 
@@ -23,6 +25,7 @@ export default function App() {
 
   const router = createBrowserRouter([
     {
+      //use it as a parent element to always display nav panel
       path: "/",
       element: <Layout />,
       children: [

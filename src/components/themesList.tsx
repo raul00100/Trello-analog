@@ -14,6 +14,7 @@ type ThemeStore = {
   setCurrentTheme: (theme: string) => void;
 };
 
+//use zustand to manage themes as using context causes unnecessary re-renders
 export const useThemes = create<ThemeStore>((set) => ({
   currentTheme: localStorage.getItem("theme") || "Aurora",
   setCurrentTheme: (theme) => {
