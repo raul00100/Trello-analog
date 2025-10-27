@@ -1,49 +1,57 @@
-# 🚀 Trello Analog - Kanban Board
+# Trello Analog - Kanban Board
 
-[![React](https://img.shields.io/badge/React-19.x-blue?logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-4.x-purple?logo=vite)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-cyan?logo=tailwindcss)](https://tailwindcss.com/)
+A modern web application for task management based on the **Kanban methodology**.
+Users can create boards, columns, and tasks with intuitive **drag-and-drop functionality** for smooth organization.
+The app features **dynamic live wallpapers** for a customizable visual experience and a **global search page** that allows quick navigation across all boards and tasks.
 
-A modern web application for task management using the Kanban methodology. Create boards, columns, and tasks with intuitive drag-and-drop functionality.
+---
 
 ## ✨ Features
 
-- 📋 **Task Management** - Add, edit, and delete tasks
-- 🗂️ **Kanban Columns** - Organize tasks by status (To Do, In Progress, Done)
-- 🎯 **Drag & Drop** - Intuitive task moving between columns
-- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
-- ⚡ **High Performance** - Built with modern technology stack
-- 🎨 **Modern UI** - Clean interface with Tailwind CSS
-- 🔒 **Type Safety** - Full TypeScript support
-- 🫧 **Clean code** - Usage of Prettier and ESLint
+* 📋 **Task Management** — Add, edit, and delete tasks
+* 🗂️ **Kanban Columns** — Organize tasks by status (To Do, In Progress, Done)
+* 🎯 **Drag & Drop** — Intuitive task movement between columns
+* 🔍 **Global Search** — Quickly find boards and tasks across the app
+* 🪄 **Live Wallpapers** — Animated backgrounds for better user experience
+* 📱 **Responsive Design** — Fully functional on desktop and mobile
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React 19 + TypeScript
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS
-- **Drag & Drop:** @dnd-kit
-- **Icons:** Material UI
-- **Background:** React Bits
+* **React** + **TypeScript** + **Vite**
+* **Tailwind CSS** — styling and responsive layout
+* **Zustand**, **Context API**, and **React Router** — for clean and scalable project architecture
+* **@hello-pangea/dnd** — smooth drag-and-drop interactions
+* **React Bits** — background
+* **ESLint** and **Prettier** — code quality and formatting
+* **Material UI** — icons and additional UI elements
+
+---
+
+## 🧑🏻‍💻 Deployment
+
+**Vercel:** [https://trello-analog.vercel.app/](https://trello-analog.vercel.app/)
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 16+
-- npm or yarn
+* Node.js 16+
+* npm or yarn
 
 ### Installation & Running
 
-1. **Clone the repository:**
+1. **Clone the repository**
 
 ```bash
 git clone https://github.com/raul00100/Trello-analog.git
 cd Trello-analog
 ```
 
-2. **Install dependencies:**
+2. **Install dependencies**
 
 ```bash
 npm install
@@ -51,7 +59,7 @@ npm install
 yarn install
 ```
 
-3. **Start development server:**
+3. **Start the development server**
 
 ```bash
 npm run dev
