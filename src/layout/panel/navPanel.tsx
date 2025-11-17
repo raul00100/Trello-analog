@@ -21,7 +21,7 @@ const headerStyle =
 const buttonHeader = "flex items-center cursor-pointer ";
 
 export default function NavPanel() {
-  const { boards, more, setMore } = useSharedProvider();
+  const { boards, more, setMore, setSearchColumn } = useSharedProvider();
 
   const isBoard = !!useMatch("/board/:id");
   const params = useParams();
@@ -68,6 +68,7 @@ export default function NavPanel() {
     <header
       ref={panelRef}
       className="w-full bg-white/20 backdrop-blur-md border-b border-white h-65"
+      onClick={() => setSearchColumn(undefined)}
     >
       {/* undisclosed panel  */}
       <div className={divHeader}>

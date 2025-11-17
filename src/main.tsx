@@ -4,6 +4,8 @@ import "./index.css";
 import App from "./App.tsx";
 import { SharedProvider } from "./shared/context/SharedProvider.tsx";
 
+// localStorage.clear();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <SharedProvider>

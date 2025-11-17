@@ -6,7 +6,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import AssignmentAddIcon from "@mui/icons-material/AssignmentAdd";
-import RemoveIcon from "@mui/icons-material/Remove";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 //components and shared elements
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -23,7 +23,8 @@ export type ColumnListProps = {
   setColumns: React.Dispatch<React.SetStateAction<ColumnCard[]>>;
 };
 
-const buttonActions = "px-4 py-2 text-left hover:bg-zinc-400 transition-all";
+const buttonActions =
+  "lg:w-[65.5px] w-[52.5px] lg:h-9 h-7 transition-all rounded-xl flex items-center justify-center cursor-pointer";
 const columnStyle =
   "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-lg lg:ml-10 ml-5 flex ";
 const grab = "flex justify-center rotate-90";
@@ -48,6 +49,21 @@ const ColumnList = React.memo(function ColumnList({
   useEffect(() => {
     localStorage.setItem("compress", JSON.stringify(compress));
   }, [compress]);
+
+  // close settings popup when clicking outside of it
+  useEffect(() => {
+    if (!showSetting) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const el = document.querySelector(`[data-settings-id="${showSetting}"]`);
+      if (el && !el.contains(e.target as Node)) {
+        setShowSetting(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showSetting]);
 
   const addEmptyCard = () => {
     const newCard = {
@@ -172,48 +188,44 @@ const ColumnList = React.memo(function ColumnList({
                                   </button>
                                   {/* actions with a column*/}
                                   {showSetting === card.id && (
-                                    <div className="absolute lg:left-3 top-13 left-0 mt-2 w-60 bg-zinc-200 text-black rounded shadow-lg flex flex-col z-50 text-sm">
-                                      <div className="flex flex-row">
-                                        <h4 className="py-2 px-4 rounded-t font-medium mx-auto ml-9">
-                                          Actions with the list
-                                        </h4>
-                                        <button
-                                          onClick={() => setShowSetting(null)}
-                                          className="mr-2 cursor-pointer hover:bg-zinc-400 my-1.5 rounded-md p-0.5"
-                                        >
-                                          <CloseIcon />
-                                        </button>
-                                      </div>
+                                    <div
+                                      data-settings-id={card.id}
+                                      className="absolute left-1 top-0 mt-2 lg:w-[262px] w-[210px] lg:h-9 h-7 bg-black text-white rounded-xl flex flex-row z-50 text-sm items-center justify-center"
+                                    >
                                       <button
                                         onClick={() => {
                                           setEditingIndex(index);
                                           setEditingNaming(columns[index].name);
                                           setShowSetting(null);
                                         }}
-                                        className={buttonActions}
+                                        className={`${buttonActions}  hover:bg-zinc-400 `}
                                       >
-                                        <DriveFileRenameOutlineIcon className="mr-2" />
-                                        Rename
+                                        <DriveFileRenameOutlineIcon />
                                       </button>
                                       <button
                                         onClick={() => {
                                           deleteCard(index);
                                           setShowSetting(null);
                                         }}
-                                        className={buttonActions}
+                                        className={`${buttonActions} hover:bg-zinc-400 `}
                                       >
-                                        <RemoveIcon className="mr-2" />
-                                        delete
+                                        <DeleteOutlineIcon />
                                       </button>
                                       <button
                                         onClick={() => {
                                           setCompress([...compress, card.id]);
                                           setShowSetting(null);
                                         }}
-                                        className={`${buttonActions} mb-2`}
+                                        className={`${buttonActions}  hover:bg-zinc-400 `}
                                       >
-                                        <CompressIcon className="mr-2" />
-                                        compress
+                                        <CompressIcon />
+                                      </button>
+
+                                      <button
+                                        onClick={() => setShowSetting(null)}
+                                        className={`${buttonActions} hover:bg-red-700`}
+                                      >
+                                        <CloseIcon />
                                       </button>
                                     </div>
                                   )}

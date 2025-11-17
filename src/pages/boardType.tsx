@@ -12,7 +12,7 @@ function getBoardId(id: string | undefined) {
 }
 
 export default function BoardType() {
-  const { boards, setBoards } = useSharedProvider();
+  const { boards, setBoards, setSearchColumn } = useSharedProvider();
   const { id } = useParams<{ id: string }>();
   const boardId = getBoardId(id);
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export default function BoardType() {
   }
 
   return (
-    <div className="pb-30">
+    <div className="pb-30" onClick={() => setSearchColumn(undefined)}>
       <AnimatePresence mode="wait">
         <motion.div
           key={boardId}
