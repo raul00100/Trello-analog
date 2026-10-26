@@ -1,8 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
-import { SharedProvider } from "./shared/context/SharedProvider.tsx";
+import "./shared/styles/index.css";
+import App from "./app/App.tsx";
+import { SharedProvider } from "./app/providers/SharedProvider.tsx";
 
 // localStorage.clear();
 

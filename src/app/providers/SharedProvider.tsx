@@ -1,22 +1,12 @@
 import { useState, useEffect } from "react";
-import type { Board } from "../exportType";
-import { SharedContext } from "./sharedContext";
-
-type StoredBoard = Omit<Board, "id"> & { id?: string };
+import type { Board } from "../../features/boards/model/boardTypes";
+import { loadBoards, saveBoards } from "../../features/boards/model/boardStorage";
+import { SharedContext } from "../../shared/context/sharedContext";
 
 export const SharedProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [boards, setBoards] = useState<Board[]>(() => {
-    const savedBoard = localStorage.getItem("board");
-    if (!savedBoard || savedBoard === "undefined") return [];
-
-    const storedBoards: StoredBoard[] = JSON.parse(savedBoard);
-    return storedBoards.map((board) => ({
-      ...board,
-      id: board.id || crypto.randomUUID(),
-    }));
-  });
+  const [boards, setBoards] = useState<Board[]>(loadBoards);
   const [more, setMore] = useState(() => {
     const savedMore = localStorage.getItem("more");
     return savedMore ? JSON.parse(savedMore) : false;
@@ -24,7 +14,7 @@ export const SharedProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchColumn, setSearchColumn] = useState<string | undefined>("");
 
   useEffect(() => {
-    localStorage.setItem("board", JSON.stringify(boards));
+    saveBoards(boards);
   }, [boards]);
   useEffect(() => {
     localStorage.setItem("more", JSON.stringify(more));

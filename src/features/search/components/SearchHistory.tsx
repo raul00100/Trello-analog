@@ -2,8 +2,8 @@ import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
 //components and context
-import { useSharedProvider } from "../shared/context/useSharedProvider";
-import type { SearchHistoryItem } from "../shared/exportType";
+import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import type { SearchHistoryItem } from "../model/searchTypes";
 //icons
 import HistoryIcon from "@mui/icons-material/History";
 import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";

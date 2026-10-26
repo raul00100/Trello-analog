@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { useThemes } from "../components/themesList.tsx";
+import { useThemes } from "../model/themeStore";
 
 export default function ThemeSelector() {
   const { themesOptions, currentTheme, setCurrentTheme } = useThemes();

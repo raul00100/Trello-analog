@@ -21,11 +21,42 @@ The app features **dynamic live wallpapers** for a customizable visual experienc
 
 * **React** + **TypeScript** + **Vite**
 * **Tailwind CSS** — styling and responsive layout
-* **Zustand**, **Context API**, and **React Router** — for clean and scalable project architecture
+* **Zustand** — theme selection state
+* **React Context** — shared board state
+* **React Router** — application routing
 * **@hello-pangea/dnd** — smooth drag-and-drop interactions
 * **React Bits** — background
 * **ESLint** and **Prettier** — code quality and formatting
 * **Material UI** — icons and additional UI elements
+
+## 📁 Project Structure
+
+```text
+src/
+  app/
+    App.tsx
+    router.tsx
+    providers/
+      SharedProvider.tsx
+  features/
+    boards/
+      components/  BoardPage, BoardSwitcher, columns, and todos
+      model/       Board types and local storage
+    search/
+      components/  SearchPage and SearchHistory
+      model/       Search history types
+    themes/
+      components/  ThemeSelector
+      model/       Theme state
+  shared/
+    components/  Reusable inputs and error page
+    lib/         Shared utilities
+    styles/      Global styles
+  backgrounds/  Animated background implementations
+```
+
+Feature-specific UI and model types live together under `features/`. The
+`shared/` directory is reserved for elements and context used across features.
 
 ---
 

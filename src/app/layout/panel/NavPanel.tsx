@@ -7,9 +7,9 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 //components and context
-import { useSharedProvider } from "../../shared/context/useSharedProvider";
-import PanelSetting from "./panelSetting";
-import Switcher from "./switcher";
+import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import PanelSetting from "./PanelSetting";
+import BoardSwitcher from "../../../features/boards/components/BoardSwitcher";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
@@ -122,7 +122,7 @@ export default function NavPanel() {
       >
         {/* board switcher */}
         {isBoard ? (
-          <Switcher boardId={boardId} />
+          <BoardSwitcher boardId={boardId} />
         ) : (
           <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55" />
         )}

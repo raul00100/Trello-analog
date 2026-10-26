@@ -10,13 +10,12 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 //components and shared elements
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import Column from "./column";
-import SharedInput from "../shared/sharedInput";
-import { useSharedProvider } from "../shared/context/useSharedProvider";
-import type { ColumnCard } from "../shared/exportType";
+import TodoList from "./TodoList";
+import SharedInput from "../../../shared/components/SharedInput";
+import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import type { ColumnCard } from "../model/boardTypes";
 //animation and design
 import { AnimatePresence, motion } from "framer-motion";
-import "../index.css";
 
 export type ColumnListProps = {
   columns: ColumnCard[];
@@ -232,7 +231,7 @@ const ColumnList = React.memo(function ColumnList({
                                 </div>
                               )}
                               {/* list of column  */}
-                              <Column
+                              <TodoList
                                 cards={card.todos}
                                 setCards={(newTodos) => {
                                   const updatedColumn = [...columns];

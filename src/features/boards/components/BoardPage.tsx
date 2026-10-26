@@ -2,16 +2,16 @@ import { useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 //components and shared elements
-import { useSharedProvider } from "../shared/context/useSharedProvider";
-import ColumnList from "../components/columnList";
-import type { ColumnCard } from "../shared/exportType";
+import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import ColumnList from "../components/ColumnList";
+import type { ColumnCard } from "../model/boardTypes";
 
 function getBoardId(id: string | undefined) {
   if (id && !isNaN(Number(id))) return Number(id);
   return 0;
 }
 
-export default function BoardType() {
+export default function BoardPage() {
   const { boards, setBoards, setSearchColumn } = useSharedProvider();
   const { id } = useParams<{ id: string }>();
   const boardId = getBoardId(id);

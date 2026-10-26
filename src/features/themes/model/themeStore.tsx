@@ -1,7 +1,7 @@
-import Dither from "../background/Dither";
-import LiquidEther from "../background/LiquidEther";
-import Aurora from "../background/Aurora";
-import Squares from "../background/Squares";
+import Dither from "../../../backgrounds/Dither";
+import LiquidEther from "../../../backgrounds/LiquidEther";
+import Aurora from "../../../backgrounds/Aurora";
+import Squares from "../../../backgrounds/Squares";
 import { create } from "zustand";
 import type { JSX } from "react";
 

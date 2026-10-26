@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 // components
-import SharedInput from "../shared/sharedInput";
+import SharedInput from "../../../shared/components/SharedInput";
 
 type CardsType = {
   cards: { id: string; text: string; done: boolean }[];

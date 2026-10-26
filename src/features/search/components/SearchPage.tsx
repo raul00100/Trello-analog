@@ -3,10 +3,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 //components and context
-import { useSharedProvider } from "../shared/context/useSharedProvider";
-import type { SearchHistoryItem } from "../shared/exportType";
-import SharedInput from "../shared/sharedInput";
-import History from "../components/history";
+import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import type { SearchHistoryItem } from "../model/searchTypes";
+import SharedInput from "../../../shared/components/SharedInput";
+import SearchHistory from "./SearchHistory";
 //icons
 import ErrorIcon from "@mui/icons-material/Error";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -14,7 +14,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const arrowStyle = "scale-90 mx-1";
 const arrowBlock = "flex items-center ";
 
-export default function Search() {
+export default function SearchPage() {
   const { boards, setSearchColumn } = useSharedProvider();
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
@@ -162,7 +162,7 @@ export default function Search() {
             </ul>
           )}
         </div>
-        <History
+        <SearchHistory
           history={history}
           setHistory={setHistory}
           handleHistory={handleHistory}

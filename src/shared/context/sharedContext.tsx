@@ -1,4 +1,4 @@
-import type { Board } from "../exportType";
+import type { Board } from "../../features/boards/model/boardTypes";
 import React, { createContext } from "react";
 
 type ContextType = {

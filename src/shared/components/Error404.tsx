@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import TextType from "../styles/TextType";
+import TextType from "./TextType";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 export default function Error() {
