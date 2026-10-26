@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
 //components and context
 import { useSharedProvider } from "../shared/context/useSharedProvider";
+import type { SearchHistoryItem } from "../shared/exportType";
 //icons
 import HistoryIcon from "@mui/icons-material/History";
 import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
@@ -10,25 +11,9 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 type HistoryProp = {
-  history: {
-    boardName: string;
-    colName?: string | undefined;
-    todoName?: string | undefined;
-  }[];
-  setHistory: Dispatch<
-    SetStateAction<
-      {
-        boardName: string;
-        colName?: string;
-        todoName?: string;
-      }[]
-    >
-  >;
-  handleHistory: (newValue: {
-    boardName: string;
-    colName?: string | undefined;
-    todoName?: string | undefined;
-  }) => void;
+  history: SearchHistoryItem[];
+  setHistory: Dispatch<SetStateAction<SearchHistoryItem[]>>;
+  handleHistory: (newValue: SearchHistoryItem) => void;
   deleteHistory: (index: number) => void;
 };
 
@@ -62,8 +47,10 @@ export default function History({
       ) : (
         <div>
           {history.map((item, idx) => {
-            const boardIdx = boards.findIndex((b) => b.name === item.boardName);
-            const board = boards[boardIdx];
+            const boardIdx = boards.findIndex(
+              (board) => board.id === item.boardId
+            );
+            const board = boardIdx >= 0 ? boards[boardIdx] : undefined;
             const colExists = item.colName
               ? board?.lists?.some((col) => col.name === item.colName)
               : true;

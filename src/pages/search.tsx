@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 //components and context
 import { useSharedProvider } from "../shared/context/useSharedProvider";
+import type { SearchHistoryItem } from "../shared/exportType";
 import SharedInput from "../shared/sharedInput";
 import History from "../components/history";
 //icons
@@ -17,15 +18,17 @@ export default function Search() {
   const { boards, setSearchColumn } = useSharedProvider();
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
-  const [history, setHistory] = useState<
-    {
-      boardName: string;
-      colName?: string;
-      todoName?: string;
-    }[]
-  >(() => {
+  const [history, setHistory] = useState<SearchHistoryItem[]>(() => {
     const savedHistory = localStorage.getItem("history");
-    return savedHistory ? JSON.parse(savedHistory) : [];
+    if (!savedHistory) return [];
+
+    const storedHistory: SearchHistoryItem[] = JSON.parse(savedHistory);
+    return storedHistory.map((item) => ({
+      ...item,
+      boardId:
+        item.boardId ??
+        boards.find((board) => board.name === item.boardName)?.id,
+    }));
   });
 
   useEffect(() => {
@@ -36,27 +39,28 @@ export default function Search() {
     const m = searchText.trim().toLowerCase();
     if (!m) return [];
 
-    const results: {
-      boardName: string;
-      colName?: string;
-      todoName?: string;
-    }[] = [];
+    const results: SearchHistoryItem[] = [];
 
     boards?.forEach((board) => {
       if (board?.name?.toLowerCase().includes(m)) {
-        results.push({ boardName: board.name });
+        results.push({ boardId: board.id, boardName: board.name });
         return;
       }
 
       board?.lists?.forEach((col) => {
         if (col?.name?.toLowerCase().includes(m)) {
-          results.push({ boardName: board.name, colName: col.name });
+          results.push({
+            boardId: board.id,
+            boardName: board.name,
+            colName: col.name,
+          });
           return;
         }
 
         col?.todos?.forEach((todo) => {
           if (todo?.text?.toLowerCase().includes(m)) {
             results.push({
+              boardId: board.id,
               boardName: board.name,
               colName: col.name,
               todoName: todo.text,
@@ -69,14 +73,10 @@ export default function Search() {
     return results;
   }, [boards, searchText]);
 
-  const handleHistory = (newValue: {
-    boardName: string;
-    colName?: string;
-    todoName?: string;
-  }) => {
+  const handleHistory = (newValue: SearchHistoryItem) => {
     const exists = history.some(
       (item) =>
-        item.boardName === newValue.boardName &&
+        item.boardId === newValue.boardId &&
         item.colName === newValue.colName &&
         item.todoName === newValue.todoName
     );
@@ -118,8 +118,9 @@ export default function Search() {
                 <ul>
                   {filtered.map((item, idx) => {
                     const boardIdx = boards.findIndex(
-                      (b) => b.name === item.boardName
+                      (board) => board.id === item.boardId
                     );
+                    if (boardIdx < 0) return null;
                     return (
                       <Link key={idx} to={`/board/${boardIdx}`}>
                         <li

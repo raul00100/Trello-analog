@@ -2,14 +2,20 @@ import { useState, useEffect } from "react";
 import type { Board } from "../exportType";
 import { SharedContext } from "./sharedContext";
 
+type StoredBoard = Omit<Board, "id"> & { id?: string };
+
 export const SharedProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [boards, setBoards] = useState<Board[]>(() => {
     const savedBoard = localStorage.getItem("board");
-    return savedBoard && savedBoard !== "undefined"
-      ? JSON.parse(savedBoard)
-      : [];
+    if (!savedBoard || savedBoard === "undefined") return [];
+
+    const storedBoards: StoredBoard[] = JSON.parse(savedBoard);
+    return storedBoards.map((board) => ({
+      ...board,
+      id: board.id || crypto.randomUUID(),
+    }));
   });
   const [more, setMore] = useState(() => {
     const savedMore = localStorage.getItem("more");
@@ -37,9 +43,12 @@ export const SharedProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const addBoard = (navigate?: (path: string) => void) => {
     if (boards.length === 0) {
-      setBoards([{ name: "Board 1", lists: [] }]);
+      setBoards([{ id: crypto.randomUUID(), name: "Board 1", lists: [] }]);
     } else {
-      setBoards([...boards, { name: "", lists: [] }]);
+      setBoards([
+        ...boards,
+        { id: crypto.randomUUID(), name: "", lists: [] },
+      ]);
     }
     if (navigate) navigate(`/board/${boards.length}`);
   };
