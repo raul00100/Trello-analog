@@ -3,7 +3,7 @@
 A modern web application for task management based on the **Kanban methodology**.
 Users can create boards, columns, and tasks with intuitive **drag-and-drop functionality** for smooth organization.
 The app features **dynamic live wallpapers** for a customizable visual experience and a **global search page** that allows quick navigation across all boards and tasks.
-Boards are stored in Supabase and are associated with an anonymous session.
+Boards are stored in Supabase and associated with the signed-in user.
 
 ---
 
@@ -24,7 +24,7 @@ Boards are stored in Supabase and are associated with an anonymous session.
 * **Tailwind CSS** — styling and responsive layout
 * **Zustand** — theme selection state
 * **React Context** — shared board state
-* **Supabase** — PostgreSQL database and anonymous sessions
+* **Supabase** — PostgreSQL database and email/password authentication
 * **@hello-pangea/dnd** — smooth drag-and-drop interactions
 * **React Bits** — background
 * **ESLint** and **Prettier** — code quality and formatting
@@ -53,7 +53,7 @@ src/
       model/       Theme state
   shared/
     components/  Reusable inputs and error page
-    lib/         Shared utilities
+    lib/         Supabase client
     styles/      Global styles
   backgrounds/  Animated background implementations
 ```
@@ -78,7 +78,7 @@ Feature-specific UI and model types live together under `features/`. The
 
 ### Supabase setup
 
-1. Create a Supabase project and enable **Anonymous Sign-Ins** under Authentication settings.
+1. Create a Supabase project. Under Authentication settings, enable **Anonymous Sign-Ins** so registration can upgrade the current browser session and preserve its boards. Configure email/password authentication and set the site's URL/redirect URLs for local development and deployment.
 2. Run [`supabase/migrations/20261029000000_create_boards.sql`](./supabase/migrations/20261029000000_create_boards.sql) in the Supabase SQL Editor. The table uses row-level security so a session can only access its own boards.
 3. Copy `.env.example` to `.env.local` and set the project URL and publishable/anon key:
 
@@ -90,9 +90,9 @@ Feature-specific UI and model types live together under `features/`. The
    The anon key is intended for browser apps; RLS policies enforce data access. Never put a `service_role` key in a `NEXT_PUBLIC_` variable.
 4. Install dependencies and start the app as described below.
 
-Existing boards in `localStorage` are copied to the anonymous session's database on its first load, then the old board entry is removed from browser storage. The anonymous session itself remains in browser storage, so clearing site data or switching browsers/devices loses access to that session's boards. Google sign-in and account recovery are not configured yet.
+Registering upgrades the browser's anonymous Supabase session to an email/password account, preserving boards already stored for that session. Existing legacy boards in `localStorage` are copied during registration and removed from local storage after a successful copy. Signing into an existing account from a browser with anonymous boards does not merge the anonymous boards. Google sign-in and account recovery are not configured yet.
 
-For Vercel, add the same two public environment variables to the project's Environment Variables and redeploy. Enable anonymous sign-ins in Supabase before opening the deployed app.
+For Vercel, add the same two public environment variables to the project's Environment Variables and redeploy. Configure the production site URL and redirect URL in Supabase before registering accounts from the deployed app.
 
 ### Installation & Running
 

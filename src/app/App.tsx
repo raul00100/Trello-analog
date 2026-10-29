@@ -3,6 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useThemes } from "../features/themes/model/themeStore";
 import EmptyBoardCard from "../features/boards/components/EmptyBoardCard";
+import AuthPage from "../features/auth/components/AuthPage";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
 import NavPanel from "./layout/panel/NavPanel";
 
@@ -11,7 +12,7 @@ type AppProps = {
 };
 
 export default function App({ children }: AppProps) {
-  const { boards, storageStatus, storageError, retryStorage } =
+  const { authStatus, boards, storageStatus, storageError, retryStorage } =
     useSharedProvider();
   const { currentTheme, themesOptions } = useThemes();
 
@@ -19,6 +20,33 @@ export default function App({ children }: AppProps) {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) useThemes.setState({ currentTheme: savedTheme });
   }, []);
+
+  if (storageStatus === "error" && authStatus !== "signedIn") {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-black px-6 text-center text-white">
+        <p>Could not connect to your cloud storage.</p>
+        <p className="max-w-2xl text-sm text-red-200">{storageError}</p>
+        <button
+          className="rounded border border-white px-4 py-2 hover:bg-white/20"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (authStatus === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        Checking your account...
+      </div>
+    );
+  }
+
+  if (authStatus === "signedOut") {
+    return <AuthPage />;
+  }
 
   if (storageStatus === "loading") {
     return (

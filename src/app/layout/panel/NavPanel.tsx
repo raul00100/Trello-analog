@@ -24,7 +24,8 @@ const headerStyle =
 const buttonHeader = "flex items-center cursor-pointer ";
 
 export default function NavPanel() {
-  const { boards, more, setMore, setSearchColumn } = useSharedProvider();
+  const { boards, more, setMore, setSearchColumn, signOut } =
+    useSharedProvider();
   const pathname = usePathname();
   const isBoard = pathname.startsWith("/board/");
   const params = useParams<{ id: string }>();
@@ -36,6 +37,15 @@ export default function NavPanel() {
     isBoard && params.id && !isNaN(Number(params.id))
       ? Number(params.id)
       : homeBoardId;
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      window.alert(
+        error instanceof Error ? error.message : "Could not sign out."
+      );
+    }
+  };
 
   // animation for a folding and unfolding panel
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -106,17 +116,19 @@ export default function NavPanel() {
         <h1 className="text-lg lg:text-2xl font-medium font-stretch-expanded text-white lg:absolute lg:left-1/2 lg:-translate-x-1/8">
           My trello board
         </h1>
-        <button
-          onClick={() => setMore((prev) => !prev)}
-          className="mr-8 lg:mr-30"
-        >
-          <SettingsIcon
-            className={`text-white lg:scale-130 cursor-pointer ${
-              more ? "animate-spin" : ""
-            }`}
-            style={{ animationDuration: "5s" }}
-          />
-        </button>
+        <div className="mr-8 lg:mr-30">
+          <button
+            onClick={() => setMore((prev) => !prev)}
+            aria-label="Toggle settings"
+          >
+            <SettingsIcon
+              className={`text-white lg:scale-130 cursor-pointer ${
+                more ? "animate-spin" : ""
+              }`}
+              style={{ animationDuration: "5s" }}
+            />
+          </button>
+        </div>
       </div>
 
       {/* revealed panel */}
@@ -140,7 +152,10 @@ export default function NavPanel() {
           </p>
         </div>
 
-        <PanelSetting homeBoardId={homeBoardId} />
+        <PanelSetting
+          homeBoardId={homeBoardId}
+          onSignOut={() => void handleSignOut()}
+        />
       </div>
     </header>
   );

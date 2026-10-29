@@ -44,10 +44,6 @@ const ColumnList = React.memo(function ColumnList({
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("column", JSON.stringify(columns));
-  }, [columns]);
-
-  useEffect(() => {
     localStorage.setItem("compress", JSON.stringify(compress));
   }, [compress]);
 

@@ -3,6 +3,10 @@ import { createContext } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
 type ContextType = {
+  authStatus: "loading" | "signedOut" | "signedIn";
+  signIn: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<boolean>;
+  signOut: () => Promise<void>;
   boards: Board[];
   setBoards: Dispatch<SetStateAction<Board[]>>;
   storageStatus: "loading" | "ready" | "error";
