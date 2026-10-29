@@ -114,7 +114,7 @@ export default function NavPanel() {
           </h2>
         )}
         <h1 className="text-lg lg:text-2xl font-medium font-stretch-expanded text-white lg:absolute lg:left-1/2 lg:-translate-x-1/8">
-          My trello board
+          Management Tool
         </h1>
         <div className="mr-8 lg:mr-30">
           <button
@@ -147,8 +147,7 @@ export default function NavPanel() {
         {/* description */}
         <div className="flex-col text-center absolute left-1/2 -translate-x-1/3 mt-2 hidden md:flex">
           <p className={`${textDec} w-100 font-mono font-medium text-lg`}>
-            Trello is a web-based project management application that helps you
-            organize work
+            A web-based project management tool that helps you organize work
           </p>
         </div>
 

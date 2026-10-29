@@ -1,4 +1,4 @@
-# Trello Analog - Kanban Board
+# Management Tool - Kanban Board
 
 A modern web application for task management based on the **Kanban methodology**.
 Users can create boards, columns, and tasks with intuitive **drag-and-drop functionality** for smooth organization.
@@ -65,7 +65,7 @@ Feature-specific UI and model types live together under `features/`. The
 
 ## 🧑🏻‍💻 Deployment
 
-**Vercel:** [https://trello-analog.vercel.app/](https://trello-analog.vercel.app/)
+The original repository is available at [github.com/raul00100/Trello-analog](https://github.com/raul00100/Trello-analog).
 
 ---
 
@@ -78,7 +78,7 @@ Feature-specific UI and model types live together under `features/`. The
 
 ### Supabase setup
 
-1. Create a Supabase project. Under Authentication settings, enable **Anonymous Sign-Ins** so registration can upgrade the current browser session and preserve its boards. Configure email/password authentication and set the site's URL/redirect URLs for local development and deployment.
+1. Create a Supabase project. Configure email/password authentication and set the site's URL/redirect URLs for local development and deployment. Anonymous sign-ins are not required.
 2. Run [`supabase/migrations/20261029000000_create_boards.sql`](./supabase/migrations/20261029000000_create_boards.sql) in the Supabase SQL Editor. The table uses row-level security so a session can only access its own boards.
 3. Copy `.env.example` to `.env.local` and set the project URL and publishable/anon key:
 
@@ -90,7 +90,7 @@ Feature-specific UI and model types live together under `features/`. The
    The anon key is intended for browser apps; RLS policies enforce data access. Never put a `service_role` key in a `NEXT_PUBLIC_` variable.
 4. Install dependencies and start the app as described below.
 
-Registering upgrades the browser's anonymous Supabase session to an email/password account, preserving boards already stored for that session. Existing legacy boards in `localStorage` are copied during registration and removed from local storage after a successful copy. Signing into an existing account from a browser with anonymous boards does not merge the anonymous boards. Google sign-in and account recovery are not configured yet.
+Registration creates an email/password account directly. Boards are created and stored only after the user signs in. Boards from previous anonymous sessions or legacy browser storage are not imported; any leftover anonymous session from an older app version is signed out. Google sign-in and account recovery are not configured yet.
 
 For Vercel, add the same two public environment variables to the project's Environment Variables and redeploy. Configure the production site URL and redirect URL in Supabase before registering accounts from the deployed app.
 
@@ -99,8 +99,8 @@ For Vercel, add the same two public environment variables to the project's Envir
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/raul00100/Trello-analog.git
-cd Trello-analog
+git clone https://github.com/raul00100/Trello-analog.git management-tool
+cd management-tool
 ```
 
 2. **Install dependencies**

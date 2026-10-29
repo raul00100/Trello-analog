@@ -3,12 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import type { FC, ReactNode } from "react";
 import type { Board } from "../../features/boards/model/boardTypes";
-import {
-  clearLegacyBoards,
-  loadBoards,
-  loadLegacyBoards,
-  saveBoards,
-} from "../../features/boards/model/boardStorage";
+import { loadBoards, saveBoards } from "../../features/boards/model/boardStorage";
 import { SharedContext } from "../../shared/context/sharedContext";
 import { getSupabaseClient } from "../../shared/lib/supabaseClient";
 
@@ -76,13 +71,13 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
       }
     };
 
-    const handleSession = (userId: string | null, isAnonymous: boolean) => {
-      if (userId === activeUserId && (isAnonymous || boardsLoadedRef.current)) {
+    const handleSession = (userId: string | null) => {
+      if (userId === activeUserId && boardsLoadedRef.current) {
         return;
       }
       activeUserId = userId;
 
-      if (!userId || isAnonymous) {
+      if (!userId) {
         userIdRef.current = null;
         boardsLoadedRef.current = false;
         setBoards([]);
@@ -99,13 +94,25 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
       void loadUserBoards(userId);
     };
 
+    const clearOldAnonymousSession = async () => {
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (error) {
+        setStorageError(error.message);
+        setStorageStatus("error");
+        return;
+      }
+      handleSession(null);
+    };
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user;
-      queueMicrotask(() =>
-        handleSession(user?.id ?? null, user?.is_anonymous ?? false)
-      );
+      if (user?.is_anonymous) {
+        queueMicrotask(() => void clearOldAnonymousSession());
+        return;
+      }
+      queueMicrotask(() => handleSession(user?.id ?? null));
     });
 
     void supabase.auth.getSession().then(({ data, error }) => {
@@ -116,7 +123,11 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
         return;
       }
       const user = data.session?.user;
-      handleSession(user?.id ?? null, user?.is_anonymous ?? false);
+      if (user?.is_anonymous) {
+        void clearOldAnonymousSession();
+        return;
+      }
+      handleSession(user?.id ?? null);
     });
 
     return () => {
@@ -154,35 +165,14 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
 
   const register = async (email: string, password: string) => {
     const supabase = getSupabaseClient();
-    const { data: sessionData, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError) throw sessionError;
-
-    let user = sessionData.session?.user ?? null;
-    if (!user) {
-      const { data, error } = await supabase.auth.signInAnonymously();
-      if (error) throw error;
-      user = data.user;
-    }
-
-    if (!user) throw new Error("Could not start a registration session.");
-
-    const existingBoards = await loadBoards(user.id);
-    if (existingBoards.length === 0) {
-      const legacyBoards = loadLegacyBoards();
-      if (legacyBoards.length > 0) {
-        await saveBoards(legacyBoards, user.id);
-        clearLegacyBoards();
-      }
-    }
-
-    const { data, error } = await supabase.auth.updateUser(
-      { email, password },
-      { emailRedirectTo: window.location.origin }
-    );
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.origin },
+    });
     if (error) throw error;
 
-    return data.user.is_anonymous ?? false;
+    return !data.session;
   };
 
   const signOut = async () => {

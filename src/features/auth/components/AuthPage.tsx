@@ -2,7 +2,18 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { GalleryVerticalEnd } from "lucide-react";
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import { Button } from "../../../shared/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../shared/components/ui/card";
+import { Input } from "../../../shared/components/ui/input";
+import { Label } from "../../../shared/components/ui/label";
 
 export default function AuthPage() {
   const { signIn, register } = useSharedProvider();
@@ -34,7 +45,7 @@ export default function AuthPage() {
         );
         if (needsEmailConfirmation) {
           setInfoMessage(
-            "Check your email and confirm the address to finish creating your account. Your boards will remain attached to this browser session."
+            "Check your email and confirm the address to finish creating your account, then sign in."
           );
         } else {
           router.replace("/board/0");
@@ -57,104 +68,109 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#080b14] px-4 text-white">
-      <section className="w-full max-w-md rounded-2xl border border-white/15 bg-white/[0.06] p-8 shadow-2xl backdrop-blur-xl">
-        <p className="mb-2 text-sm font-medium uppercase tracking-[0.25em] text-indigo-300">
-          Trello Analog
-        </p>
-        <h1 className="mb-2 text-3xl font-semibold">
-          {mode === "signIn" ? "Welcome back" : "Create your account"}
-        </h1>
-        <p className="mb-7 text-sm text-white/65">
-          {mode === "signIn"
-            ? "Sign in to access your boards."
-            : "Create an account to keep your boards safe and accessible."}
-        </p>
-
-        <div className="mb-6 grid grid-cols-2 rounded-lg bg-black/25 p-1 text-sm">
-          <button
-            type="button"
-            aria-pressed={mode === "signIn"}
-            onClick={() => changeMode("signIn")}
-            className={`rounded-md px-3 py-2 transition ${
-              mode === "signIn" ? "bg-white/15 text-white" : "text-white/60"
-            }`}
-          >
-            Sign in
-          </button>
-          <button
-            type="button"
-            aria-pressed={mode === "signUp"}
-            onClick={() => changeMode("signUp")}
-            className={`rounded-md px-3 py-2 transition ${
-              mode === "signUp" ? "bg-white/15 text-white" : "text-white/60"
-            }`}
-          >
-            Register
-          </button>
-        </div>
-
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <label className="flex flex-col gap-2 text-sm text-white/80">
-            Email
-            <input
-              type="email"
-              autoComplete="email"
-              required
-              value={activeEmail}
-              onChange={(event) => {
-                const email = event.target.value;
-                if (mode === "signIn") {
-                  setSignInEmail(email);
-                } else {
-                  setSignUpEmail(email);
-                }
-              }}
-              className="rounded-lg border border-white/15 bg-black/30 px-3 py-3 text-white outline-none transition focus:border-indigo-400"
-              placeholder="you@example.com"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm text-white/80">
-            Password
-            <input
-              type="password"
-              autoComplete={
-                mode === "signIn" ? "current-password" : "new-password"
+    <main className="dark flex min-h-svh items-center justify-center bg-background p-6 text-foreground md:p-10">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="items-center text-center">
+          <div className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <GalleryVerticalEnd className="size-5" />
+          </div>
+          <CardTitle className="text-xl">
+            {mode === "signIn" ? "Welcome back" : "Create your account"}
+          </CardTitle>
+          <CardDescription>
+            {mode === "signIn"
+              ? "Sign in to Management Tool"
+              : "Register to save and access your boards"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6 grid grid-cols-2 rounded-lg bg-muted p-1 text-sm">
+            <Button
+              type="button"
+              variant={mode === "signIn" ? "default" : "ghost"}
+              aria-pressed={mode === "signIn"}
+              onClick={() => changeMode("signIn")}
+              className={
+                mode === "signIn"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "text-muted-foreground hover:text-foreground"
               }
-              minLength={6}
-              required
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="rounded-lg border border-white/15 bg-black/30 px-3 py-3 text-white outline-none transition focus:border-indigo-400"
-              placeholder="At least 6 characters"
-            />
-          </label>
+            >
+              Sign in
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "signUp" ? "default" : "ghost"}
+              aria-pressed={mode === "signUp"}
+              onClick={() => changeMode("signUp")}
+              className={
+                mode === "signUp"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "text-muted-foreground hover:text-foreground"
+              }
+            >
+              Register
+            </Button>
+          </div>
 
-          {errorMessage && (
-            <p role="alert" className="text-sm text-red-300">
-              {errorMessage}
-            </p>
-          )}
-          {infoMessage && (
-            <p role="status" className="text-sm text-emerald-200">
-              {infoMessage}
-            </p>
-          )}
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            <div className="grid gap-2">
+              <Label htmlFor="auth-email">Email</Label>
+              <Input
+                id="auth-email"
+                type="email"
+                autoComplete="email"
+                required
+                value={activeEmail}
+                onChange={(event) => {
+                  const email = event.target.value;
+                  if (mode === "signIn") {
+                    setSignInEmail(email);
+                  } else {
+                    setSignUpEmail(email);
+                  }
+                }}
+                placeholder="you@example.com"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2 rounded-lg bg-indigo-500 px-4 py-3 font-semibold transition hover:bg-indigo-400 disabled:cursor-wait disabled:opacity-60"
-          >
-            {isSubmitting
-              ? "Please wait..."
-              : mode === "signIn"
-                ? "Sign in"
-                : "Create account"}
-          </button>
-        </form>
-      </section>
+            <div className="grid gap-2">
+              <Label htmlFor="auth-password">Password</Label>
+              <Input
+                id="auth-password"
+                type="password"
+                autoComplete={
+                  mode === "signIn" ? "current-password" : "new-password"
+                }
+                minLength={6}
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="At least 6 characters"
+              />
+            </div>
+
+            {errorMessage && (
+              <p role="alert" className="text-sm text-destructive">
+                {errorMessage}
+              </p>
+            )}
+            {infoMessage && (
+              <p role="status" className="text-sm text-emerald-600">
+                {infoMessage}
+              </p>
+            )}
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting
+                ? "Please wait..."
+                : mode === "signIn"
+                  ? "Sign in"
+                  : "Create account"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   );
 }

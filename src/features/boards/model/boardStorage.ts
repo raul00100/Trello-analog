@@ -1,21 +1,6 @@
 import type { Board } from "./boardTypes";
 import { getSupabaseClient } from "../../../shared/lib/supabaseClient";
 
-type StoredBoard = Omit<Board, "id"> & { id?: string };
-
-const BOARD_STORAGE_KEY = "board";
-
-export function loadLegacyBoards(): Board[] {
-  const savedBoards = localStorage.getItem(BOARD_STORAGE_KEY);
-  if (!savedBoards || savedBoards === "undefined") return [];
-
-  const storedBoards: StoredBoard[] = JSON.parse(savedBoards);
-  return storedBoards.map((board) => ({
-    ...board,
-    id: board.id || crypto.randomUUID(),
-  }));
-}
-
 export async function loadBoards(userId: string): Promise<Board[]> {
   const { data, error } = await getSupabaseClient()
     .from("boards")
@@ -71,8 +56,4 @@ export async function saveBoards(
     .eq("owner_id", userId)
     .in("id", removedIds);
   if (error) throw error;
-}
-
-export function clearLegacyBoards(): void {
-  localStorage.removeItem(BOARD_STORAGE_KEY);
 }

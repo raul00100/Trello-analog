@@ -4,7 +4,7 @@ import { SharedProvider } from "./providers/SharedProvider";
 import "../shared/styles/index.css";
 
 export const metadata = {
-  title: "Trello - analog",
+  title: "Management Tool",
   description: "A Kanban board for organizing your work.",
   icons: { icon: "/icon.jpg" },
 };
