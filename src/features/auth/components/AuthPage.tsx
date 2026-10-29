@@ -14,14 +14,20 @@ import {
 } from "../../../shared/components/ui/card";
 import { Input } from "../../../shared/components/ui/input";
 import { Label } from "../../../shared/components/ui/label";
+import {
+  validateRegistration,
+  validateSignIn,
+} from "../model/authValidation";
 
 export default function AuthPage() {
   const { signIn, register } = useSharedProvider();
   const router = useRouter();
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
+  const [name, setName] = useState("");
   const [signInEmail, setSignInEmail] = useState("");
   const [signUpEmail, setSignUpEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const activeEmail = mode === "signIn" ? signInEmail : signUpEmail;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
@@ -31,6 +37,16 @@ export default function AuthPage() {
     event.preventDefault();
     setErrorMessage(null);
     setInfoMessage(null);
+
+    const validationError =
+      mode === "signIn"
+        ? validateSignIn(signInEmail, password)
+        : validateRegistration(name, signUpEmail, password, confirmPassword);
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -39,10 +55,7 @@ export default function AuthPage() {
         const savedBoardId = localStorage.getItem("boardId") ?? "0";
         router.replace(`/board/${savedBoardId}`);
       } else {
-        const needsEmailConfirmation = await register(
-          signUpEmail,
-          password
-        );
+        const needsEmailConfirmation = await register(name, signUpEmail, password);
         if (needsEmailConfirmation) {
           setInfoMessage(
             "Check your email and confirm the address to finish creating your account, then sign in."
@@ -63,6 +76,7 @@ export default function AuthPage() {
   const changeMode = (nextMode: "signIn" | "signUp") => {
     setMode(nextMode);
     setPassword("");
+    setConfirmPassword("");
     setErrorMessage(null);
     setInfoMessage(null);
   };
@@ -114,6 +128,22 @@ export default function AuthPage() {
           </div>
 
           <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            {mode === "signUp" && (
+              <div className="grid gap-2">
+                <Label htmlFor="auth-name">Name</Label>
+                <Input
+                  id="auth-name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  maxLength={100}
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="Your name"
+                />
+              </div>
+            )}
+
             <div className="grid gap-2">
               <Label htmlFor="auth-email">Email</Label>
               <Input
@@ -121,6 +151,7 @@ export default function AuthPage() {
                 type="email"
                 autoComplete="email"
                 required
+                maxLength={254}
                 value={activeEmail}
                 onChange={(event) => {
                   const email = event.target.value;
@@ -143,12 +174,30 @@ export default function AuthPage() {
                   mode === "signIn" ? "current-password" : "new-password"
                 }
                 minLength={6}
+                maxLength={128}
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="At least 6 characters"
               />
             </div>
+
+            {mode === "signUp" && (
+              <div className="grid gap-2">
+                <Label htmlFor="auth-confirm-password">Confirm password</Label>
+                <Input
+                  id="auth-confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={6}
+                  maxLength={128}
+                  required
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="Enter your password again"
+                />
+              </div>
+            )}
 
             {errorMessage && (
               <p role="alert" className="text-sm text-destructive">

@@ -6,13 +6,13 @@ import { useSharedProvider } from "../shared/context/useSharedProvider";
 
 export default function HomePage() {
   const router = useRouter();
-  const { authStatus } = useSharedProvider();
+  const { authStatus, boards } = useSharedProvider();
 
   useEffect(() => {
-    if (authStatus !== "signedIn") return;
+    if (authStatus !== "signedIn" || boards.length === 0) return;
     const savedBoardId = localStorage.getItem("boardId");
     router.replace(`/board/${savedBoardId ?? 0}`);
-  }, [authStatus, router]);
+  }, [authStatus, boards.length, router]);
 
   return null;
 }

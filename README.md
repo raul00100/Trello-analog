@@ -90,7 +90,7 @@ The original repository is available at [github.com/raul00100/Trello-analog](htt
    The anon key is intended for browser apps; RLS policies enforce data access. Never put a `service_role` key in a `NEXT_PUBLIC_` variable.
 4. Install dependencies and start the app as described below.
 
-Registration creates an email/password account directly. Boards are created and stored only after the user signs in. Boards from previous anonymous sessions or legacy browser storage are not imported; any leftover anonymous session from an older app version is signed out. Google sign-in and account recovery are not configured yet.
+Registration creates an email/password account directly and stores the user's name in Supabase Auth metadata (`full_name`) for future profile features. Users must enter the password twice. Boards are created and stored only after the user signs in. Boards from previous anonymous sessions or legacy browser storage are not imported; any leftover anonymous session from an older app version is signed out. Google sign-in and account recovery are not configured yet.
 
 For Vercel, add the same two public environment variables to the project's Environment Variables and redeploy. Configure the production site URL and redirect URL in Supabase before registering accounts from the deployed app.
 

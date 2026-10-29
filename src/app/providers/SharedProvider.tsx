@@ -3,7 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 import type { FC, ReactNode } from "react";
 import type { Board } from "../../features/boards/model/boardTypes";
-import { loadBoards, saveBoards } from "../../features/boards/model/boardStorage";
+import {
+  loadBoardsOrCreateInitial,
+  saveBoards,
+} from "../../features/boards/model/boardStorage";
+import {
+  validateEmail,
+  validatePassword,
+  validateRegistration,
+} from "../../features/auth/model/authValidation";
 import { SharedContext } from "../../shared/context/sharedContext";
 import { getSupabaseClient } from "../../shared/lib/supabaseClient";
 
@@ -42,6 +50,7 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
   useEffect(() => {
     let cancelled = false;
     let activeUserId: string | null = null;
+    const loadingUserIds = new Set<string>();
     let supabase: ReturnType<typeof getSupabaseClient>;
     try {
       supabase = getSupabaseClient();
@@ -55,19 +64,24 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
     }
 
     const loadUserBoards = async (userId: string) => {
+      if (loadingUserIds.has(userId)) return;
+      loadingUserIds.add(userId);
+
       try {
-        const loadedBoards = await loadBoards(userId);
-        if (cancelled) return;
+        const loadedBoards = await loadBoardsOrCreateInitial(userId);
+        if (cancelled || userIdRef.current !== userId) return;
         setBoards(loadedBoards);
         boardsLoadedRef.current = true;
         setStorageError(null);
         setStorageStatus("ready");
       } catch (error) {
-        if (cancelled) return;
+        if (cancelled || userIdRef.current !== userId) return;
         setStorageError(
           error instanceof Error ? error.message : "Could not load your boards."
         );
         setStorageStatus("error");
+      } finally {
+        loadingUserIds.delete(userId);
       }
     };
 
@@ -141,7 +155,7 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
     setStorageStatus("loading");
     setStorageError(null);
     boardsLoadedRef.current = false;
-    void loadBoards(userIdRef.current)
+    void loadBoardsOrCreateInitial(userIdRef.current)
       .then((loadedBoards) => {
         setBoards(loadedBoards);
         boardsLoadedRef.current = true;
@@ -156,19 +170,33 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
   }, [loadAttempt]);
 
   const signIn = async (email: string, password: string) => {
+    const validationError = validateEmail(email) ?? validatePassword(password);
+    if (validationError) throw new Error(validationError);
+
     const { error } = await getSupabaseClient().auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
     if (error) throw error;
   };
 
-  const register = async (email: string, password: string) => {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase.auth.signUp({
+  const register = async (name: string, email: string, password: string) => {
+    const validationError = validateRegistration(
+      name,
       email,
       password,
-      options: { emailRedirectTo: window.location.origin },
+      password
+    );
+    if (validationError) throw new Error(validationError);
+
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: { full_name: name.trim() },
+      },
     });
     if (error) throw error;
 

@@ -2,7 +2,6 @@
 
 import { useEffect, type ReactNode } from "react";
 import { useThemes } from "../features/themes/model/themeStore";
-import EmptyBoardCard from "../features/boards/components/EmptyBoardCard";
 import AuthPage from "../features/auth/components/AuthPage";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
 import NavPanel from "./layout/panel/NavPanel";
@@ -12,7 +11,7 @@ type AppProps = {
 };
 
 export default function App({ children }: AppProps) {
-  const { authStatus, boards, storageStatus, storageError, retryStorage } =
+  const { authStatus, storageStatus, storageError, retryStorage } =
     useSharedProvider();
   const { currentTheme, themesOptions } = useThemes();
 
@@ -67,16 +66,6 @@ export default function App({ children }: AppProps) {
         >
           Retry
         </button>
-      </div>
-    );
-  }
-
-  if (boards.length === 0) {
-    return (
-      <div className="absolute inset-0 z-0 bg-black">
-        <div className="relative z-10 flex h-screen items-center justify-center">
-          <EmptyBoardCard />
-        </div>
       </div>
     );
   }

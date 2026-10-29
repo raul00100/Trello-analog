@@ -103,7 +103,7 @@ export default function NavPanel() {
               </span>
             </button>
           </h2>
-        ) : (
+        ) : boards.length > 0 ? (
           <h2 className={`${headerStyle}`}>
             <Link href={`/board/${homeBoardId}`}>
               <button className={buttonHeader}>
@@ -112,6 +112,8 @@ export default function NavPanel() {
               </button>
             </Link>
           </h2>
+        ) : (
+          <div className={headerStyle} />
         )}
         <h1 className="text-lg lg:text-2xl font-medium font-stretch-expanded text-white lg:absolute lg:left-1/2 lg:-translate-x-1/8">
           Management Tool
@@ -138,7 +140,7 @@ export default function NavPanel() {
         }`}
       >
         {/* board switcher */}
-        {isBoard ? (
+        {isBoard || boards.length === 0 ? (
           <BoardSwitcher boardId={boardId} />
         ) : (
           <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55" />

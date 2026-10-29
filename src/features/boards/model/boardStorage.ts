@@ -17,6 +17,35 @@ export async function loadBoards(userId: string): Promise<Board[]> {
   }));
 }
 
+export async function loadBoardsOrCreateInitial(
+  userId: string
+): Promise<Board[]> {
+  const boards = await loadBoards(userId);
+  if (boards.length > 0) return boards;
+
+  const initialBoard: Board = {
+    id: `initial-${userId}`,
+    name: "Board 1",
+    lists: [],
+  };
+  const { error } = await getSupabaseClient()
+    .from("boards")
+    .upsert(
+      {
+        id: initialBoard.id,
+        owner_id: userId,
+        position: 0,
+        name: initialBoard.name,
+        lists: initialBoard.lists,
+      },
+      { onConflict: "owner_id,id" }
+    );
+
+  if (error) throw error;
+
+  return loadBoards(userId);
+}
+
 export async function saveBoards(
   boards: Board[],
   userId: string
