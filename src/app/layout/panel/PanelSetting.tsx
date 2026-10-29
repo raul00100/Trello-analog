@@ -1,4 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import SearchIcon from "@mui/icons-material/Search";
 import HomeIcon from "@mui/icons-material/Home";
@@ -10,7 +13,7 @@ type PanelSettingProps = {
 const icons = "mr-2 lg:scale-105 scale-95";
 
 export default function PanelSetting({ homeBoardId }: PanelSettingProps) {
-  const location = useLocation();
+  const pathname = usePathname();
 
   const settingOptions = [
     {
@@ -38,13 +41,13 @@ export default function PanelSetting({ homeBoardId }: PanelSettingProps) {
               key={idx}
               className={`font-sans font-stretch-semi-expanded antialiased lg:text-lg text-sm transition-all cursor-pointer 
                       ${
-                        location.pathname === option.path
+                        pathname === option.path
                           ? " underline scale-105 text-white underline-offset-3 hover:animate-pulse"
                           : " hover:underline hover:scale-105 text-zinc-300 hover:text-white hover:underline-offset-3"
                       }
                         `}
             >
-              <Link to={option.path}>
+              <Link href={option.path}>
                 <span className="flex items-center ">
                   {option.icon}
                   {option.label}

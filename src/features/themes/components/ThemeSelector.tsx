@@ -1,11 +1,13 @@
+"use client";
+
 import { AnimatePresence, motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 import { useThemes } from "../model/themeStore";
 
 export default function ThemeSelector() {
   const { themesOptions, currentTheme, setCurrentTheme } = useThemes();
 
-  const location = useLocation();
+  const pathname = usePathname();
   if (!themesOptions || themesOptions.length === 0)
     return (
       <p className="text-2xl text-white flex items-center justify-center z-20 h-screen w-screen">
@@ -16,7 +18,7 @@ export default function ThemeSelector() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={location.pathname}
+        key={pathname}
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -10, opacity: 0 }}

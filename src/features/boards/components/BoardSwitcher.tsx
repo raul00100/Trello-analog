@@ -1,5 +1,8 @@
+"use client";
+
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 //components and context
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import SharedInput from "../../../shared/components/SharedInput";
@@ -19,7 +22,7 @@ export default function Switcher({ boardId }: SwitcherProps) {
   const [hovered, setHovered] = useState<number | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleAddBoard = () => {
     addBoard();
@@ -51,7 +54,7 @@ export default function Switcher({ boardId }: SwitcherProps) {
           {/* list of board name */}
           <button
             onClick={() => {
-              navigate(`/board/${index}`);
+              router.push(`/board/${index}`);
             }}
             onMouseEnter={() => setHovered(index)}
             onMouseLeave={() => setHovered(null)}
@@ -131,7 +134,7 @@ export default function Switcher({ boardId }: SwitcherProps) {
         </div>
       ))}
       {/* add another board */}
-      <Link to={`/board/${boards.length}`}>
+      <Link href={`/board/${boards.length}`}>
         <button
           onClick={handleAddBoard}
           className="flex items-center py-1 mb-5 hover:bg-white hover:text-black text-white active:scale-95 underline rounded transition-all duration-300 mt-5 w-41.5 justify-center lg:scale-110 scale-95 cursor-pointer"

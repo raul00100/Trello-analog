@@ -1,14 +1,18 @@
 import type { Board } from "../../features/boards/model/boardTypes";
-import React, { createContext } from "react";
+import { createContext } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 type ContextType = {
   boards: Board[];
-  setBoards: React.Dispatch<React.SetStateAction<Board[]>>;
+  setBoards: Dispatch<SetStateAction<Board[]>>;
+  storageStatus: "loading" | "ready" | "error";
+  storageError: string | null;
+  retryStorage: () => void;
   more: boolean;
-  setMore: React.Dispatch<React.SetStateAction<boolean>>;
+  setMore: Dispatch<SetStateAction<boolean>>;
   addBoard: () => void;
   searchColumn: string | undefined;
-  setSearchColumn: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setSearchColumn: Dispatch<SetStateAction<string | undefined>>;
 };
 
 export const SharedContext = createContext<ContextType | undefined>(undefined);

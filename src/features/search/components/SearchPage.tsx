@@ -1,7 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+"use client";
+
+import { useState, useMemo, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 //components and context
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import type { SearchHistoryItem } from "../model/searchTypes";
@@ -17,23 +19,33 @@ const arrowBlock = "flex items-center ";
 export default function SearchPage() {
   const { boards, setSearchColumn } = useSharedProvider();
   const [searchText, setSearchText] = useState("");
-  const location = useLocation();
-  const [history, setHistory] = useState<SearchHistoryItem[]>(() => {
-    const savedHistory = localStorage.getItem("history");
-    if (!savedHistory) return [];
-
-    const storedHistory: SearchHistoryItem[] = JSON.parse(savedHistory);
-    return storedHistory.map((item) => ({
-      ...item,
-      boardId:
-        item.boardId ??
-        boards.find((board) => board.name === item.boardName)?.id,
-    }));
-  });
+  const pathname = usePathname();
+  const [history, setHistory] = useState<SearchHistoryItem[]>([]);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const historyInitialized = useRef(false);
 
   useEffect(() => {
+    if (historyInitialized.current) return;
+    historyInitialized.current = true;
+    const savedHistory = localStorage.getItem("history");
+    if (savedHistory) {
+      const storedHistory: SearchHistoryItem[] = JSON.parse(savedHistory);
+      setHistory(
+        storedHistory.map((item) => ({
+          ...item,
+          boardId:
+            item.boardId ??
+            boards.find((board) => board.name === item.boardName)?.id,
+        }))
+      );
+    }
+    setHistoryLoaded(true);
+  }, [boards]);
+
+  useEffect(() => {
+    if (!historyLoaded) return;
     localStorage.setItem("history", JSON.stringify(history));
-  }, [history]);
+  }, [history, historyLoaded]);
 
   const filtered = useMemo(() => {
     const m = searchText.trim().toLowerCase();
@@ -92,7 +104,7 @@ export default function SearchPage() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={location.pathname}
+        key={pathname}
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -10, opacity: 0 }}
@@ -122,7 +134,7 @@ export default function SearchPage() {
                     );
                     if (boardIdx < 0) return null;
                     return (
-                      <Link key={idx} to={`/board/${boardIdx}`}>
+                      <Link key={idx} href={`/board/${boardIdx}`}>
                         <li
                           key={idx}
                           className="border-b-2 border-black py-3 lg:w-130 w-80 cursor-pointer lg:text-lg text-base"

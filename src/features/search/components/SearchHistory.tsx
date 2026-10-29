@@ -1,6 +1,8 @@
+"use client";
+
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 //components and context
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import type { SearchHistoryItem } from "../model/searchTypes";
@@ -79,7 +81,7 @@ export default function History({
                   <div className="w-10 h-12" />
                 )}
 
-                <Link key={idx} to={`/board/${boardIdx}`}>
+                <Link key={idx} href={`/board/${boardIdx}`}>
                   <li
                     key={idx}
                     className={`${historyBlock} cursor-pointer justify-between flex-1 transition-transform`}

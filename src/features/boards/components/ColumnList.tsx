@@ -35,11 +35,13 @@ const ColumnList = React.memo(function ColumnList({
   const { searchColumn } = useSharedProvider();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
-  const [compress, setCompress] = useState<string[]>(() => {
-    const savedCompress = localStorage.getItem("compress");
-    return savedCompress ? JSON.parse(savedCompress) : [];
-  });
+  const [compress, setCompress] = useState<string[]>([]);
   const [showSetting, setShowSetting] = useState<string | null>("");
+
+  useEffect(() => {
+    const savedCompress = localStorage.getItem("compress");
+    if (savedCompress) setCompress(JSON.parse(savedCompress));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("column", JSON.stringify(columns));

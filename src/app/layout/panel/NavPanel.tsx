@@ -1,6 +1,9 @@
-import { useEffect, useRef } from "react";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { useMatch, Link, useParams } from "react-router-dom";
+import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
 //icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -22,11 +25,13 @@ const buttonHeader = "flex items-center cursor-pointer ";
 
 export default function NavPanel() {
   const { boards, more, setMore, setSearchColumn } = useSharedProvider();
-
-  const isBoard = !!useMatch("/board/:id");
-  const params = useParams();
-  const savedBoardId = localStorage.getItem("boardId");
-  const homeBoardId = Number(savedBoardId);
+  const pathname = usePathname();
+  const isBoard = pathname.startsWith("/board/");
+  const params = useParams<{ id: string }>();
+  const [homeBoardId, setHomeBoardId] = useState(0);
+  useEffect(() => {
+    setHomeBoardId(Number(localStorage.getItem("boardId")));
+  }, []);
   const boardId =
     isBoard && params.id && !isNaN(Number(params.id))
       ? Number(params.id)
@@ -90,7 +95,7 @@ export default function NavPanel() {
           </h2>
         ) : (
           <h2 className={`${headerStyle}`}>
-            <Link to={`/board/${homeBoardId}`}>
+            <Link href={`/board/${homeBoardId}`}>
               <button className={buttonHeader}>
                 <ArrowBackIosIcon />
                 <span className="hidden lg:block"> Go Home</span>
