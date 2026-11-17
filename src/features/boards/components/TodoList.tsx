@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 //icons
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import DeleteIcon from "@mui/icons-material/Delete";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import { Textarea } from "../../../shared/components/ui/textarea";
+import TodoEditDialog from "./TodoEditDialog";
 
 type CardsType = {
   cards: { id: string; text: string; done: boolean }[];
@@ -15,11 +14,10 @@ type CardsType = {
 };
 
 export default function Column({ cards, setCards }: CardsType) {
-  const [editingValue, setEditingValue] = useState("");
   const [input, setInput] = useState("");
   const [add, setAdd] = useState(false);
-  const [hovered, setHovered] = useState<number | null>(null);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingTodoId, setEditingTodoId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState("");
 
   const addTodo = () => {
     if (input.trim() === "") return;
@@ -30,24 +28,25 @@ export default function Column({ cards, setCards }: CardsType) {
     setInput("");
   };
 
-  const removeTodo = (index: number) => {
-    setCards(cards.filter((_, i) => i !== index));
+  const removeTodo = (id: string) => {
+    setCards(cards.filter((card) => card.id !== id));
+    setEditingTodoId(null);
   };
 
-  const handleEdit = (index: number, value: string) => {
-    const updated = [...cards];
-    updated[index].text = value;
-    setCards(updated);
+  const saveTodoEdit = () => {
+    if (!editingTodoId || editingValue.trim() === "") return;
+    setCards(
+      cards.map((card) =>
+        card.id === editingTodoId ? { ...card, text: editingValue } : card,
+      ),
+    );
+    setEditingTodoId(null);
   };
 
-  const finishEdit = (index: number, value: string, removeIfEmpty = false) => {
-    if (value.trim() === "") {
-      if (removeIfEmpty) removeTodo(index);
-      else return;
-    } else {
-      handleEdit(index, value);
-    }
-    setEditingIndex(null);
+  const openTodoEditor = (id: string, text: string) => {
+    setAdd(false);
+    setEditingTodoId(id);
+    setEditingValue(text);
   };
 
   const toggleDone = (index: number) => {
@@ -58,89 +57,59 @@ export default function Column({ cards, setCards }: CardsType) {
 
   return (
     <div className="flex flex-col">
+      {/* todo content */}
       {cards.map((item, index) => (
         <ul
           key={index}
-          className="bg-zinc-300 text-black pl-3 rounded-md mt-1.5 py-1 h-7.5 flex items-center relative z-0"
-          onMouseEnter={() => setHovered(index)}
-          onMouseLeave={() => setHovered(null)}
+          className="relative z-0 mt-1.5 flex h-7.5 w-full items-center rounded-md bg-zinc-300 pl-3 py-1 text-black"
           onClick={() => setAdd(false)}
-          onDoubleClick={() => {
-            if (item.done) return;
-            setEditingIndex(index);
-            setEditingValue(item.text);
-          }}
         >
-          <li>
-            {/* editing a todo */}
-            {editingIndex === index && add === false ? (
-              <div className="flex flex-row items-center justify-between">
-                <Textarea
-                  value={editingValue}
-                  onChange={(event) => setEditingValue(event.target.value)}
-                  autoFocus
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      finishEdit(index, editingValue, true);
-                    }
-                  }}
-                  onBlur={() => finishEdit(index, editingValue)}
-                  className="h-7.5 min-h-0 w-51 resize-none rounded border-none bg-transparent px-2 py-0 text-base text-black shadow-none focus-visible:ring-0"
+          <li className="w-full min-w-0">
+            <div className="relative flex w-full min-w-0 flex-row items-center justify-between">
+              <button
+                type="button"
+                aria-label={`Edit todo: ${item.text}`}
+                onClick={() => openTodoEditor(item.id, item.text)}
+                className="absolute inset-0 z-0 rounded bg-transparent p-0 focus-visible:outline focus-visible:outline-offset-[-2px] focus-visible:outline-white cursor-pointer"
+              />
+              <label className="relative z-10 inline-flex shrink-0 cursor-pointer items-center">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={item.done}
+                  onChange={() => toggleDone(index)}
                 />
-                <EditIcon />
-              </div>
-            ) : (
-              //  viewing the list
-              <div className=" flex flex-row items-center justify-between lg:w-full w-[185px]">
-                {/* checkbox thing */}
-                <label className="inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={item.done}
-                    onChange={() => toggleDone(index)}
+                <div
+                  className={`w-[19px] h-[19px] rounded-full border-2 mr-2 flex items-center justify-center ${
+                    item.done ? "bg-lime-600 border-none" : "border-black"
+                  } transition-all`}
+                >
+                  <DoneOutlineIcon
+                    className={`hidden scale-53 ${
+                      item.done ? "text-black" : "text-zinc-300"
+                    }`}
                   />
-                  <div
-                    className={`w-[19px] h-[19px] rounded-full border-2 mr-2 flex items-center justify-center ${
-                      item.done ? "bg-lime-600 border-none" : "border-black"
-                    } transition-all`}
-                  >
-                    <DoneOutlineIcon
-                      className={`hidden scale-53 ${
-                        item.done ? "text-black" : "text-zinc-300"
-                      }`}
-                    />
-                  </div>
-                </label>
-                {/* todo text */}
-                <span
-                  className={`flex-1 cursor-pointer lg:text-base text-sm truncate w-42 ${
-                    item.done ? "line-through text-gray-400" : ""
-                  }`}
-                >
-                  {item.text}
-                </span>
-                <button
-                  onClick={() => removeTodo(index)}
-                  className={`hover:text-red-700 px-2.5 rounded cursor-pointer   ${
-                    hovered === index ? "opacity-100" : "opacity-0"
-                  } transition-all duration-300`}
-                >
-                  <DeleteIcon className="scale-90 lg:scale-100" />
-                </button>
-              </div>
-            )}
+                </div>
+              </label>
+              <span
+                className={`pointer-events-none relative z-10 min-w-0 flex-1 truncate text-left lg:text-base text-sm mr-2 ${
+                  item.done ? "line-through text-gray-400" : ""
+                }`}
+              >
+                {item.text}
+              </span>
+            </div>
           </li>
         </ul>
       ))}
-      {/* adding a new cards */}
+
+      {/* adding a new todo */}
       {add ? (
         <div>
           <Textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            className="mt-4 h-20 max-h-screen resize-none rounded-lg  bg-black py-1.5 pl-2 text-base text-white placeholder:text-gray-400 focus-visible:border-zinc-100 focus-visible:ring-1"
+            className="mt-4 h-20 max-h-screen resize-none rounded-lg  bg-black py-1.5 pl-2 text-base text-white placeholder:text-gray-400 focus-visible:border-zinc-100 focus-visible:ring-offset-0"
             placeholder="Add a new todo..."
             autoFocus
             onKeyDown={(e) => {
@@ -177,6 +146,15 @@ export default function Column({ cards, setCards }: CardsType) {
           <AddIcon />
           Add Todo
         </button>
+      )}
+      {editingTodoId && (
+        <TodoEditDialog
+          value={editingValue}
+          onChange={setEditingValue}
+          onSave={saveTodoEdit}
+          onDelete={() => removeTodo(editingTodoId)}
+          onCancel={() => setEditingTodoId(null)}
+        />
       )}
     </div>
   );
