@@ -29,26 +29,55 @@ const ColumnList = React.memo(function ColumnList({
 }: ColumnListProps) {
   const { searchColumn } = useSharedProvider();
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
-  const editingColumn = columns.find((column) => column.id === editingColumnId);
+  const [newColumnDraft, setNewColumnDraft] = useState<Column | null>(null);
+  const [todoEditRequest, setTodoEditRequest] = useState<{
+    columnId: string;
+    todoId: string;
+  } | null>(null);
+  const editingColumn =
+    newColumnDraft ?? columns.find((column) => column.id === editingColumnId);
+
+  const handleTodoEditRequestHandled = React.useCallback(
+    (columnId: string, todoId: string) => {
+      setTodoEditRequest((currentRequest) =>
+        currentRequest?.columnId === columnId &&
+        currentRequest.todoId === todoId
+          ? null
+          : currentRequest,
+      );
+    },
+    [],
+  );
 
   const addColumn = () => {
-    const newColumn = {
+    setEditingColumnId(null);
+    setTodoEditRequest(null);
+    setNewColumnDraft({
       id: Date.now().toString(),
       name: `Column ${columns.length + 1}`,
       todos: [],
-    };
-    setColumns([...columns, newColumn]);
-    setEditingColumnId(newColumn.id);
+    });
   };
 
   const saveColumnName = (name: string) => {
-    if (!editingColumnId) return;
-    setColumns((currentColumns) =>
-      currentColumns.map((column) =>
-        column.id === editingColumnId ? { ...column, name } : column,
-      ),
-    );
+    if (newColumnDraft) {
+      setColumns((currentColumns) => [
+        ...currentColumns,
+        { ...newColumnDraft, name },
+      ]);
+    } else if (editingColumnId) {
+      setColumns((currentColumns) =>
+        currentColumns.map((column) =>
+          column.id === editingColumnId ? { ...column, name } : column,
+        ),
+      );
+    } else {
+      return;
+    }
+
     setEditingColumnId(null);
+    setNewColumnDraft(null);
+    setTodoEditRequest(null);
   };
 
   const deleteColumn = () => {
@@ -57,15 +86,26 @@ const ColumnList = React.memo(function ColumnList({
       currentColumns.filter((column) => column.id !== editingColumnId),
     );
     setEditingColumnId(null);
+    setNewColumnDraft(null);
+    setTodoEditRequest(null);
+  };
+
+  const cancelColumnEdit = () => {
+    setEditingColumnId(null);
+    setNewColumnDraft(null);
+    setTodoEditRequest(null);
   };
 
   // drag and drop functionality
   const handleOnDragEnd = (result: import("@hello-pangea/dnd").DropResult) => {
-    if (!result.destination) return;
-    const items = Array.from(columns);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setColumns(items);
+    const destination = result.destination;
+    if (!destination) return;
+    setColumns((currentColumns) => {
+      const items = Array.from(currentColumns);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(destination.index, 0, reorderedItem);
+      return items;
+    });
   };
 
   return (
@@ -103,13 +143,17 @@ const ColumnList = React.memo(function ColumnList({
                                 : ""
                             }`}
                           >
-                            <div className="mb-2 flex min-w-0 items-center justify-between gap-2">
+                            <div className="flex flex-row min-w-0 items-center justify-between">
                               <h2 className="min-w-0 flex-1 truncate font-sans text-base font-medium text-white lg:text-lg">
                                 {column.name}
                               </h2>
                               <button
                                 type="button"
-                                onClick={() => setEditingColumnId(column.id)}
+                                onClick={() => {
+                                  setNewColumnDraft(null);
+                                  setTodoEditRequest(null);
+                                  setEditingColumnId(column.id);
+                                }}
                                 aria-label={`Open column: ${column.name || "Untitled"}`}
                                 title="Open column"
                                 className="flex items-center justify-center scale-95  cursor-pointer rounded p-1 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-white"
@@ -118,7 +162,16 @@ const ColumnList = React.memo(function ColumnList({
                               </button>
                             </div>
                             <TodoList
+                              columnId={column.id}
                               todos={column.todos}
+                              todoEditRequestId={
+                                todoEditRequest?.columnId === column.id
+                                  ? todoEditRequest.todoId
+                                  : null
+                              }
+                              onTodoEditRequestHandled={
+                                handleTodoEditRequestHandled
+                              }
                               setTodos={(todoUpdate) => {
                                 setColumns((currentColumns) =>
                                   currentColumns.map((currentColumn) =>
@@ -167,9 +220,15 @@ const ColumnList = React.memo(function ColumnList({
         <ColumnEditModal
           key={editingColumn.id}
           column={editingColumn}
+          isCreating={newColumnDraft !== null}
           onSave={saveColumnName}
           onDelete={deleteColumn}
-          onCancel={() => setEditingColumnId(null)}
+          onCancel={cancelColumnEdit}
+          onEditTodo={(todoId) => {
+            setTodoEditRequest({ columnId: editingColumn.id, todoId })
+            setEditingColumnId(null);
+            setNewColumnDraft(null);
+          }}
         />
       )}
     </div>

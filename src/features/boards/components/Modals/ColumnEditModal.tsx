@@ -1,20 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "../../../shared/components/ui/button";
-import { Input } from "../../../shared/components/ui/input";
-import type { Column } from "../model/boardTypes";
+import { Button } from "../../../../shared/components/ui/button";
+import { Input } from "../../../../shared/components/ui/input";
+import type { Column } from "../../model/boardTypes";
+
+import DoneIcon from "@mui/icons-material/Done";
+import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 
 type ColumnEditModalProps = {
   column: Column;
+  isCreating: boolean;
   onSave: (name: string) => void;
   onDelete: () => void;
   onCancel: () => void;
+  onEditTodo: (todoId: string) => void;
 };
 
 export default function ColumnEditModal({
   column,
+  isCreating,
   onSave,
   onDelete,
   onCancel,
+  onEditTodo,
 }: ColumnEditModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState(column.name);
@@ -48,7 +55,7 @@ export default function ColumnEditModal({
         className="flex flex-col gap-5 p-5"
       >
         <h2 id="column-edit-title" className="text-xl font-semibold">
-          Edit column
+          {isCreating ? "Create new column" : "Edit column"}
         </h2>
         <Input
           autoFocus
@@ -64,23 +71,31 @@ export default function ColumnEditModal({
           {column.todos.length > 0 ? (
             <ul className="max-h-64 space-y-2 overflow-y-auto rounded-md border border-zinc-700 p-3">
               {column.todos.map((todo) => (
-                <li
-                  key={todo.id}
-                  className="flex min-w-0 items-start gap-2 text-sm"
-                >
-                  <span
-                    aria-label={todo.done ? "Completed" : "Not completed"}
-                    className="shrink-0"
+                <li key={todo.id} className="min-w-0 text-sm">
+                  <button
+                    type="button"
+                    aria-label={`Edit todo: ${todo.text}`}
+                    onClick={() => onEditTodo(todo.id)}
+                    className="flex w-full min-w-0 h-8 px-2 cursor-pointer items-center gap-2 rounded text-left hover:bg-white/10 focus-visible:outline focus-visible:outline-white"
                   >
-                    {todo.done ? "✓" : "○"}
-                  </span>
-                  <span
-                    className={`min-w-0 whitespace-pre-wrap break-words ${
-                      todo.done ? "text-zinc-400 line-through" : ""
-                    }`}
-                  >
-                    {todo.text}
-                  </span>
+                    <span
+                      className={`flex-1 truncate ${
+                        todo.done ? "text-zinc-400 line-through" : ""
+                      }`}
+                    >
+                      {todo.text}
+                    </span>
+                    <span
+                      aria-label={todo.done ? "Completed" : "Not completed"}
+                      className="shrink-0"
+                    >
+                      {todo.done ? (
+                        <DoneIcon fontSize="small" />
+                      ) : (
+                        <HourglassBottomIcon fontSize="small" />
+                      )}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -91,9 +106,11 @@ export default function ColumnEditModal({
           )}
         </section>
         <div className="flex items-center justify-between gap-3">
-          <Button type="button" variant="destructive" onClick={onDelete}>
-            Delete column
-          </Button>
+          {!isCreating && (
+            <Button type="button" variant="destructive" onClick={onDelete}>
+              Delete column
+            </Button>
+          )}
           <div className="flex gap-3">
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
@@ -103,7 +120,7 @@ export default function ColumnEditModal({
               disabled={name.trim() === ""}
               variant="secondary"
             >
-              Save
+              {isCreating ? "Create" : "Save"}
             </Button>
           </div>
         </div>

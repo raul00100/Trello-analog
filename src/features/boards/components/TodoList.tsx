@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import AddIcon from "@mui/icons-material/Add";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
@@ -11,8 +11,11 @@ import TodoEditModal from "./Modals/TodoEditModal";
 import { type Todo } from "../model/boardTypes";
 
 type TodoListProps = {
+  columnId: string;
   todos: Todo[];
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  todoEditRequestId: string | null;
+  onTodoEditRequestHandled: (columnId: string, todoId: string) => void;
 };
 
 type TodoListMode =
@@ -20,9 +23,30 @@ type TodoListMode =
   | { type: "adding" }
   | { type: "editing"; todoId: string; value: string };
 
-export default function TodoList({ todos, setTodos }: TodoListProps) {
+export default function TodoList({
+  columnId,
+  todos,
+  setTodos,
+  todoEditRequestId,
+  onTodoEditRequestHandled,
+}: TodoListProps) {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<TodoListMode>({ type: "idle" });
+
+  useEffect(() => {
+    if (!todoEditRequestId) return;
+
+    const todo = todos.find((item) => item.id === todoEditRequestId);
+    if (todo) {
+      setMode({ type: "editing", todoId: todo.id, value: todo.text });
+    }
+    onTodoEditRequestHandled(columnId, todoEditRequestId);
+  }, [
+    columnId,
+    onTodoEditRequestHandled,
+    todoEditRequestId,
+    todos,
+  ]);
 
   const addTodo = () => {
     if (mode.type !== "adding" || input.trim() === "") return;
@@ -64,7 +88,7 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
 
   return (
     <div className="flex flex-col">
-      <ul className="flex flex-col my-2">
+      <ul className={`flex flex-col ${todos.length > 0 ? "mt-3 mb-5" : ""} `}>
         {todos.map((item) => (
           <li
             key={item.id}
@@ -123,7 +147,7 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
               }
             }}
           />
-          <div className="flex flex-row justify-center mt-2 mb-4 gap-3">
+          <div className="flex flex-row justify-center my-3 gap-3">
             <Button
               type="button"
               variant="outline"
@@ -147,7 +171,7 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
         <button
           type="button"
           onClick={() => setMode({ type: "adding" })}
-          className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-black active:bg-zinc-800 pl-2 rounded-sm py-1 transition-all cursor-pointer mb-3 opacity-60 hover:opacity-100"
+          className={` ${todos.length === 0 ? "my-4" : ""} font-bold text-white text-sm flex items-center gap-1.5 hover:bg-black active:bg-zinc-800 pl-2 rounded-sm py-1 transition-all cursor-pointer mb-3 opacity-60 hover:opacity-100`}
         >
           <AddIcon />
           Add Todo
