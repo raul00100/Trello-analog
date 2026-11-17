@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from "react";
-//icons
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState } from "react";
+
+import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import { type Column } from "../model/boardTypes";
+
+import { AnimatePresence, motion } from "framer-motion";
+
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import AssignmentAddIcon from "@mui/icons-material/AssignmentAdd";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-//components and shared elements
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+
 import TodoList from "./TodoList";
-import SharedInput from "../../../shared/components/SharedInput";
-import { useSharedProvider } from "../../../shared/context/useSharedProvider";
-import type { Column } from "../model/boardTypes";
-//animation and design
-import { AnimatePresence, motion } from "framer-motion";
+import ColumnEditModal from "./Modals/ColumnEditModal";
 
 export type ColumnListProps = {
   columns: Column[];
   setColumns: React.Dispatch<React.SetStateAction<Column[]>>;
 };
 
-const buttonActions =
-  "lg:w-[65.5px] w-[52.5px] lg:h-9 h-7 transition-all rounded-xl flex items-center justify-center cursor-pointer";
 const columnStyle =
   "text-white bg-white/20 backdrop-blur-md border-1 border-zinc-400 rounded-lg lg:ml-10 ml-5 flex ";
 const grab = "flex justify-center rotate-90";
@@ -31,38 +28,35 @@ const ColumnList = React.memo(function ColumnList({
   setColumns,
 }: ColumnListProps) {
   const { searchColumn } = useSharedProvider();
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingNaming, setEditingNaming] = useState("");
-  const [showSetting, setShowSetting] = useState<string | null>("");
-
-  // close settings popup when clicking outside of it
-  useEffect(() => {
-    if (!showSetting) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const el = document.querySelector(`[data-settings-id="${showSetting}"]`);
-      if (el && !el.contains(e.target as Node)) {
-        setShowSetting(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showSetting]);
+  const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
+  const editingColumn = columns.find((column) => column.id === editingColumnId);
 
   const addColumn = () => {
     const newColumn = {
       id: Date.now().toString(),
-      name: "",
+      name: `Column ${columns.length + 1}`,
       todos: [],
     };
     setColumns([...columns, newColumn]);
-    setEditingIndex(columns.length);
-    setEditingNaming(`Column ${columns.length + 1}`);
+    setEditingColumnId(newColumn.id);
   };
 
-  const deleteColumn = (index: number) => {
-    setColumns(columns.filter((_, i) => i !== index));
+  const saveColumnName = (name: string) => {
+    if (!editingColumnId) return;
+    setColumns((currentColumns) =>
+      currentColumns.map((column) =>
+        column.id === editingColumnId ? { ...column, name } : column,
+      ),
+    );
+    setEditingColumnId(null);
+  };
+
+  const deleteColumn = () => {
+    if (!editingColumnId) return;
+    setColumns((currentColumns) =>
+      currentColumns.filter((column) => column.id !== editingColumnId),
+    );
+    setEditingColumnId(null);
   };
 
   // drag and drop functionality
@@ -109,79 +103,36 @@ const ColumnList = React.memo(function ColumnList({
                                 : ""
                             }`}
                           >
-                            {editingIndex === index ? (
-                              <SharedInput
-                                value={editingNaming}
-                                onChange={setEditingNaming}
-                                onSubmit={(newValue) => {
-                                  const updatedColumn = [...columns];
-                                  updatedColumn[index].name = newValue;
-                                  setColumns(updatedColumn);
-                                  setEditingIndex(null);
-                                }}
-                                className="lg:text-lg mb-1.5 text-base font-sans bg-black rounded px-2 focus:outline-none focus:border-white border-1 border-black text-zinc-300"
-                              />
-                            ) : (
-                              <div className="flex flex-row justify-between items-center">
-                                <span
-                                  onDoubleClick={() => {
-                                    setEditingIndex(index);
-                                    setEditingNaming(columns[index].name);
-                                  }}
-                                >
-                                  <h2 className="lg:text-lg text-base font-medium font-sans text-white cursor-pointer mb-2 truncate lg:w-50 w-35">
-                                    {columns[index].name}
-                                  </h2>
-                                </span>
-                                <button
-                                  onClick={() => setShowSetting(column.id)}
-                                  className="mb-2"
-                                >
-                                  <MoreVertIcon className="cursor-pointer lg:scale-100 scale-90" />
-                                </button>
-                                {showSetting === column.id && (
-                                  <div
-                                    data-settings-id={column.id}
-                                    className="absolute left-1 top-0 mt-2 lg:w-[262px] w-[210px] lg:h-9 h-7 bg-black text-white rounded-xl flex flex-row z-50 text-sm items-center justify-center"
-                                  >
-                                    <button
-                                      onClick={() => {
-                                        setEditingIndex(index);
-                                        setEditingNaming(columns[index].name);
-                                        setShowSetting(null);
-                                      }}
-                                      className={`${buttonActions}  hover:bg-zinc-400 `}
-                                    >
-                                      <DriveFileRenameOutlineIcon />
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        deleteColumn(index);
-                                        setShowSetting(null);
-                                      }}
-                                      className={`${buttonActions} hover:bg-zinc-400 `}
-                                    >
-                                      <DeleteOutlineIcon />
-                                    </button>
-                                    <button
-                                      onClick={() => setShowSetting(null)}
-                                      className={`${buttonActions} hover:bg-red-700`}
-                                    >
-                                      <CloseIcon />
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                            <div className="mb-2 flex min-w-0 items-center justify-between gap-2">
+                              <h2 className="min-w-0 flex-1 truncate font-sans text-base font-medium text-white lg:text-lg">
+                                {column.name}
+                              </h2>
+                              <button
+                                type="button"
+                                onClick={() => setEditingColumnId(column.id)}
+                                aria-label={`Open column: ${column.name || "Untitled"}`}
+                                title="Open column"
+                                className="flex items-center justify-center scale-95  cursor-pointer rounded p-1 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-white"
+                              >
+                                <OpenInFullIcon fontSize="small" />
+                              </button>
+                            </div>
                             <TodoList
                               todos={column.todos}
-                              setTodos={(newTodos) => {
-                                const updatedColumn = [...columns];
-                                updatedColumn[index].todos =
-                                  typeof newTodos === "function"
-                                    ? newTodos(updatedColumn[index].todos)
-                                    : newTodos;
-                                setColumns(updatedColumn);
+                              setTodos={(todoUpdate) => {
+                                setColumns((currentColumns) =>
+                                  currentColumns.map((currentColumn) =>
+                                    currentColumn.id === column.id
+                                      ? {
+                                          ...currentColumn,
+                                          todos:
+                                            typeof todoUpdate === "function"
+                                              ? todoUpdate(currentColumn.todos)
+                                              : todoUpdate,
+                                        }
+                                      : currentColumn,
+                                  ),
+                                );
                               }}
                             />
                             <div className={grab}>
@@ -212,6 +163,15 @@ const ColumnList = React.memo(function ColumnList({
           )}
         </Droppable>
       </DragDropContext>
+      {editingColumn && (
+        <ColumnEditModal
+          key={editingColumn.id}
+          column={editingColumn}
+          onSave={saveColumnName}
+          onDelete={deleteColumn}
+          onCancel={() => setEditingColumnId(null)}
+        />
+      )}
     </div>
   );
 });

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-//components and context
+
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import SharedInput from "../../../shared/components/SharedInput";
-//icons
+
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import QueueIcon from "@mui/icons-material/Queue";
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,29 +18,32 @@ const boardNameDiv = "flex flex-row items-center justify-between w-full ";
 
 export default function Switcher({ boardId }: SwitcherProps) {
   const { boards, addBoard, setBoards } = useSharedProvider();
-  const [hovered, setHovered] = useState<number | null>(null);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [hoveredBoardId, setHoveredBoardId] = useState<string | null>(null);
+  const [editingBoardId, setEditingBoardId] = useState<string | null>(null);
   const [editingNaming, setEditingNaming] = useState("");
   const navigate = useNavigate();
 
   const handleAddBoard = () => {
-    addBoard();
-
+    const newBoardId = addBoard();
     if (boards.length > 0) {
-      setEditingIndex(boards.length);
+      setEditingBoardId(newBoardId);
       setEditingNaming(`Board ${boards.length + 1}`);
     }
   };
 
-  const deleteBoard = (index: number) => {
-    const newBoards = boards.filter((_, i) => i !== index);
-    setBoards(newBoards);
+  const deleteBoard = (id: string) => {
+    setBoards((currentBoards) =>
+      currentBoards.filter((board) => board.id !== id),
+    );
   };
 
   return (
     <nav className="flex flex-col items-center lg:ml-25 overflow-y-auto lg:max-h-50 max-h-37 lg:w-55 ml-3">
       {boards.map((board, index) => (
-        <div key={index} className="relative w-full flex justify-center mt-2">
+        <div
+          key={board.id}
+          className="relative w-full flex justify-center mt-2"
+        >
           {/* reserved space for buttons */}
           <div className="absolute inset-0 flex justify-between items-center px-5 pointer-events-none">
             <button className="opacity-0">
@@ -55,8 +58,8 @@ export default function Switcher({ boardId }: SwitcherProps) {
             onClick={() => {
               navigate(`/board/${index}`);
             }}
-            onMouseEnter={() => setHovered(index)}
-            onMouseLeave={() => setHovered(null)}
+            onMouseEnter={() => setHoveredBoardId(board.id)}
+            onMouseLeave={() => setHoveredBoardId(null)}
             className={`lg:w-45 lg:h-8 w-35 h-6 mt-1.5 font-semibold lg:text-base text-xs transition-all duration-300 flex justify-center items-center hover:scale-115 hover:rounded font-stretch-semi-expanded cursor-pointer ${
               index === boardId
                 ? "bg-zinc-100 text-black border-none rounded"
@@ -64,7 +67,7 @@ export default function Switcher({ boardId }: SwitcherProps) {
             }`}
           >
             <span className="ml-1 w-full">
-              {editingIndex === index ? (
+              {editingBoardId === board.id ? (
                 <div className={boardNameDiv}>
                   <SharedInput
                     value={editingNaming}
@@ -73,29 +76,33 @@ export default function Switcher({ boardId }: SwitcherProps) {
                       index === boardId ? "text-black" : "text-white"
                     }`}
                     onSubmit={(newValue) => {
-                      const updatedBoards = [...boards];
-                      updatedBoards[index].name = newValue;
-                      setBoards(updatedBoards);
-                      setEditingIndex(null);
+                      setBoards((currentBoards) =>
+                        currentBoards.map((currentBoard) =>
+                          currentBoard.id === board.id
+                            ? { ...currentBoard, name: newValue }
+                            : currentBoard,
+                        ),
+                      );
+                      setEditingBoardId(null);
                     }}
                   />
                 </div>
               ) : (
                 <div className={boardNameDiv}>
-                  {hovered === index && (
+                  {hoveredBoardId === board.id && (
                     <span
                       role="button"
                       tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setEditingIndex(index);
-                        setEditingNaming(boards[index].name);
+                        setEditingBoardId(board.id);
+                        setEditingNaming(board.name);
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          setEditingIndex(index);
-                          setEditingNaming(boards[index].name);
+                          setEditingBoardId(board.id);
+                          setEditingNaming(board.name);
                         }
                       }}
                       className="inline-flex items-center lg:scale-105 scale-90 cursor-pointer ml-2 focus:outline-none"
@@ -106,19 +113,19 @@ export default function Switcher({ boardId }: SwitcherProps) {
                   <span className="truncate flex-1 mx-3 text-base">
                     {board.name}
                   </span>
-                  {hovered === index && (
+                  {hoveredBoardId === board.id && (
                     <span
                       role="button"
                       tabIndex={0}
                       className="hover:text-red-500 hover:underline cursor-pointer transition-all duration-300 inline-flex items-center focus:outline-none"
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteBoard(index);
+                        deleteBoard(board.id);
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          deleteBoard(index);
+                          deleteBoard(board.id);
                         }
                       }}
                     >

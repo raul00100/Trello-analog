@@ -1,70 +1,75 @@
 import React, { useState } from "react";
-//icons
+
 import AddIcon from "@mui/icons-material/Add";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
+
 import { Button } from "../../../shared/components/ui/button";
 import { Textarea } from "../../../shared/components/ui/textarea";
-import TodoEditDialog from "./TodoEditDialog";
+
+import TodoEditModal from "./Modals/TodoEditModal";
+
+import { type Todo } from "../model/boardTypes";
 
 type TodoListProps = {
-  todos: { id: string; text: string; done: boolean }[];
-  setTodos: React.Dispatch<
-    React.SetStateAction<{ id: string; text: string; done: boolean }[]>
-  >;
+  todos: Todo[];
+  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 };
+
+type TodoListMode =
+  | { type: "idle" }
+  | { type: "adding" }
+  | { type: "editing"; todoId: string; value: string };
 
 export default function TodoList({ todos, setTodos }: TodoListProps) {
   const [input, setInput] = useState("");
-  const [add, setAdd] = useState(false);
-  const [editingTodoId, setEditingTodoId] = useState<string | null>(null);
-  const [editingValue, setEditingValue] = useState("");
+  const [mode, setMode] = useState<TodoListMode>({ type: "idle" });
 
   const addTodo = () => {
-    if (input.trim() === "") return;
-    setTodos([
-      ...todos,
+    if (mode.type !== "adding" || input.trim() === "") return;
+    setTodos((currentTodos) => [
+      ...currentTodos,
       { id: Date.now().toString(), text: input, done: false },
     ]);
     setInput("");
+    setMode({ type: "idle" });
   };
 
   const removeTodo = (id: string) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-    setEditingTodoId(null);
+    setTodos((currentTodos) => currentTodos.filter((todo) => todo.id !== id));
+    setMode({ type: "idle" });
   };
 
   const saveTodoEdit = () => {
-    if (!editingTodoId || editingValue.trim() === "") return;
-    setTodos(
-      todos.map((todo) =>
-        todo.id === editingTodoId ? { ...todo, text: editingValue } : todo,
+    if (mode.type !== "editing" || mode.value.trim() === "") return;
+    setTodos((currentTodos) =>
+      currentTodos.map((todo) =>
+        todo.id === mode.todoId ? { ...todo, text: mode.value } : todo,
       ),
     );
-    setEditingTodoId(null);
+    setMode({ type: "idle" });
   };
 
   const openTodoEditor = (id: string, text: string) => {
-    setAdd(false);
-    setEditingTodoId(id);
-    setEditingValue(text);
+    setMode({ type: "editing", todoId: id, value: text });
   };
 
-  const toggleDone = (index: number) => {
-    const updated = [...todos];
-    updated[index].done = !updated[index].done;
-    setTodos(updated);
+  const toggleDone = (id: string) => {
+    setTodos((currentTodos) =>
+      currentTodos.map((todo) =>
+        todo.id === id ? { ...todo, done: !todo.done } : todo,
+      ),
+    );
+    if (mode.type === "adding") setMode({ type: "idle" });
   };
 
   return (
     <div className="flex flex-col">
-      {/* todo content */}
-      {todos.map((item, index) => (
-        <ul
-          key={index}
-          className="relative z-0 mt-1.5 flex h-7.5 w-full items-center rounded-md bg-zinc-300 pl-3 py-1 text-black"
-          onClick={() => setAdd(false)}
-        >
-          <li className="w-full min-w-0">
+      <ul className="flex flex-col my-2">
+        {todos.map((item) => (
+          <li
+            key={item.id}
+            className="relative mt-1.5 flex h-7.5 w-full items-center gap-3 rounded-md bg-zinc-300 py-1 pl-3 text-black"
+          >
             <div className="relative flex w-full min-w-0 flex-row items-center justify-between">
               <button
                 type="button"
@@ -77,7 +82,7 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
                   type="checkbox"
                   className="sr-only peer"
                   checked={item.done}
-                  onChange={() => toggleDone(index)}
+                  onChange={() => toggleDone(item.id)}
                 />
                 <div
                   className={`w-[19px] h-[19px] rounded-full border-2 mr-2 flex items-center justify-center ${
@@ -100,11 +105,10 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
               </span>
             </div>
           </li>
-        </ul>
-      ))}
+        ))}
+      </ul>
 
-      {/* adding a new todo */}
-      {add ? (
+      {mode.type === "adding" ? (
         <div>
           <Textarea
             value={input}
@@ -116,7 +120,6 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
               if (e.key === "Enter") {
                 e.preventDefault();
                 addTodo();
-                setAdd(false);
               }
             }}
           />
@@ -124,7 +127,7 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setAdd(false)}
+              onClick={() => setMode({ type: "idle" })}
               className="flex-1"
             >
               Cancel
@@ -133,10 +136,7 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => {
-                addTodo();
-                setAdd(false);
-              }}
+              onClick={addTodo}
               className="flex-1"
             >
               Submit
@@ -145,20 +145,27 @@ export default function TodoList({ todos, setTodos }: TodoListProps) {
         </div>
       ) : (
         <button
-          onClick={() => setAdd(true)}
+          type="button"
+          onClick={() => setMode({ type: "adding" })}
           className="font-bold mt-4 text-white text-sm flex items-center gap-1.5 hover:bg-black active:bg-zinc-800 pl-2 rounded-sm py-1 transition-all cursor-pointer mb-3 opacity-60 hover:opacity-100"
         >
           <AddIcon />
           Add Todo
         </button>
       )}
-      {editingTodoId && (
-        <TodoEditDialog
-          value={editingValue}
-          onChange={setEditingValue}
+      {mode.type === "editing" && (
+        <TodoEditModal
+          value={mode.value}
+          onChange={(value) =>
+            setMode((currentMode) =>
+              currentMode.type === "editing"
+                ? { ...currentMode, value }
+                : currentMode,
+            )
+          }
           onSave={saveTodoEdit}
-          onDelete={() => removeTodo(editingTodoId)}
-          onCancel={() => setEditingTodoId(null)}
+          onDelete={() => removeTodo(mode.todoId)}
+          onCancel={() => setMode({ type: "idle" })}
         />
       )}
     </div>

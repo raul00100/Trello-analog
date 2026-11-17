@@ -14,7 +14,7 @@ type ContextType = {
   retryStorage: () => void;
   more: boolean;
   setMore: Dispatch<SetStateAction<boolean>>;
-  addBoard: () => void;
+  addBoard: () => string;
   searchColumn: string | undefined;
   setSearchColumn: Dispatch<SetStateAction<string | undefined>>;
 };

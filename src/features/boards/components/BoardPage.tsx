@@ -3,14 +3,15 @@
 import { useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
-//components and shared elements
+
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import ColumnList from "../components/ColumnList";
 import type { Column } from "../model/boardTypes";
 
-function getBoardId(id: string | undefined) {
-  if (id && !isNaN(Number(id))) return Number(id);
-  return 0;
+function getBoardId(id: string | undefined): number | null {
+  if (!id || !/^\d+$/.test(id)) return null;
+  const boardId = Number(id);
+  return Number.isSafeInteger(boardId) ? boardId : null;
 }
 
 export default function BoardPage() {
@@ -20,35 +21,37 @@ export default function BoardPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!boards[boardId]) {
-      if (boards.length > 0) {
-        navigate(`/board/${boardId - 1}`, { replace: true });
-      } else {
-        navigate("/", { replace: true });
-      }
+    if (boardId !== null && boards[boardId]) return;
+
+    if (boards.length === 0) {
+      navigate("/", { replace: true });
+    } else {
+      const destinationId =
+        boardId === null ? 0 : Math.min(boardId, boards.length - 1);
+      navigate(`/board/${destinationId}`, { replace: true });
     }
   }, [boards, boardId, navigate]);
 
   const handleColumns = useCallback(
     (newColumns: Column[] | ((prev: Column[]) => Column[])) => {
-      setBoards((boards) =>
-        boards.map((b, index) =>
+      setBoards((currentBoards) =>
+        currentBoards.map((board, index) =>
           index === boardId
             ? {
-                ...b,
+                ...board,
                 lists:
                   typeof newColumns === "function"
-                    ? newColumns(b.lists)
+                    ? newColumns(board.lists)
                     : newColumns,
               }
-            : b
-        )
+            : board,
+        ),
       );
     },
-    [setBoards, boardId]
+    [setBoards, boardId],
   );
 
-  if (!boards[boardId]) {
+  if (boardId === null || !boards[boardId]) {
     return null;
   }
 

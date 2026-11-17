@@ -242,16 +242,17 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
     }
   }, [searchColumn]);
 
-  const addBoard = (navigate?: (path: string) => void) => {
-    if (boards.length === 0) {
-      setBoards([{ id: crypto.randomUUID(), name: "Board 1", lists: [] }]);
-    } else {
-      setBoards([
-        ...boards,
-        { id: crypto.randomUUID(), name: "", lists: [] },
-      ]);
-    }
-    if (navigate) navigate(`/board/${boards.length}`);
+  const addBoard = () => {
+    const id = crypto.randomUUID();
+    setBoards((currentBoards) => [
+      ...currentBoards,
+      {
+        id,
+        name: currentBoards.length === 0 ? "Board 1" : "",
+        lists: [],
+      },
+    ]);
+    return id;
   };
 
   return (
