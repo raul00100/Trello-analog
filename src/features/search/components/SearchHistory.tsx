@@ -72,7 +72,7 @@ export default function History({
               >
                 {hovered === idx ? (
                   <button
-                    className={`${buttonStyle}`}
+                    className={buttonStyle}
                     onClick={() => deleteHistory(idx)}
                   >
                     <DeleteOutlineIcon className={deleteIcon} />

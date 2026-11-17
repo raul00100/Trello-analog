@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { Input } from "./ui/input";
 
 type InputProp = {
   value: string;
@@ -38,7 +39,7 @@ export default function SharedInput({
   };
 
   return (
-    <input
+    <Input
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -51,7 +52,7 @@ export default function SharedInput({
         }
       }}
       onBlur={handleSubmit}
-      className={`text-base font-medium font-sans focus:outline-none px-2 ${className}`}
+      className={`h-auto w-auto rounded-none border-0 bg-transparent px-2 py-0 text-base font-medium font-sans shadow-none focus:outline-none focus-visible:ring-0 ${className}`}
       onFocus={handleFocus}
       placeholder={placeholder}
     />

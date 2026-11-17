@@ -6,7 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 //components and context
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import type { SearchHistoryItem } from "../model/searchTypes";
-import SharedInput from "../../../shared/components/SharedInput";
+import { Input } from "../../../shared/components/ui/input";
 import SearchHistory from "./SearchHistory";
 //icons
 import ErrorIcon from "@mui/icons-material/Error";
@@ -113,10 +113,11 @@ export default function SearchPage() {
       >
         {/* search part */}
         <div className="lg:ml-20 flex lg:items-start items-center flex-col mt-10 lg:mt-0">
-          <SharedInput
+          <Input
             value={searchText}
-            onChange={setSearchText}
-            className=" bg-white/20 backdrop-blur-md border-2 border-white text-white rounded-sm lg:h-10 h-10 mb-3 w-60 text-lg"
+            onChange={(event) => setSearchText(event.target.value)}
+            autoFocus
+            className="mb-3 h-10 w-60 rounded-sm border-2 border-white bg-white/20 px-2 py-0 text-lg text-white shadow-none backdrop-blur-md"
             placeholder="Search..."
           />
           {searchText.trim() !== "" && (

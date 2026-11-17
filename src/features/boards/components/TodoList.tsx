@@ -5,8 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
-// components
-import SharedInput from "../../../shared/components/SharedInput";
+import { Textarea } from "../../../shared/components/ui/textarea";
 
 type CardsType = {
   cards: { id: string; text: string; done: boolean }[];
@@ -41,6 +40,16 @@ export default function Column({ cards, setCards }: CardsType) {
     setCards(updated);
   };
 
+  const finishEdit = (index: number, value: string, removeIfEmpty = false) => {
+    if (value.trim() === "") {
+      if (removeIfEmpty) removeTodo(index);
+      else return;
+    } else {
+      handleEdit(index, value);
+    }
+    setEditingIndex(null);
+  };
+
   const toggleDone = (index: number) => {
     const updated = [...cards];
     updated[index].done = !updated[index].done;
@@ -65,32 +74,19 @@ export default function Column({ cards, setCards }: CardsType) {
           <li>
             {/* editing a todo */}
             {editingIndex === index && add === false ? (
-              <div
-                className="flex flex-row items-center justify-between"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    if (editingValue.trim() === "") {
-                      removeTodo(index);
-                    } else {
-                      handleEdit(index, editingValue);
-                    }
-                    setEditingIndex(null);
-                  }
-                }}
-              >
-                <SharedInput
+              <div className="flex flex-row items-center justify-between">
+                <Textarea
                   value={editingValue}
-                  onChange={setEditingValue}
-                  onSubmit={(newValue) => {
-                    if (newValue.trim() === "") {
-                      removeTodo(index);
-                    } else {
-                      handleEdit(index, newValue);
+                  onChange={(event) => setEditingValue(event.target.value)}
+                  autoFocus
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      finishEdit(index, editingValue, true);
                     }
-                    setEditingIndex(null);
                   }}
-                  className="text-black text-base rounded border-none focus:outline-none w-51"
+                  onBlur={() => finishEdit(index, editingValue)}
+                  className="h-7.5 min-h-0 w-51 resize-none rounded border-none bg-transparent px-2 py-0 text-base text-black shadow-none focus-visible:ring-0"
                 />
                 <EditIcon />
               </div>
@@ -141,14 +137,12 @@ export default function Column({ cards, setCards }: CardsType) {
       {/* adding a new cards */}
       {add ? (
         <div>
-          <textarea
+          <Textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="h-20 pt-1.5 mt-4 bg-black w-full text-white placeholder:text-gray-400 text-base rounded-lg pl-2 max-h-screen resize-none focus:outline-none border-1 border-black focus:border-zinc-100"
+            onChange={(event) => setInput(event.target.value)}
+            className="mt-4 h-20 max-h-screen resize-none rounded-lg  bg-black py-1.5 pl-2 text-base text-white placeholder:text-gray-400 focus-visible:border-zinc-100 focus-visible:ring-1"
             placeholder="Add a new todo..."
-            ref={(el) => {
-              if (el) el.focus();
-            }}
+            autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
