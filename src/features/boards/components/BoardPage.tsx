@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 //components and shared elements
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import ColumnList from "../components/ColumnList";
-import type { ColumnCard } from "../model/boardTypes";
+import type { Column } from "../model/boardTypes";
 
 function getBoardId(id: string | undefined) {
   if (id && !isNaN(Number(id))) return Number(id);
@@ -30,7 +30,7 @@ export default function BoardPage() {
   }, [boards, boardId, navigate]);
 
   const handleColumns = useCallback(
-    (newColumns: ColumnCard[] | ((prev: ColumnCard[]) => ColumnCard[])) => {
+    (newColumns: Column[] | ((prev: Column[]) => Column[])) => {
       setBoards((boards) =>
         boards.map((b, index) =>
           index === boardId

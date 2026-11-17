@@ -61,12 +61,7 @@ export default function TodoEditDialog({
             Delete
           </Button>
           <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              className="border-zinc-500 bg-transparent text-white hover:bg-white/10 hover:text-white"
-            >
+            <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
             <Button

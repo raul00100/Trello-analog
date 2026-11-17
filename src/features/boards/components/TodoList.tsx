@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 //icons
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
+import { Button } from "../../../shared/components/ui/button";
 import { Textarea } from "../../../shared/components/ui/textarea";
 import TodoEditDialog from "./TodoEditDialog";
 
-type CardsType = {
-  cards: { id: string; text: string; done: boolean }[];
-  setCards: React.Dispatch<
+type TodoListProps = {
+  todos: { id: string; text: string; done: boolean }[];
+  setTodos: React.Dispatch<
     React.SetStateAction<{ id: string; text: string; done: boolean }[]>
   >;
 };
 
-export default function Column({ cards, setCards }: CardsType) {
+export default function TodoList({ todos, setTodos }: TodoListProps) {
   const [input, setInput] = useState("");
   const [add, setAdd] = useState(false);
   const [editingTodoId, setEditingTodoId] = useState<string | null>(null);
@@ -21,23 +21,23 @@ export default function Column({ cards, setCards }: CardsType) {
 
   const addTodo = () => {
     if (input.trim() === "") return;
-    setCards([
-      ...cards,
+    setTodos([
+      ...todos,
       { id: Date.now().toString(), text: input, done: false },
     ]);
     setInput("");
   };
 
   const removeTodo = (id: string) => {
-    setCards(cards.filter((card) => card.id !== id));
+    setTodos(todos.filter((todo) => todo.id !== id));
     setEditingTodoId(null);
   };
 
   const saveTodoEdit = () => {
     if (!editingTodoId || editingValue.trim() === "") return;
-    setCards(
-      cards.map((card) =>
-        card.id === editingTodoId ? { ...card, text: editingValue } : card,
+    setTodos(
+      todos.map((todo) =>
+        todo.id === editingTodoId ? { ...todo, text: editingValue } : todo,
       ),
     );
     setEditingTodoId(null);
@@ -50,15 +50,15 @@ export default function Column({ cards, setCards }: CardsType) {
   };
 
   const toggleDone = (index: number) => {
-    const updated = [...cards];
+    const updated = [...todos];
     updated[index].done = !updated[index].done;
-    setCards(updated);
+    setTodos(updated);
   };
 
   return (
     <div className="flex flex-col">
       {/* todo content */}
-      {cards.map((item, index) => (
+      {todos.map((item, index) => (
         <ul
           key={index}
           className="relative z-0 mt-1.5 flex h-7.5 w-full items-center rounded-md bg-zinc-300 pl-3 py-1 text-black"
@@ -109,7 +109,7 @@ export default function Column({ cards, setCards }: CardsType) {
           <Textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            className="mt-4 h-20 max-h-screen resize-none rounded-lg  bg-black py-1.5 pl-2 text-base text-white placeholder:text-gray-400 focus-visible:border-zinc-100 focus-visible:ring-offset-0"
+            className="mt-4 h-20 max-h-screen resize-none rounded-lg border-1 border-zinc-200  bg-black py-1.5 pl-2 text-base text-white placeholder:text-gray-400  focus-visible:ring-white focus-visible:ring-offset-0"
             placeholder="Add a new todo..."
             autoFocus
             onKeyDown={(e) => {
@@ -120,22 +120,27 @@ export default function Column({ cards, setCards }: CardsType) {
               }
             }}
           />
-          <div className="flex flex-row mt-2 mb-4.5">
-            <button
+          <div className="flex flex-row justify-center mt-2 mb-4 gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setAdd(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="button"
+              variant="secondary"
               onClick={() => {
                 addTodo();
                 setAdd(false);
               }}
-              className="bg-zinc-300 text-black text-base gap-1.5 active:scale-90 hover:bg-zinc-300 pl-2 rounded-sm py-1 w-[155px] transition-all cursor-pointer "
+              className="flex-1"
             >
               Submit
-            </button>
-            <button
-              onClick={() => setAdd(false)}
-              className="hover:bg-red-700 ml-2.5 px-1 rounded cursor-pointer transition-all"
-            >
-              <CloseIcon sx={{ color: "white" }} />
-            </button>
+            </Button>
           </div>
         </div>
       ) : (

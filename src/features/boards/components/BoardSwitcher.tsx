@@ -78,7 +78,6 @@ export default function Switcher({ boardId }: SwitcherProps) {
                       setBoards(updatedBoards);
                       setEditingIndex(null);
                     }}
-                    onFocus={() => {}}
                   />
                 </div>
               ) : (

@@ -6,7 +6,6 @@ type InputProp = {
   onChange: (value: string) => void;
   onSubmit?: (value: string) => void;
   className: string;
-  onFocus?: () => void;
   placeholder?: string;
 };
 
@@ -15,7 +14,6 @@ export default function SharedInput({
   onChange,
   onSubmit,
   className = "",
-  onFocus,
   placeholder = "",
 }: InputProp) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -29,13 +27,6 @@ export default function SharedInput({
   const handleSubmit = () => {
     if (value.trim() === "") return;
     onSubmit?.(value);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (onFocus) {
-      onFocus();
-      e.target.select();
-    }
   };
 
   return (
@@ -53,7 +44,7 @@ export default function SharedInput({
       }}
       onBlur={handleSubmit}
       className={`h-auto w-auto rounded-none border-0 bg-transparent px-2 py-0 text-base font-medium font-sans shadow-none focus:outline-none focus-visible:ring-0 ${className}`}
-      onFocus={handleFocus}
+      onFocus={(event) => event.target.select()}
       placeholder={placeholder}
     />
   );
