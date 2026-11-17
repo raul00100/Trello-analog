@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { useThemes } from "../features/themes/model/themeStore";
 import AuthPage from "../features/auth/components/AuthPage";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
+import Error404 from "../shared/components/Error404";
 import NavPanel from "./layout/panel/NavPanel";
+import HomePage from "./page";
+import BoardRoute from "./board/[id]/page";
+import SearchRoute from "./search/page";
+import ThemePage from "./theme/page";
 
-type AppProps = {
-  children: ReactNode;
-};
-
-export default function App({ children }: AppProps) {
+export default function App() {
   const { authStatus, storageStatus, storageError, retryStorage } =
     useSharedProvider();
   const { currentTheme, themesOptions } = useThemes();
@@ -77,7 +79,14 @@ export default function App({ children }: AppProps) {
       </div>
       <div className="relative z-10 h-screen overflow-y-hidden">
         <NavPanel />
-        {children}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/board/:id" element={<BoardRoute />} />
+          <Route path="/search" element={<SearchRoute />} />
+          <Route path="/theme" element={<ThemePage />} />
+          <Route path="/404" element={<Error404 />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
       {storageError && (
         <div

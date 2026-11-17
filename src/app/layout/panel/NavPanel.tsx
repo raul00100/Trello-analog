@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { Link, useLocation, useParams } from "react-router-dom";
 //icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -26,7 +25,8 @@ const buttonHeader = "flex items-center cursor-pointer ";
 export default function NavPanel() {
   const { boards, more, setMore, setSearchColumn, signOut } =
     useSharedProvider();
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   const isBoard = pathname.startsWith("/board/");
   const params = useParams<{ id: string }>();
   const [homeBoardId, setHomeBoardId] = useState(0);
@@ -105,7 +105,7 @@ export default function NavPanel() {
           </h2>
         ) : boards.length > 0 ? (
           <h2 className={`${headerStyle}`}>
-            <Link href={`/board/${homeBoardId}`}>
+            <Link to={`/board/${homeBoardId}`}>
               <button className={buttonHeader}>
                 <ArrowBackIosIcon />
                 <span className="hidden lg:block"> Go Home</span>

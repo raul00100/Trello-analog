@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import { Button } from "../../../shared/components/ui/button";
@@ -21,7 +21,7 @@ import {
 
 export default function AuthPage() {
   const { signIn, register } = useSharedProvider();
-  const router = useRouter();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [name, setName] = useState("");
   const [signInEmail, setSignInEmail] = useState("");
@@ -53,7 +53,7 @@ export default function AuthPage() {
       if (mode === "signIn") {
         await signIn(signInEmail, password);
         const savedBoardId = localStorage.getItem("boardId") ?? "0";
-        router.replace(`/board/${savedBoardId}`);
+        navigate(`/board/${savedBoardId}`, { replace: true });
       } else {
         const needsEmailConfirmation = await register(name, signUpEmail, password);
         if (needsEmailConfirmation) {
@@ -61,7 +61,7 @@ export default function AuthPage() {
             "Check your email and confirm the address to finish creating your account, then sign in."
           );
         } else {
-          router.replace("/board/0");
+          navigate("/board/0", { replace: true });
         }
       }
     } catch (error) {

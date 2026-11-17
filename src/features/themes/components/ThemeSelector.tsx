@@ -1,13 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router-dom";
 import { useThemes } from "../model/themeStore";
 
 export default function ThemeSelector() {
   const { themesOptions, currentTheme, setCurrentTheme } = useThemes();
 
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   if (!themesOptions || themesOptions.length === 0)
     return (
       <p className="text-2xl text-white flex items-center justify-center z-20 h-screen w-screen">

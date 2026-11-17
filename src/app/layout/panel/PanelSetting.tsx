@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "react-router-dom";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import SearchIcon from "@mui/icons-material/Search";
 import HomeIcon from "@mui/icons-material/Home";
@@ -23,7 +22,8 @@ export default function PanelSetting({
   homeBoardId,
   onSignOut,
 }: PanelSettingProps) {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   const settingOptions: SettingOption[] = [
     {
@@ -81,7 +81,7 @@ export default function PanelSetting({
                   {contents}
                 </button>
               ) : (
-                <Link href={option.path} className={controlClassName}>
+                <Link to={option.path} className={controlClassName}>
                   {contents}
                 </Link>
               )}

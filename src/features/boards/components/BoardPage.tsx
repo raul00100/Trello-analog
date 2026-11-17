@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useParams, useRouter } from "next/navigation";
+import { useNavigate, useParams } from "react-router-dom";
 //components and shared elements
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import ColumnList from "../components/ColumnList";
@@ -17,17 +17,17 @@ export default function BoardPage() {
   const { boards, setBoards, setSearchColumn } = useSharedProvider();
   const { id } = useParams<{ id: string }>();
   const boardId = getBoardId(id);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!boards[boardId]) {
       if (boards.length > 0) {
-        router.replace(`/board/${boardId - 1}`);
+        navigate(`/board/${boardId - 1}`, { replace: true });
       } else {
-        router.replace("/");
+        navigate("/", { replace: true });
       }
     }
-  }, [boards, boardId, router]);
+  }, [boards, boardId, navigate]);
 
   const handleColumns = useCallback(
     (newColumns: ColumnCard[] | ((prev: ColumnCard[]) => ColumnCard[])) => {

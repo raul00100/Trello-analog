@@ -2,8 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "react-router-dom";
 //components and context
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import type { SearchHistoryItem } from "../model/searchTypes";
@@ -19,7 +18,8 @@ const arrowBlock = "flex items-center ";
 export default function SearchPage() {
   const { boards, setSearchColumn } = useSharedProvider();
   const [searchText, setSearchText] = useState("");
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   const [history, setHistory] = useState<SearchHistoryItem[]>([]);
   const [historyLoaded, setHistoryLoaded] = useState(false);
   const historyInitialized = useRef(false);
@@ -134,7 +134,7 @@ export default function SearchPage() {
                     );
                     if (boardIdx < 0) return null;
                     return (
-                      <Link key={idx} href={`/board/${boardIdx}`}>
+                      <Link key={idx} to={`/board/${boardIdx}`}>
                         <li
                           key={idx}
                           className="border-b-2 border-black py-3 lg:w-130 w-80 cursor-pointer lg:text-lg text-base"

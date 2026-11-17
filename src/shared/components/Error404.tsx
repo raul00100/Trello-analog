@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import TextType from "./TextType";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
@@ -33,7 +33,7 @@ export default function Error() {
           loop={true}
           initialDelay={500}
         />
-        <Link href="/" className="text-2xl flex items-center gap-1.5 mt-7">
+        <Link to="/" className="text-2xl flex items-center gap-1.5 mt-7">
           <ArrowBackIosNewIcon className="animate-pulse scale-110" />
           <span className="hover:underline hover:scale-105 active:scale-95 transition-all semibold ">
             Home Page
