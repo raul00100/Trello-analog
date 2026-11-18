@@ -1,26 +1,39 @@
 "use client";
 
 import { useEffect } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useThemes } from "../features/themes/model/themeStore";
 import AuthPage from "../features/auth/components/AuthPage";
+import BoardPage from "../features/boards/components/BoardPage";
+import SearchPage from "../features/search/components/SearchPage";
+import ThemeSelector from "../features/themes/components/ThemeSelector";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
-import Error404 from "../shared/components/Error404";
-import NavPanel from "./layout/panel/NavPanel";
-import HomePage from "./page";
-import BoardRoute from "./board/[id]/page";
-import SearchRoute from "./search/page";
-import ThemePage from "./theme/page";
+import Error404 from "./Error404";
+import NavPanel from "./panel/NavPanel";
 
 export default function App() {
-  const { authStatus, storageStatus, storageError, retryStorage } =
-    useSharedProvider();
+  const {
+    authStatus,
+    boards,
+    storageStatus,
+    storageError,
+    retryStorage,
+    setMore,
+  } = useSharedProvider();
+  const navigate = useNavigate();
   const { currentTheme, themesOptions } = useThemes();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) useThemes.setState({ currentTheme: savedTheme });
   }, []);
+
+  useEffect(() => {
+    if (authStatus !== "signedIn" || boards.length === 0) return;
+    if (window.location.pathname !== "/") return;
+    const savedBoardId = localStorage.getItem("boardId");
+    navigate(`/board/${savedBoardId ?? 0}`, { replace: true });
+  }, [authStatus, boards.length, navigate]);
 
   if (storageStatus === "error" && authStatus !== "signedIn") {
     return (
@@ -80,10 +93,40 @@ export default function App() {
       <div className="relative z-10 h-screen overflow-y-hidden">
         <NavPanel />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/board/:id" element={<BoardRoute />} />
-          <Route path="/search" element={<SearchRoute />} />
-          <Route path="/theme" element={<ThemePage />} />
+          <Route path="/" element={null} />
+          <Route
+            path="/board/:id"
+            element={
+              <div
+                className="h-screen w-screen overflow-auto"
+                onClick={() => setMore(false)}
+              >
+                <BoardPage />
+              </div>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <div
+                className="h-screen w-screen overflow-auto"
+                onClick={() => setMore(false)}
+              >
+                <SearchPage />
+              </div>
+            }
+          />
+          <Route
+            path="/theme"
+            element={
+              <div
+                className="h-screen w-screen overflow-auto"
+                onClick={() => setMore(false)}
+              >
+                <ThemeSelector />
+              </div>
+            }
+          />
           <Route path="/404" element={<Error404 />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

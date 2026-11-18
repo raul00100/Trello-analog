@@ -2,22 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link, useLocation, useParams } from "react-router-dom";
 //icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 //components and context
-import { useSharedProvider } from "../../../shared/context/useSharedProvider";
+import { useSharedProvider } from "../../shared/context/useSharedProvider";
 import PanelSetting from "./PanelSetting";
-import BoardSwitcher from "../../../features/boards/components/BoardSwitcher";
+import BoardSwitcher from "./BoardSwitcher";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
 const divHeader =
   "w-screen relative text-white flex flex-row justify-between items-start pt-5";
-const expandIcon = "lg:scale-140 lg:mr-2 mr-0.5 scale-140";
+const expandIcon = "scale-125 lg:size-6";
 const headerStyle =
   " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 lg:ml-30 ml-8";
 const buttonHeader = "flex items-center cursor-pointer ";
@@ -25,6 +25,7 @@ const buttonHeader = "flex items-center cursor-pointer ";
 export default function NavPanel() {
   const { boards, more, setMore, setSearchColumn, signOut } =
     useSharedProvider();
+  const reduceMotion = useReducedMotion();
   const location = useLocation();
   const pathname = location.pathname;
   const isBoard = pathname.startsWith("/board/");
@@ -42,7 +43,7 @@ export default function NavPanel() {
       await signOut();
     } catch (error) {
       window.alert(
-        error instanceof Error ? error.message : "Could not sign out."
+        error instanceof Error ? error.message : "Could not sign out.",
       );
     }
   };
@@ -88,41 +89,47 @@ export default function NavPanel() {
       {/* undisclosed panel  */}
       <div className={divHeader}>
         {isBoard ? (
-          <h2 className={`${headerStyle}`}>
+          <div className={`${headerStyle} flex items-center`}>
             <button
               onClick={() => setMore((prev) => !prev)}
               className={buttonHeader}
             >
-              {more ? (
-                <ExpandLessIcon className={expandIcon} />
-              ) : (
+              <motion.span
+                initial={false}
+                animate={{
+                  rotate: more ? 180 : 0,
+                  scale: more ? 1.05 : 1,
+                }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.28,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="mr-1 inline-flex size-6 shrink-0 items-center justify-center lg:mr-2"
+              >
                 <ExpandMoreIcon className={expandIcon} />
-              )}
-              <span className="truncate max-w-60 hidden lg:inline-block lg:h-8">
-                {boards[boardId] ? boards[boardId].name : "No board"}
-              </span>
+              </motion.span>
             </button>
-          </h2>
+            <h2 className="truncate max-w-60 hidden lg:inline-block lg:h-8">
+              {boards[boardId] ? boards[boardId].name : "No board"}
+            </h2>
+          </div>
         ) : boards.length > 0 ? (
-          <h2 className={`${headerStyle}`}>
-            <Link to={`/board/${homeBoardId}`}>
-              <button className={buttonHeader}>
-                <ArrowBackIosIcon />
-                <span className="hidden lg:block"> Go Home</span>
-              </button>
+          <div className={`${headerStyle}`}>
+            <Link to={`/board/${homeBoardId}`} className={buttonHeader}>
+              <ArrowBackIosIcon />
+              <span className="hidden lg:block"> Go Home</span>
             </Link>
-          </h2>
+          </div>
         ) : (
           <div className={headerStyle} />
         )}
+
         <h1 className="text-lg lg:text-2xl font-medium font-stretch-expanded text-white lg:absolute lg:left-1/2 lg:-translate-x-1/8">
           Management Tool
         </h1>
+
         <div className="mr-8 lg:mr-30">
-          <button
-            onClick={() => setMore((prev) => !prev)}
-            aria-label="Toggle settings"
-          >
+          <button onClick={() => setMore((prev) => !prev)}>
             <SettingsIcon
               className={`text-white lg:scale-130 cursor-pointer ${
                 more ? "animate-spin" : ""

@@ -37,7 +37,6 @@ export default function ColumnEditModal({
   return (
     <dialog
       ref={dialogRef}
-      aria-labelledby="column-edit-title"
       onCancel={(event) => {
         event.preventDefault();
         onCancel();
@@ -59,7 +58,6 @@ export default function ColumnEditModal({
         </h2>
         <Input
           autoFocus
-          aria-label="Column name"
           value={name}
           onChange={(event) => setName(event.target.value)}
           className="border-zinc-600 bg-black text-white focus-visible:ring-white focus-visible:ring-offset-0"
@@ -75,7 +73,7 @@ export default function ColumnEditModal({
             </time>
           </p>
         )}
-        <section aria-labelledby="column-todos-title" className="min-h-0">
+        <section className="min-h-0">
           <h3 id="column-todos-title" className="mb-2 font-medium">
             Todos ({column.todos.length})
           </h3>
@@ -85,7 +83,6 @@ export default function ColumnEditModal({
                 <li key={todo.id} className="min-w-0 text-sm">
                   <button
                     type="button"
-                    aria-label={`Edit todo: ${todo.text}`}
                     onClick={() => onEditTodo(todo.id)}
                     className="flex w-full min-w-0 min-h-8 px-2 py-1 cursor-pointer items-center gap-2 rounded text-left hover:bg-white/10 focus-visible:outline focus-visible:outline-white"
                   >
@@ -99,7 +96,6 @@ export default function ColumnEditModal({
                       </span>
                     </span>
                     <span
-                      aria-label={todo.done ? "Completed" : "Not completed"}
                       className="shrink-0"
                     >
                       {todo.done ? (

@@ -138,7 +138,6 @@ export default function TodoList({
             <div className="relative flex w-full min-w-0 flex-row items-center justify-between">
               <button
                 type="button"
-                aria-label={`Edit todo: ${item.text}`}
                 onClick={() => openTodoEditor(item)}
                 className="absolute inset-0 z-0 rounded bg-transparent p-0 focus-visible:outline focus-visible:outline-offset-[-2px] focus-visible:outline-white cursor-pointer"
               />

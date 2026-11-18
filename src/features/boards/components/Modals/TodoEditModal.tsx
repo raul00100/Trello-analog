@@ -71,7 +71,7 @@ export default function TodoEditModal({
             {createdAt && (
               <div className="flex items-center">
                 <p className="text-sm text-zinc-400">
-                  Created at:{" "}
+                  Created at{" "}
                   <time dateTime={createdAt}>
                     {new Date(createdAt).toLocaleString(undefined, {
                       dateStyle: "medium",
@@ -126,7 +126,7 @@ export default function TodoEditModal({
                 <div className="flex flex-col gap-2 border-l border-zinc-800 pl-3 mb-2">
                   {lastModifiedAt && (
                     <p className="text-sm text-zinc-400">
-                      Last modified:
+                      Last modified{" "}
                       <time dateTime={lastModifiedAt}>
                         {new Date(lastModifiedAt).toLocaleString(undefined, {
                           dateStyle: "medium",
@@ -137,7 +137,7 @@ export default function TodoEditModal({
                   )}
                   {completedAt && (
                     <p className="text-sm text-zinc-400">
-                      Completed at:
+                      Completed at{" "}
                       <time dateTime={completedAt}>
                         {new Date(completedAt).toLocaleString(undefined, {
                           dateStyle: "medium",

@@ -102,7 +102,6 @@ export default function AuthPage() {
             <Button
               type="button"
               variant={mode === "signIn" ? "default" : "ghost"}
-              aria-pressed={mode === "signIn"}
               onClick={() => changeMode("signIn")}
               className={
                 mode === "signIn"
@@ -115,7 +114,6 @@ export default function AuthPage() {
             <Button
               type="button"
               variant={mode === "signUp" ? "default" : "ghost"}
-              aria-pressed={mode === "signUp"}
               onClick={() => changeMode("signUp")}
               className={
                 mode === "signUp"

@@ -3,20 +3,20 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { useSharedProvider } from "../../../shared/context/useSharedProvider";
-import SharedInput from "../../../shared/components/SharedInput";
+import { useSharedProvider } from "@/shared/context/useSharedProvider";
+import { Input } from "@/shared/components/ui/input";
 
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import QueueIcon from "@mui/icons-material/Queue";
 import EditIcon from "@mui/icons-material/Edit";
 
-type SwitcherProps = {
+type BoardSwitcherProps = {
   boardId: number;
 };
 
 const boardNameDiv = "flex flex-row items-center justify-between w-full ";
 
-export default function Switcher({ boardId }: SwitcherProps) {
+export default function BoardSwitcher({ boardId }: BoardSwitcherProps) {
   const { boards, addBoard, setBoards } = useSharedProvider();
   const [hoveredBoardId, setHoveredBoardId] = useState<string | null>(null);
   const [editingBoardId, setEditingBoardId] = useState<string | null>(null);
@@ -38,13 +38,9 @@ export default function Switcher({ boardId }: SwitcherProps) {
   };
 
   return (
-    <nav className="flex flex-col items-center lg:ml-25 overflow-y-auto lg:max-h-50 max-h-37 lg:w-55 ml-3">
+    <nav className="flex flex-col items-center lg:ml-25 overflow-y-auto lg:max-h-50 max-h-37 lg:w-55 ml-3 mt-0">
       {boards.map((board, index) => (
-        <div
-          key={board.id}
-          className="relative w-full flex justify-center mt-2"
-        >
-          {/* reserved space for buttons */}
+        <div key={board.id} className="relative w-full flex justify-center">
           <div className="absolute inset-0 flex justify-between items-center px-5 pointer-events-none">
             <button className="opacity-0">
               <EditIcon />
@@ -53,7 +49,6 @@ export default function Switcher({ boardId }: SwitcherProps) {
               <DeleteForeverIcon />
             </button>
           </div>
-          {/* list of board name */}
           <button
             onClick={() => {
               navigate(`/board/${index}`);
@@ -69,22 +64,40 @@ export default function Switcher({ boardId }: SwitcherProps) {
             <span className="ml-1 w-full">
               {editingBoardId === board.id ? (
                 <div className={boardNameDiv}>
-                  <SharedInput
+                  <Input
+                    autoFocus
                     value={editingNaming}
-                    onChange={setEditingNaming}
-                    className={`text-base font-medium w-full font-sans focus:outline-none px-2${
-                      index === boardId ? "text-black" : "text-white"
-                    }`}
-                    onSubmit={(newValue) => {
+                    onChange={(event) => setEditingNaming(event.target.value)}
+                    onFocus={(event) => event.target.select()}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (editingNaming.trim() === "") return;
+                        setBoards((currentBoards) =>
+                          currentBoards.map((currentBoard) =>
+                            currentBoard.id === board.id
+                              ? { ...currentBoard, name: editingNaming.trim() }
+                              : currentBoard,
+                          ),
+                        );
+                        setEditingBoardId(null);
+                      }
+                    }}
+                    onBlur={() => {
+                      if (editingNaming.trim() === "") return;
                       setBoards((currentBoards) =>
                         currentBoards.map((currentBoard) =>
                           currentBoard.id === board.id
-                            ? { ...currentBoard, name: newValue }
+                            ? { ...currentBoard, name: editingNaming.trim() }
                             : currentBoard,
                         ),
                       );
                       setEditingBoardId(null);
                     }}
+                    className={`h-auto w-auto rounded-none border-0 bg-transparent px-2 py-0 text-base font-medium shadow-none focus:outline-none focus-visible:ring-0${
+                      index === boardId ? "text-black" : "text-white"
+                    }`}
                   />
                 </div>
               ) : (
@@ -138,7 +151,6 @@ export default function Switcher({ boardId }: SwitcherProps) {
           </button>
         </div>
       ))}
-      {/* add another board */}
       <Link to={`/board/${boards.length}`}>
         <button
           onClick={handleAddBoard}

@@ -12,8 +12,8 @@ import {
   validatePassword,
   validateRegistration,
 } from "../../features/auth/model/authValidation";
-import { SharedContext } from "../../shared/context/sharedContext";
-import { getSupabaseClient } from "../../shared/lib/supabaseClient";
+import { SharedContext } from "./sharedContext";
+import { getSupabaseClient } from "../lib/supabaseClient";
 
 export const SharedProvider: FC<{ children: ReactNode }> = ({
   children,
@@ -33,6 +33,7 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
   const userIdRef = useRef<string | null>(null);
   const boardsLoadedRef = useRef(false);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const loadGenerationRef = useRef(0);
 
   const retryStorage = () => {
     boardsLoadedRef.current = false;
@@ -43,7 +44,14 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     const savedMore = localStorage.getItem("more");
-    if (savedMore) setMore(JSON.parse(savedMore));
+    if (savedMore) {
+      try {
+        const savedValue: unknown = JSON.parse(savedMore);
+        if (typeof savedValue === "boolean") setMore(savedValue);
+      } catch {
+        localStorage.removeItem("more");
+      }
+    }
     setPreferencesLoaded(true);
   }, []);
 
@@ -66,16 +74,29 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
     const loadUserBoards = async (userId: string) => {
       if (loadingUserIds.has(userId)) return;
       loadingUserIds.add(userId);
+      const loadGeneration = loadGenerationRef.current;
 
       try {
         const loadedBoards = await loadBoardsOrCreateInitial(userId);
-        if (cancelled || userIdRef.current !== userId) return;
+        if (
+          cancelled ||
+          userIdRef.current !== userId ||
+          loadGenerationRef.current !== loadGeneration
+        ) {
+          return;
+        }
         setBoards(loadedBoards);
         boardsLoadedRef.current = true;
         setStorageError(null);
         setStorageStatus("ready");
       } catch (error) {
-        if (cancelled || userIdRef.current !== userId) return;
+        if (
+          cancelled ||
+          userIdRef.current !== userId ||
+          loadGenerationRef.current !== loadGeneration
+        ) {
+          return;
+        }
         setStorageError(
           error instanceof Error ? error.message : "Could not load your boards."
         );
@@ -90,6 +111,7 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
         return;
       }
       activeUserId = userId;
+      loadGenerationRef.current += 1;
 
       if (!userId) {
         userIdRef.current = null;
@@ -152,21 +174,42 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     if (loadAttempt === 0 || !userIdRef.current) return;
+    const userId = userIdRef.current;
+    const loadGeneration = ++loadGenerationRef.current;
     setStorageStatus("loading");
     setStorageError(null);
     boardsLoadedRef.current = false;
-    void loadBoardsOrCreateInitial(userIdRef.current)
+    let cancelled = false;
+    void loadBoardsOrCreateInitial(userId)
       .then((loadedBoards) => {
+        if (
+          cancelled ||
+          userIdRef.current !== userId ||
+          loadGenerationRef.current !== loadGeneration
+        ) {
+          return;
+        }
         setBoards(loadedBoards);
         boardsLoadedRef.current = true;
         setStorageStatus("ready");
       })
       .catch((error: unknown) => {
+        if (
+          cancelled ||
+          userIdRef.current !== userId ||
+          loadGenerationRef.current !== loadGeneration
+        ) {
+          return;
+        }
         setStorageError(
           error instanceof Error ? error.message : "Could not load your boards."
         );
         setStorageStatus("error");
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [loadAttempt]);
 
   const signIn = async (email: string, password: string) => {
