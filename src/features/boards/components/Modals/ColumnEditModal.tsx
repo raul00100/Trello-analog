@@ -64,6 +64,17 @@ export default function ColumnEditModal({
           onChange={(event) => setName(event.target.value)}
           className="border-zinc-600 bg-black text-white focus-visible:ring-white focus-visible:ring-offset-0"
         />
+        {column.createdAt && !isCreating && (
+          <p className="text-sm text-zinc-400">
+            Created at:{" "}
+            <time dateTime={column.createdAt}>
+              {new Date(column.createdAt).toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
+            </time>
+          </p>
+        )}
         <section aria-labelledby="column-todos-title" className="min-h-0">
           <h3 id="column-todos-title" className="mb-2 font-medium">
             Todos ({column.todos.length})
@@ -76,14 +87,16 @@ export default function ColumnEditModal({
                     type="button"
                     aria-label={`Edit todo: ${todo.text}`}
                     onClick={() => onEditTodo(todo.id)}
-                    className="flex w-full min-w-0 h-8 px-2 cursor-pointer items-center gap-2 rounded text-left hover:bg-white/10 focus-visible:outline focus-visible:outline-white"
+                    className="flex w-full min-w-0 min-h-8 px-2 py-1 cursor-pointer items-center gap-2 rounded text-left hover:bg-white/10 focus-visible:outline focus-visible:outline-white"
                   >
-                    <span
-                      className={`flex-1 truncate ${
-                        todo.done ? "text-zinc-400 line-through" : ""
-                      }`}
-                    >
-                      {todo.text}
+                    <span className="flex min-w-0 flex-1 flex-col items-start">
+                      <span
+                        className={`w-full truncate ${
+                          todo.done ? "text-zinc-400 line-through" : ""
+                        }`}
+                      >
+                        {todo.text}
+                      </span>
                     </span>
                     <span
                       aria-label={todo.done ? "Completed" : "Not completed"}

@@ -21,7 +21,14 @@ type TodoListProps = {
 type TodoListMode =
   | { type: "idle" }
   | { type: "adding" }
-  | { type: "editing"; todoId: string; value: string };
+  | {
+      type: "editing";
+      todoId: string;
+      value: string;
+      createdAt: string;
+      lastModifiedAt?: string;
+      completedAt?: string;
+    };
 
 export default function TodoList({
   columnId,
@@ -38,7 +45,14 @@ export default function TodoList({
 
     const todo = todos.find((item) => item.id === todoEditRequestId);
     if (todo) {
-      setMode({ type: "editing", todoId: todo.id, value: todo.text });
+      setMode({
+        type: "editing",
+        todoId: todo.id,
+        value: todo.text,
+        createdAt: todo.createdAt,
+        lastModifiedAt: todo.lastModifiedAt,
+        completedAt: todo.completedAt,
+      });
     }
     onTodoEditRequestHandled(columnId, todoEditRequestId);
   }, [
@@ -52,7 +66,12 @@ export default function TodoList({
     if (mode.type !== "adding" || input.trim() === "") return;
     setTodos((currentTodos) => [
       ...currentTodos,
-      { id: Date.now().toString(), text: input, done: false },
+      {
+        id: Date.now().toString(),
+        text: input,
+        done: false,
+        createdAt: new Date().toISOString(),
+      },
     ]);
     setInput("");
     setMode({ type: "idle" });
@@ -65,23 +84,45 @@ export default function TodoList({
 
   const saveTodoEdit = () => {
     if (mode.type !== "editing" || mode.value.trim() === "") return;
+    const lastModifiedAt = new Date().toISOString();
     setTodos((currentTodos) =>
       currentTodos.map((todo) =>
-        todo.id === mode.todoId ? { ...todo, text: mode.value } : todo,
+        todo.id === mode.todoId
+          ? {
+              ...todo,
+              text: mode.value,
+              lastModifiedAt:
+                todo.text === mode.value ? todo.lastModifiedAt : lastModifiedAt,
+            }
+          : todo,
       ),
     );
     setMode({ type: "idle" });
   };
 
-  const openTodoEditor = (id: string, text: string) => {
-    setMode({ type: "editing", todoId: id, value: text });
+  const openTodoEditor = (todo: Todo) => {
+    setMode({
+      type: "editing",
+      todoId: todo.id,
+      value: todo.text,
+      createdAt: todo.createdAt,
+      lastModifiedAt: todo.lastModifiedAt,
+      completedAt: todo.completedAt,
+    });
   };
 
   const toggleDone = (id: string) => {
+    const changedAt = new Date().toISOString();
     setTodos((currentTodos) =>
-      currentTodos.map((todo) =>
-        todo.id === id ? { ...todo, done: !todo.done } : todo,
-      ),
+      currentTodos.map((todo) => {
+        if (todo.id !== id) return todo;
+        const done = !todo.done;
+        return {
+          ...todo,
+          done,
+          completedAt: done ? changedAt : undefined,
+        };
+      }),
     );
     if (mode.type === "adding") setMode({ type: "idle" });
   };
@@ -98,7 +139,7 @@ export default function TodoList({
               <button
                 type="button"
                 aria-label={`Edit todo: ${item.text}`}
-                onClick={() => openTodoEditor(item.id, item.text)}
+                onClick={() => openTodoEditor(item)}
                 className="absolute inset-0 z-0 rounded bg-transparent p-0 focus-visible:outline focus-visible:outline-offset-[-2px] focus-visible:outline-white cursor-pointer"
               />
               <label className="relative z-10 inline-flex shrink-0 cursor-pointer items-center">
@@ -180,6 +221,9 @@ export default function TodoList({
       {mode.type === "editing" && (
         <TodoEditModal
           value={mode.value}
+          createdAt={mode.createdAt}
+          lastModifiedAt={mode.lastModifiedAt}
+          completedAt={mode.completedAt}
           onChange={(value) =>
             setMode((currentMode) =>
               currentMode.type === "editing"

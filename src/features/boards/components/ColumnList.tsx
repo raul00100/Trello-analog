@@ -56,6 +56,7 @@ const ColumnList = React.memo(function ColumnList({
       id: Date.now().toString(),
       name: `Column ${columns.length + 1}`,
       todos: [],
+      createdAt: new Date().toISOString(),
     });
   };
 
@@ -225,9 +226,13 @@ const ColumnList = React.memo(function ColumnList({
           onDelete={deleteColumn}
           onCancel={cancelColumnEdit}
           onEditTodo={(todoId) => {
-            setTodoEditRequest({ columnId: editingColumn.id, todoId })
-            setEditingColumnId(null);
-            setNewColumnDraft(null);
+            setTodoEditRequest({ columnId: editingColumn.id, todoId });
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                setEditingColumnId(null);
+                setNewColumnDraft(null);
+              });
+            });
           }}
         />
       )}
