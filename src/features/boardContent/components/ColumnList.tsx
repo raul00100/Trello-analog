@@ -9,7 +9,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import AssignmentAddIcon from "@mui/icons-material/AssignmentAdd";
-import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import EditIcon from "@mui/icons-material/Edit";
 
 import TodoList from "./TodoList";
 import ColumnEditModal from "./Modals/ColumnEditModal";
@@ -17,6 +17,7 @@ import ColumnEditModal from "./Modals/ColumnEditModal";
 export type ColumnListProps = {
   columns: Column[];
   setColumns: React.Dispatch<React.SetStateAction<Column[]>>;
+  openColumnId?: string | null;
 };
 
 const columnStyle =
@@ -26,6 +27,7 @@ const grab = "flex justify-center rotate-90";
 const ColumnList = React.memo(function ColumnList({
   columns,
   setColumns,
+  openColumnId,
 }: ColumnListProps) {
   const { searchColumn } = useSharedProvider();
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
@@ -36,6 +38,18 @@ const ColumnList = React.memo(function ColumnList({
   } | null>(null);
   const editingColumn =
     newColumnDraft ?? columns.find((column) => column.id === editingColumnId);
+
+  React.useEffect(() => {
+    if (
+      !openColumnId ||
+      !columns.some((column) => column.id === openColumnId)
+    ) {
+      return;
+    }
+    setNewColumnDraft(null);
+    setTodoEditRequest(null);
+    setEditingColumnId(openColumnId);
+  }, [columns, openColumnId]);
 
   const handleTodoEditRequestHandled = React.useCallback(
     (columnId: string, todoId: string) => {
@@ -54,7 +68,7 @@ const ColumnList = React.memo(function ColumnList({
     setTodoEditRequest(null);
     setNewColumnDraft({
       id: Date.now().toString(),
-      name: `Column ${columns.length + 1}`,
+      name: "",
       todos: [],
       createdAt: new Date().toISOString(),
     });
@@ -159,7 +173,7 @@ const ColumnList = React.memo(function ColumnList({
                                 title="Open column"
                                 className="flex items-center justify-center scale-95  cursor-pointer rounded p-1 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-white"
                               >
-                                <OpenInFullIcon fontSize="small" />
+                                <EditIcon fontSize="small" />
                               </button>
                             </div>
                             <TodoList

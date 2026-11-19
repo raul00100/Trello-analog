@@ -1,4 +1,4 @@
-import type { Board } from "../../features/boards/model/boardTypes";
+import type { Board } from "../../features/boardContent/model/boardTypes";
 import { createContext } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
@@ -14,7 +14,7 @@ type ContextType = {
   retryStorage: () => void;
   more: boolean;
   setMore: Dispatch<SetStateAction<boolean>>;
-  addBoard: () => string;
+  addBoard: (name: string) => string;
   searchColumn: string | undefined;
   setSearchColumn: Dispatch<SetStateAction<string | undefined>>;
 };

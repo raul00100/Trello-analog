@@ -13,4 +13,9 @@ export type Column = {
   todos: Todo[];
   createdAt?: string;
 };
-export type Board = { id: string; name: string; lists: Column[] };
+export type Board = {
+  id: string;
+  name: string;
+  lists: Column[];
+  createdAt: string;
+};

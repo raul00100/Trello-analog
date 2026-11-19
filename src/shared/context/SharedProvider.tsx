@@ -3,11 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import type { FC, ReactNode } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import type { Board } from "../../features/boards/model/boardTypes";
+import type { Board } from "../../features/boardContent/model/boardTypes";
 import {
   loadBoardsOrCreateInitial,
   saveBoards,
-} from "../../features/boards/model/boardStorage";
+} from "../../features/boardContent/model/boardStorage";
 import {
   validateEmail,
   validatePassword,
@@ -16,9 +16,7 @@ import {
 import { SharedContext } from "./sharedContext";
 import { getSupabaseClient } from "../lib/supabaseClient";
 
-export const SharedProvider: FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const SharedProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [boards, setBoardsState] = useState<Board[]>([]);
   const [boardsChanged, setBoardsChanged] = useState(false);
   const [authStatus, setAuthStatus] = useState<
@@ -71,7 +69,9 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
       supabase = getSupabaseClient();
     } catch (error) {
       setStorageError(
-        error instanceof Error ? error.message : "Could not connect to Supabase."
+        error instanceof Error
+          ? error.message
+          : "Could not connect to Supabase.",
       );
       setStorageStatus("error");
       setAuthStatus("signedOut");
@@ -106,7 +106,9 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
           return;
         }
         setStorageError(
-          error instanceof Error ? error.message : "Could not load your boards."
+          error instanceof Error
+            ? error.message
+            : "Could not load your boards.",
         );
         setStorageStatus("error");
       } finally {
@@ -170,26 +172,31 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
       });
     });
 
-    void supabase.auth.getSession().then(({ data, error }) => {
-      if (cancelled) return;
-      if (error) {
-        setStorageError(error.message);
+    void supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          setStorageError(error.message);
+          setStorageStatus("error");
+          return;
+        }
+        const user = data.session?.user;
+        if (user?.is_anonymous) {
+          void clearOldAnonymousSession();
+          return;
+        }
+        handleSession(user?.id ?? null);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setStorageError(
+          error instanceof Error
+            ? error.message
+            : "Could not read your session.",
+        );
         setStorageStatus("error");
-        return;
-      }
-      const user = data.session?.user;
-      if (user?.is_anonymous) {
-        void clearOldAnonymousSession();
-        return;
-      }
-      handleSession(user?.id ?? null);
-    }).catch((error: unknown) => {
-      if (cancelled) return;
-      setStorageError(
-        error instanceof Error ? error.message : "Could not read your session."
-      );
-      setStorageStatus("error");
-    });
+      });
 
     return () => {
       cancelled = true;
@@ -228,7 +235,9 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
           return;
         }
         setStorageError(
-          error instanceof Error ? error.message : "Could not load your boards."
+          error instanceof Error
+            ? error.message
+            : "Could not load your boards.",
         );
         setStorageStatus("error");
       });
@@ -254,7 +263,7 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
       name,
       email,
       password,
-      password
+      password,
     );
     if (validationError) throw new Error(validationError);
 
@@ -296,7 +305,9 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
       })
       .catch((error: unknown) => {
         setStorageError(
-          error instanceof Error ? error.message : "Could not save your boards."
+          error instanceof Error
+            ? error.message
+            : "Could not save your boards.",
         );
       });
   }, [boards, boardsChanged, storageStatus]);
@@ -317,14 +328,15 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
     }
   }, [searchColumn]);
 
-  const addBoard = () => {
+  const addBoard = (name: string) => {
     const id = crypto.randomUUID();
     setBoards((currentBoards) => [
       ...currentBoards,
       {
         id,
-        name: currentBoards.length === 0 ? "Board 1" : "",
+        name,
         lists: [],
+        createdAt: new Date().toISOString(),
       },
     ]);
     return id;

@@ -4,7 +4,7 @@ import { getSupabaseClient } from "../../../shared/lib/supabaseClient";
 export async function loadBoards(userId: string): Promise<Board[]> {
   const { data, error } = await getSupabaseClient()
     .from("boards")
-    .select("id, name, lists")
+    .select("id, name, lists, created_at")
     .eq("owner_id", userId)
     .order("position");
 
@@ -14,6 +14,7 @@ export async function loadBoards(userId: string): Promise<Board[]> {
     id: board.id,
     name: board.name,
     lists: board.lists,
+    createdAt: board.created_at,
   }));
 }
 
@@ -27,6 +28,7 @@ export async function loadBoardsOrCreateInitial(
     id: `initial-${userId}`,
     name: "Board 1",
     lists: [],
+    createdAt: new Date().toISOString(),
   };
   const { error } = await getSupabaseClient()
     .from("boards")
@@ -37,6 +39,7 @@ export async function loadBoardsOrCreateInitial(
         position: 0,
         name: initialBoard.name,
         lists: initialBoard.lists,
+        created_at: initialBoard.createdAt,
       },
       { onConflict: "owner_id,id" }
     );
@@ -66,6 +69,7 @@ export async function saveBoards(
         position,
         name: board.name,
         lists: board.lists,
+        created_at: board.createdAt,
       })),
       { onConflict: "owner_id,id" }
     );

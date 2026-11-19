@@ -60,6 +60,7 @@ export default function ColumnEditModal({
           autoFocus
           value={name}
           onChange={(event) => setName(event.target.value)}
+          placeholder="Column name"
           className="border-zinc-600 bg-black text-white focus-visible:ring-white focus-visible:ring-offset-0"
         />
         {column.createdAt && !isCreating && (

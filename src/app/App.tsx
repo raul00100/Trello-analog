@@ -4,22 +4,17 @@ import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useThemes } from "../features/themes/model/themeStore";
 import AuthPage from "../features/auth/components/AuthPage";
-import BoardPage from "../features/boards/components/BoardPage";
+import BoardPage from "../features/boardContent/components/BoardPage";
 import SearchPage from "../features/search/components/SearchPage";
 import ThemeSelector from "../features/themes/components/ThemeSelector";
-import HomePage from "../features/boards/components/HomePage";
+import HomePage from "./HomePage";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
 import Error404 from "./Error404";
 import NavPanel from "./panel/NavPanel";
 
 export default function App() {
-  const {
-    authStatus,
-    storageStatus,
-    storageError,
-    retryStorage,
-    setMore,
-  } = useSharedProvider();
+  const { authStatus, storageStatus, storageError, retryStorage, setMore } =
+    useSharedProvider();
   const { currentTheme, themesOptions } = useThemes();
 
   useEffect(() => {

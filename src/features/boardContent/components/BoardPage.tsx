@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
-import ColumnList from "../components/ColumnList";
+import ColumnList from "./ColumnList";
 import type { Column } from "../model/boardTypes";
 
 function getBoardId(id: string | undefined): number | null {
@@ -14,11 +14,20 @@ function getBoardId(id: string | undefined): number | null {
   return Number.isSafeInteger(boardId) ? boardId : null;
 }
 
+function getOpenColumnId(state: unknown): string | null {
+  if (typeof state !== "object" || state === null || !("openColumnId" in state)) {
+    return null;
+  }
+  return typeof state.openColumnId === "string" ? state.openColumnId : null;
+}
+
 export default function BoardPage() {
   const { boards, setBoards, setSearchColumn } = useSharedProvider();
   const { id } = useParams<{ id: string }>();
   const boardId = getBoardId(id);
   const navigate = useNavigate();
+  const location = useLocation();
+  const openColumnId = getOpenColumnId(location.state);
 
   useEffect(() => {
     if (boardId !== null && boards[boardId]) return;
@@ -31,6 +40,11 @@ export default function BoardPage() {
       navigate(`/board/${destinationId}`, { replace: true });
     }
   }, [boards, boardId, navigate]);
+
+  useEffect(() => {
+    if (openColumnId === null || boardId === null || !boards[boardId]) return;
+    navigate(location.pathname, { replace: true, state: null });
+  }, [boards, boardId, location.pathname, navigate, openColumnId]);
 
   const handleColumns = useCallback(
     (newColumns: Column[] | ((prev: Column[]) => Column[])) => {
@@ -68,6 +82,7 @@ export default function BoardPage() {
           <ColumnList
             columns={boards[boardId].lists}
             setColumns={handleColumns}
+            openColumnId={openColumnId}
           />
         </motion.div>
       </AnimatePresence>
