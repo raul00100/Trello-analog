@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "react-router-dom";
-import QueueIcon from "@mui/icons-material/Queue";
+import AddIcon from "@mui/icons-material/Add";
 
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 
@@ -42,9 +42,9 @@ export default function HomePage() {
       <button
         type="button"
         onClick={handleAddBoard}
-        className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-white/50 bg-white/10 text-white transition-all duration-300 hover:border-white hover:bg-white/20 sm:w-70"
+        className="mt-6 flex h-12 w-45 items-center justify-center gap-2 rounded-lg border border-dashed border-white/50 bg-white/10 text-white transition-all duration-300 hover:border-white hover:bg-white/20 "
       >
-        <QueueIcon />
+        <AddIcon />
         Add board
       </button>
     </main>

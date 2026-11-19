@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { FC, ReactNode } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import type { Board } from "../../features/boards/model/boardTypes";
 import {
   loadBoardsOrCreateInitial,
@@ -18,7 +19,8 @@ import { getSupabaseClient } from "../lib/supabaseClient";
 export const SharedProvider: FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [boards, setBoards] = useState<Board[]>([]);
+  const [boards, setBoardsState] = useState<Board[]>([]);
+  const [boardsChanged, setBoardsChanged] = useState(false);
   const [authStatus, setAuthStatus] = useState<
     "loading" | "signedOut" | "signedIn"
   >("loading");
@@ -34,6 +36,11 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
   const boardsLoadedRef = useRef(false);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const loadGenerationRef = useRef(0);
+
+  const setBoards: Dispatch<SetStateAction<Board[]>> = (action) => {
+    setBoardsChanged(true);
+    setBoardsState(action);
+  };
 
   const retryStorage = () => {
     boardsLoadedRef.current = false;
@@ -85,7 +92,8 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
         ) {
           return;
         }
-        setBoards(loadedBoards);
+        setBoardsChanged(false);
+        setBoardsState(loadedBoards);
         boardsLoadedRef.current = true;
         setStorageError(null);
         setStorageStatus("ready");
@@ -107,7 +115,11 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
     };
 
     const handleSession = (userId: string | null) => {
-      if (userId === activeUserId && boardsLoadedRef.current) {
+      if (
+        userId === activeUserId &&
+        (boardsLoadedRef.current ||
+          (userId !== null && loadingUserIds.has(userId)))
+      ) {
         return;
       }
       activeUserId = userId;
@@ -116,7 +128,8 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
       if (!userId) {
         userIdRef.current = null;
         boardsLoadedRef.current = false;
-        setBoards([]);
+        setBoardsChanged(false);
+        setBoardsState([]);
         setAuthStatus("signedOut");
         setStorageStatus("ready");
         setStorageError(null);
@@ -125,13 +138,16 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
 
       userIdRef.current = userId;
       boardsLoadedRef.current = false;
+      setBoardsChanged(false);
       setAuthStatus("signedIn");
       setStorageStatus("loading");
       void loadUserBoards(userId);
     };
 
     const clearOldAnonymousSession = async () => {
+      if (cancelled) return;
       const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (cancelled) return;
       if (error) {
         setStorageError(error.message);
         setStorageStatus("error");
@@ -143,17 +159,20 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      const user = session?.user;
-      if (user?.is_anonymous) {
-        queueMicrotask(() => void clearOldAnonymousSession());
-        return;
-      }
-      queueMicrotask(() => handleSession(user?.id ?? null));
+      queueMicrotask(() => {
+        if (cancelled) return;
+        const user = session?.user;
+        if (user?.is_anonymous) {
+          void clearOldAnonymousSession();
+          return;
+        }
+        handleSession(user?.id ?? null);
+      });
     });
 
     void supabase.auth.getSession().then(({ data, error }) => {
+      if (cancelled) return;
       if (error) {
-        if (cancelled) return;
         setStorageError(error.message);
         setStorageStatus("error");
         return;
@@ -164,6 +183,12 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
         return;
       }
       handleSession(user?.id ?? null);
+    }).catch((error: unknown) => {
+      if (cancelled) return;
+      setStorageError(
+        error instanceof Error ? error.message : "Could not read your session."
+      );
+      setStorageStatus("error");
     });
 
     return () => {
@@ -189,7 +214,8 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
         ) {
           return;
         }
-        setBoards(loadedBoards);
+        setBoardsChanged(false);
+        setBoardsState(loadedBoards);
         boardsLoadedRef.current = true;
         setStorageStatus("ready");
       })
@@ -252,7 +278,13 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
-    if (storageStatus !== "ready" || !boardsLoadedRef.current) return;
+    if (
+      storageStatus !== "ready" ||
+      !boardsLoadedRef.current ||
+      !boardsChanged
+    ) {
+      return;
+    }
     const userId = userIdRef.current;
     if (!userId) return;
 
@@ -267,7 +299,7 @@ export const SharedProvider: FC<{ children: ReactNode }> = ({
           error instanceof Error ? error.message : "Could not save your boards."
         );
       });
-  }, [boards, storageStatus]);
+  }, [boards, boardsChanged, storageStatus]);
 
   useEffect(() => {
     if (!preferencesLoaded) return;

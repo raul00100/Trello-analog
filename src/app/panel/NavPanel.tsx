@@ -56,6 +56,10 @@ export default function NavPanel() {
   // animation for a folding and unfolding panel
   const panelRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Tween | null>(null);
+  const previousMoreRef = useRef(more);
+  const initialPanelHeight = useRef(
+    more ? (window.innerWidth >= 1024 ? 270 : 210) : 80,
+  );
 
   useEffect(() => {
     const savedBoardId = Number(localStorage.getItem("boardId"));
@@ -74,6 +78,9 @@ export default function NavPanel() {
     if (!panelRef.current) return;
 
     gsap.set(panelRef.current, { overflow: "hidden" });
+
+    if (previousMoreRef.current === more) return;
+    previousMoreRef.current = more;
 
     if (tlRef.current) tlRef.current.kill();
 
@@ -103,7 +110,8 @@ export default function NavPanel() {
   return (
     <header
       ref={panelRef}
-      className="w-full bg-white/20 backdrop-blur-md border-b border-white h-65"
+      className="w-full bg-white/20 backdrop-blur-md border-b border-white"
+      style={{ height: initialPanelHeight.current }}
       onClick={() => setSearchColumn(undefined)}
     >
       <div className={divHeader}>
