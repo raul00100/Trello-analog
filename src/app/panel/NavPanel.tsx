@@ -3,15 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { motion, useReducedMotion } from "framer-motion";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 //icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import HomeIcon from "@mui/icons-material/Home";
 //components and context
 import { useSharedProvider } from "../../shared/context/useSharedProvider";
 import PanelSetting from "./PanelSetting";
-import BoardSwitcher from "./BoardSwitcher";
 
 const textDec =
   " flex font-sans font-stretch-semi-expanded text-white antialiased";
@@ -19,7 +19,7 @@ const divHeader =
   "w-screen relative text-white flex flex-row justify-between items-start pt-5";
 const expandIcon = "scale-125 lg:size-6";
 const headerStyle =
-  " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 lg:ml-30 ml-8";
+  " font-stretch-expanded transition-all text-white font-medium text-xl hover:text-gray-300 lg:ml-25 ml-8";
 const buttonHeader = "flex items-center cursor-pointer ";
 
 export default function NavPanel() {
@@ -29,15 +29,20 @@ export default function NavPanel() {
   const location = useLocation();
   const pathname = location.pathname;
   const isBoard = pathname.startsWith("/board/");
-  const params = useParams<{ id: string }>();
-  const [homeBoardId, setHomeBoardId] = useState(0);
-  useEffect(() => {
-    setHomeBoardId(Number(localStorage.getItem("boardId")));
-  }, []);
-  const boardId =
-    isBoard && params.id && !isNaN(Number(params.id))
-      ? Number(params.id)
-      : homeBoardId;
+  const isHome = pathname === "/";
+  const [lastBoardId, setLastBoardId] = useState<number | null>(null);
+  const routeBoardId = isBoard
+    ? Number(pathname.match(/^\/board\/([^/]+)/)?.[1])
+    : null;
+  const validRouteBoardId =
+    routeBoardId !== null &&
+    Number.isSafeInteger(routeBoardId) &&
+    routeBoardId >= 0
+      ? routeBoardId
+      : null;
+  const boardId = validRouteBoardId ?? lastBoardId ?? 0;
+  const selectedBoard = lastBoardId !== null ? boards[lastBoardId] : undefined;
+  const returnToBoard = !isBoard && !isHome && selectedBoard;
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -51,6 +56,20 @@ export default function NavPanel() {
   // animation for a folding and unfolding panel
   const panelRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Tween | null>(null);
+
+  useEffect(() => {
+    const savedBoardId = Number(localStorage.getItem("boardId"));
+    if (Number.isSafeInteger(savedBoardId) && savedBoardId >= 0) {
+      setLastBoardId(savedBoardId);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isHome) return;
+    localStorage.removeItem("boardId");
+    setLastBoardId(null);
+  }, [isHome]);
+
   useEffect(() => {
     if (!panelRef.current) return;
 
@@ -75,10 +94,11 @@ export default function NavPanel() {
   }, [more]);
 
   useEffect(() => {
-    if (isBoard && params.id && !isNaN(Number(params.id))) {
-      localStorage.setItem("boardId", boardId.toString());
+    if (isBoard && validRouteBoardId !== null) {
+      localStorage.setItem("boardId", validRouteBoardId.toString());
+      setLastBoardId(validRouteBoardId);
     }
-  }, [isBoard, params.id, boardId]);
+  }, [isBoard, validRouteBoardId]);
 
   return (
     <header
@@ -86,7 +106,6 @@ export default function NavPanel() {
       className="w-full bg-white/20 backdrop-blur-md border-b border-white h-65"
       onClick={() => setSearchColumn(undefined)}
     >
-      {/* undisclosed panel  */}
       <div className={divHeader}>
         {isBoard ? (
           <div className={`${headerStyle} flex items-center`}>
@@ -108,27 +127,43 @@ export default function NavPanel() {
               >
                 <ExpandMoreIcon className={expandIcon} />
               </motion.span>
+              <h2 className="truncate max-w-60 hidden lg:inline-block lg:h-8">
+                {boards[boardId] ? boards[boardId].name : "No board"}
+              </h2>
             </button>
-            <h2 className="truncate max-w-60 hidden lg:inline-block lg:h-8">
-              {boards[boardId] ? boards[boardId].name : "No board"}
-            </h2>
           </div>
-        ) : boards.length > 0 ? (
+        ) : isHome ? (
+          <div className="font-stretch-expanded text-xl font-medium text-white lg:ml-25 ml-8">
+            <div className="flex items-center" aria-current="page">
+              <HomeIcon className="mr-2" />
+              <span className="hidden lg:block">Home</span>
+            </div>
+          </div>
+        ) : returnToBoard ? (
           <div className={`${headerStyle}`}>
-            <Link to={`/board/${homeBoardId}`} className={buttonHeader}>
+            <Link to={`/board/${boardId}`} className={buttonHeader}>
               <ArrowBackIosIcon />
-              <span className="hidden lg:block"> Go Home</span>
+              <span className="hidden lg:block">
+                Go back to {selectedBoard.name}
+              </span>
+            </Link>
+          </div>
+        ) : boards.length > 0 && !isHome ? (
+          <div className={`${headerStyle}`}>
+            <Link to="/" className={buttonHeader}>
+              <ArrowBackIosIcon />
+              <span className="hidden lg:block">Home</span>
             </Link>
           </div>
         ) : (
           <div className={headerStyle} />
         )}
 
-        <h1 className="text-lg lg:text-2xl font-medium font-stretch-expanded text-white lg:absolute lg:left-1/2 lg:-translate-x-1/8">
+        <h1 className="text-lg lg:text-2xl font-medium font-stretch-expanded text-white lg:absolute lg:left-1/2 lg:-translate-x-1/2">
           Management Tool
         </h1>
 
-        <div className="mr-8 lg:mr-30">
+        <div className="mr-5 lg:mr-25">
           <button onClick={() => setMore((prev) => !prev)}>
             <SettingsIcon
               className={`text-white lg:scale-130 cursor-pointer ${
@@ -146,24 +181,28 @@ export default function NavPanel() {
           more ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        {/* board switcher */}
-        {isBoard || boards.length === 0 ? (
-          <BoardSwitcher boardId={boardId} />
-        ) : (
-          <div className="flex flex-col items-center ml-17 overflow-y-auto max-h-50 w-55" />
-        )}
+        {/* home navigation */}
+        <div className="flex w-50 flex-col items-center lg:ml-20">
+          {(isBoard || returnToBoard) && (
+            <Link
+              to="/"
+              onClick={() => setMore(false)}
+              className="mt-2 flex w-35 items-center justify-center rounded border border-white/50 py-1.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-white hover:text-black active:scale-95 lg:w-40 lg:text-base"
+            >
+              <ArrowBackIosIcon className="mr-2 scale-75" />
+              Go Home
+            </Link>
+          )}
+        </div>
 
         {/* description */}
-        <div className="flex-col text-center absolute left-1/2 -translate-x-1/3 mt-2 hidden md:flex">
+        <div className="flex-col text-center absolute left-1/2 -translate-x-1/2 mt-2 hidden md:flex">
           <p className={`${textDec} w-100 font-mono font-medium text-lg`}>
             A web-based project management tool that helps you organize work
           </p>
         </div>
 
-        <PanelSetting
-          homeBoardId={homeBoardId}
-          onSignOut={() => void handleSignOut()}
-        />
+        <PanelSetting onSignOut={() => void handleSignOut()} />
       </div>
     </header>
   );

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { useThemes } from "../features/themes/model/themeStore";
 import AuthPage from "../features/auth/components/AuthPage";
 import BoardPage from "../features/boards/components/BoardPage";
 import SearchPage from "../features/search/components/SearchPage";
 import ThemeSelector from "../features/themes/components/ThemeSelector";
+import HomePage from "../features/boards/components/HomePage";
 import { useSharedProvider } from "../shared/context/useSharedProvider";
 import Error404 from "./Error404";
 import NavPanel from "./panel/NavPanel";
@@ -14,26 +15,17 @@ import NavPanel from "./panel/NavPanel";
 export default function App() {
   const {
     authStatus,
-    boards,
     storageStatus,
     storageError,
     retryStorage,
     setMore,
   } = useSharedProvider();
-  const navigate = useNavigate();
   const { currentTheme, themesOptions } = useThemes();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) useThemes.setState({ currentTheme: savedTheme });
   }, []);
-
-  useEffect(() => {
-    if (authStatus !== "signedIn" || boards.length === 0) return;
-    if (window.location.pathname !== "/") return;
-    const savedBoardId = localStorage.getItem("boardId");
-    navigate(`/board/${savedBoardId ?? 0}`, { replace: true });
-  }, [authStatus, boards.length, navigate]);
 
   if (storageStatus === "error" && authStatus !== "signedIn") {
     return (
@@ -93,7 +85,17 @@ export default function App() {
       <div className="relative z-10 h-screen overflow-y-hidden">
         <NavPanel />
         <Routes>
-          <Route path="/" element={null} />
+          <Route
+            path="/"
+            element={
+              <div
+                className="h-screen w-screen overflow-auto"
+                onClick={() => setMore(false)}
+              >
+                <HomePage />
+              </div>
+            }
+          />
           <Route
             path="/board/:id"
             element={

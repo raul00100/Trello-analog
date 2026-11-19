@@ -8,7 +8,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import type { ReactNode } from "react";
 
 type PanelSettingProps = {
-  homeBoardId: number;
   onSignOut: () => void;
 };
 
@@ -18,10 +17,7 @@ type SettingOption =
 
 const icons = "mr-2 lg:scale-105 scale-95";
 
-export default function PanelSetting({
-  homeBoardId,
-  onSignOut,
-}: PanelSettingProps) {
+export default function PanelSetting({ onSignOut }: PanelSettingProps) {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -29,7 +25,7 @@ export default function PanelSetting({
     {
       label: "Home",
       icon: <HomeIcon className={icons} />,
-      path: `/board/${homeBoardId}`,
+      path: "/",
     },
     {
       label: "Theme",
@@ -53,8 +49,8 @@ export default function PanelSetting({
     "flex items-center border-0 bg-transparent p-0 font-[inherit] text-[inherit] leading-[inherit]";
 
   return (
-    <nav className="flex flex-col lg:mr-20 mr-5">
-      <ul className="flex items-start flex-col text-lg font-bold gap-4.5 mt-2">
+    <nav className="flex flex-col lg:mr-20 mr-5 min-h-30">
+      <ul className="flex lg:items-center items-end flex-col text-lg font-bold lg:gap-4.5 gap-1.5 mt-2">
         {settingOptions.map((option, idx) => {
           const contents = (
             <span className="flex items-center">
@@ -66,11 +62,15 @@ export default function PanelSetting({
           return (
             <li
               key={idx}
-              className={`${optionClassName} ${
-                "path" in option && pathname === option.path
-                  ? "underline scale-105 text-white underline-offset-3 hover:animate-pulse"
-                  : ""
-              }`}
+              className={
+                "path" in option && option.path === "/" && pathname === "/"
+                  ? "text-sm font-sans font-stretch-semi-expanded text-white lg:text-base"
+                  : `${optionClassName} ${
+                      "path" in option && pathname === option.path
+                        ? "underline scale-105 text-white underline-offset-3 hover:animate-pulse"
+                        : ""
+                    }`
+              }
             >
               {"onClick" in option ? (
                 <button

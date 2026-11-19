@@ -24,6 +24,10 @@ export const useThemes = create<ThemeStore>((set) => ({
 
   themesOptions: [
     {
+      name: "Black",
+      theme: <div className="h-full w-full bg-black" />,
+    },
+    {
       name: "Dither",
       theme: (
         <Dither
