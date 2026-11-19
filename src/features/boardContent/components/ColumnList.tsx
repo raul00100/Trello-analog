@@ -30,6 +30,7 @@ const ColumnList = React.memo(function ColumnList({
   openColumnId,
 }: ColumnListProps) {
   const { searchColumn } = useSharedProvider();
+  const columnElements = React.useRef(new Map<string, HTMLDivElement>());
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [newColumnDraft, setNewColumnDraft] = useState<Column | null>(null);
   const [todoEditRequest, setTodoEditRequest] = useState<{
@@ -38,6 +39,23 @@ const ColumnList = React.memo(function ColumnList({
   } | null>(null);
   const editingColumn =
     newColumnDraft ?? columns.find((column) => column.id === editingColumnId);
+
+  React.useEffect(() => {
+    if (!searchColumn) return;
+    const target = columnElements.current.get(searchColumn);
+    if (!target) return;
+
+    const frame = requestAnimationFrame(() => {
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [columns, searchColumn]);
 
   React.useEffect(() => {
     if (
@@ -143,20 +161,30 @@ const ColumnList = React.memo(function ColumnList({
                     {(provided) => (
                       <motion.div
                         key={column.id}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                       >
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                         >
                           <div
+                            ref={(element) => {
+                              if (element) {
+                                columnElements.current.set(column.id, element);
+                              } else {
+                                columnElements.current.delete(column.id);
+                              }
+                            }}
                             className={` ${columnStyle} lg:w-[272px] w-[220px] flex-col p-3 ${
-                              column.name && column.name === searchColumn
-                                ? "bounce"
+                              column.id === searchColumn
+                                ? "border-sky-200 bg-sky-300/15 shadow-[0_0_24px_rgba(56,189,248,0.22)] ring-2 ring-sky-300/60"
                                 : ""
-                            }`}
+                            } transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300`}
+                            tabIndex={
+                              column.id === searchColumn ? -1 : undefined
+                            }
                           >
                             <div className="flex flex-row min-w-0 items-center justify-between">
                               <h2 className="min-w-0 flex-1 truncate font-sans text-base font-medium text-white lg:text-lg">

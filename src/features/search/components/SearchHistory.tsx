@@ -1,172 +1,149 @@
 "use client";
 
-import { useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
-//components and context
 import { useSharedProvider } from "../../../shared/context/useSharedProvider";
 import type { SearchHistoryItem } from "../model/searchTypes";
-//icons
-import HistoryIcon from "@mui/icons-material/History";
-import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
+import HistoryIcon from "@mui/icons-material/History";
 
-type HistoryProp = {
+type HistoryProps = {
   history: SearchHistoryItem[];
-  setHistory: Dispatch<SetStateAction<SearchHistoryItem[]>>;
   handleHistory: (newValue: SearchHistoryItem) => void;
   deleteHistory: (index: number) => void;
+  clearHistory: () => void;
 };
 
-const historyBlock =
-  "h-12 bg-white/20 backdrop-blur-md transition-all lg:w-130 w-80 lg:text-lg text-base my-2 text-white flex items-center pl-4 rounded-md border-1 border-white hover:bg-white/30 truncate";
-const arrowStyle = "scale-90 mx-1";
-const arrowBlock = "flex items-center ";
-const buttonStyle =
-  "text-white w-10 h-12 hover:bg-red-500/70 rounded-sm transition-all flex items-center justify-center hover:border-1 hover:border-white cursor-pointer";
-const mainCont = "flex flex-row items-center justify-center w-full gap-2";
-const deleteIcon = "scale-110";
-
-export default function History({
-  handleHistory,
+export default function SearchHistory({
   history,
-  setHistory,
+  handleHistory,
   deleteHistory,
-}: HistoryProp) {
+  clearHistory,
+}: HistoryProps) {
   const { boards, setSearchColumn } = useSharedProvider();
-  const [hovered, setHovered] = useState<number | null>(null);
 
   return (
-    <div className="lg:mr-20 mr-10 flex lg:items-end items-center flex-col lg:mt-0 mt-10 pb-15">
-      <h2 className="text-white lg:text-2xl text-lg mr-50 mb-7">
-        Search History:
-      </h2>
-      {history.length === 0 ? (
-        <p className={`${historyBlock}`}>
-          <span className="animate-pulse"> No items found </span>
-        </p>
-      ) : (
+    <section
+      aria-labelledby="search-history-title"
+      className="flex h-full flex-col rounded-2xl border border-white/40 bg-zinc-950/40 p-4 shadow-xl shadow-black/10 backdrop-blur-xl sm:p-6"
+    >
+      <div className="mb-5 flex items-center justify-between gap-3">
         <div>
-          {history.map((item, idx) => {
-            const boardIdx = boards.findIndex(
-              (board) => board.id === item.boardId
+          <h3 id="search-history-title" className="text-lg font-semibold">
+            Recent searches
+          </h3>
+          <p className="mt-1 text-sm text-zinc-400">
+            {history.length === 0
+              ? "Your opened results will appear here"
+              : `${history.length} ${
+                  history.length === 1 ? "item" : "items"
+                }`}
+          </p>
+        </div>
+        {history.length > 0 && (
+          <button
+            type="button"
+            onClick={clearHistory}
+            className="shrink-0 rounded-lg px-2 py-1.5 text-sm text-zinc-400 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      {history.length === 0 ? (
+        <div className="flex min-h-60 flex-1 flex-col items-center justify-center rounded-xl border border-white/25 bg-gradient-to-br from-white/[0.03] to-transparent px-4 text-center">
+          <span className="mb-3 flex size-11 items-center justify-center rounded-2xl border border-white/20 bg-white/5 text-zinc-400">
+            <HistoryIcon />
+          </span>
+          <p className="text-sm text-zinc-400">
+            Open a search result to save it here.
+          </p>
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {history.map((item, index) => {
+            const boardIndex = boards.findIndex(
+              (board) => board.id === item.boardId,
             );
-            const board = boardIdx >= 0 ? boards[boardIdx] : undefined;
-            const colExists = item.colName
-              ? board?.lists?.some((col) => col.name === item.colName)
-              : true;
-            const todoExists = item.todoName
-              ? board?.lists
-                  ?.find((col) => col.name === item.colName)
-                  ?.todos?.some((todo) => todo.text === item.todoName)
-              : true;
+            const board = boardIndex >= 0 ? boards[boardIndex] : undefined;
+            const column = item.colName
+              ? board?.lists.find((list) =>
+                  item.columnId
+                    ? list.id === item.columnId
+                    : list.name === item.colName,
+                )
+              : undefined;
+            const isValid =
+              !!board &&
+              (!item.colName || !!column) &&
+              (!item.todoName ||
+                !!column?.todos.some((todo) => todo.text === item.todoName));
+            const itemLabel = [
+              item.boardName,
+              item.colName,
+              item.todoName,
+            ]
+              .filter(Boolean)
+              .join(" / ");
 
-            const isValid = board && colExists && todoExists;
-
-            return isValid ? (
-              <div
-                className={mainCont}
-                onMouseEnter={() => setHovered(idx)}
-                onMouseLeave={() => setHovered(null)}
+            return (
+              <li
+                key={`${item.boardId}-${item.colName}-${item.todoName}-${index}`}
+                className="group flex items-center gap-2"
               >
-                {hovered === idx ? (
-                  <button
-                    className={buttonStyle}
-                    onClick={() => deleteHistory(idx)}
-                  >
-                    <DeleteOutlineIcon className={deleteIcon} />
-                  </button>
-                ) : (
-                  <div className="w-10 h-12" />
-                )}
-
-                <Link key={idx} to={`/board/${boardIdx}`}>
-                  <li
-                    key={idx}
-                    className={`${historyBlock} cursor-pointer justify-between flex-1 transition-transform`}
+                {isValid ? (
+                  <Link
+                    to={`/board/${boardIndex}`}
                     onClick={() => {
-                      setSearchColumn(item.colName ? item.colName : undefined);
+                      setSearchColumn(column?.id);
                       handleHistory(item);
                     }}
+                    title={itemLabel}
+                    className="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl border border-white/30 bg-white/[0.04] px-3 text-sm text-zinc-200 transition hover:border-white/70 hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300"
                   >
-                    <span className="flex flex-row">
-                      {item.boardName}
-                      {item.colName && (
-                        <div className={arrowBlock}>
-                          <ArrowForwardIosIcon className={arrowStyle} />
-                          {item.colName}
-                        </div>
-                      )}
-                      {item.todoName && (
-                        <div className={arrowBlock}>
-                          <ArrowForwardIosIcon className={arrowStyle} />
-                          {item.todoName}
-                        </div>
-                      )}
-                    </span>
-                  </li>
-                </Link>
-              </div>
-            ) : (
-              <div
-                className={mainCont}
-                onMouseEnter={() => setHovered(idx)}
-                onMouseLeave={() => setHovered(null)}
-              >
-                {hovered === idx ? (
-                  <button
-                    className={buttonStyle}
-                    onClick={() => deleteHistory(idx)}
-                  >
-                    <DeleteOutlineIcon className={deleteIcon} />
-                  </button>
+                    <HistoryIcon
+                      aria-hidden="true"
+                      className="shrink-0 text-zinc-500"
+                      fontSize="small"
+                    />
+                    <span className="min-w-0 flex-1 truncate">{itemLabel}</span>
+                    <ArrowForwardIosIcon
+                      aria-hidden="true"
+                      className="shrink-0 text-zinc-500"
+                      sx={{ fontSize: 12 }}
+                    />
+                  </Link>
                 ) : (
-                  <div className="w-10 h-12" />
+                  <div
+                    title={`${itemLabel} — no longer available`}
+                    className="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl border border-white/20 bg-white/[0.02] px-3 text-sm text-zinc-500"
+                  >
+                    <DoNotDisturbIcon
+                      aria-hidden="true"
+                      className="shrink-0"
+                      fontSize="small"
+                    />
+                    <span className="min-w-0 flex-1 truncate">{itemLabel}</span>
+                    <span className="hidden shrink-0 text-xs sm:inline">
+                      Unavailable
+                    </span>
+                  </div>
                 )}
-                <li
-                  key={idx}
-                  className={`${historyBlock} justify-between cursor-not-allowed`}
-                  onClick={() => {
-                    alert(
-                      "This item is no longer available due to changes or deletion"
-                    );
-                  }}
+                <button
+                  type="button"
+                  aria-label={`Remove ${itemLabel} from recent searches`}
+                  onClick={() => deleteHistory(index)}
+                  className="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-500 opacity-70 transition hover:bg-red-400/10 hover:text-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
                 >
-                  <span className="flex flex-row">
-                    {item.boardName}
-                    {item.colName && (
-                      <div className={arrowBlock}>
-                        <ArrowForwardIosIcon className={arrowStyle} />
-                        {item.colName}
-                      </div>
-                    )}
-                    {item.todoName && (
-                      <div className={arrowBlock}>
-                        <ArrowForwardIosIcon className={arrowStyle} />
-                        {item.todoName}
-                      </div>
-                    )}
-                  </span>
-                  <DoNotDisturbIcon className="mr-5 scale-110 animate-pulse" />
-                </li>
-              </div>
+                  <DeleteOutlineIcon fontSize="small" />
+                </button>
+              </li>
             );
           })}
-
-          {history.length !== 0 && (
-            <div className="flex justify-end ">
-              <button
-                className="text-white mt-5 lg:text-xl text-lg cursor-pointer active:scale-95 active:bg-white/20 hover:rounded-md hover:backdrop-blur-md hover:border-1 px-1 hover:border-white w-40 h-10 transition-all duration-300 rounded-md flex items-center justify-center mx-left"
-                onClick={() => setHistory([])}
-              >
-                Clear History
-                <HistoryIcon className="ml-2 scale-110" />
-              </button>
-            </div>
-          )}
-        </div>
+        </ul>
       )}
-    </div>
+    </section>
   );
 }

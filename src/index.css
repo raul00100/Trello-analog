@@ -119,6 +119,3 @@
     @apply bg-background text-foreground;
   }
 }
-.bounce {
-  animation: bounce 1s ease-in-out 2.5;
-}

@@ -26,6 +26,7 @@ export default function TodoEditModal({
   onCancel,
 }: TodoEditModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showTimestamp, setShowTimestamp] = useState(false);
   const reduceMotion = useReducedMotion();
 
@@ -34,6 +35,9 @@ export default function TodoEditModal({
     if (!dialog) return;
 
     dialog.showModal();
+    const textarea = textareaRef.current;
+    textarea?.focus();
+    textarea?.setSelectionRange(textarea.value.length, textarea.value.length);
     return () => dialog.close();
   }, []);
 
@@ -60,7 +64,7 @@ export default function TodoEditModal({
           Edit todo
         </h2>
         <Textarea
-          autoFocus
+          ref={textareaRef}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           className="min-h-32 mb-5 resize-y border-zinc-600 bg-black text-white focus-visible:ring-white focus-visible:ring-offset-0"

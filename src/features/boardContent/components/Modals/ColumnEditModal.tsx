@@ -24,6 +24,7 @@ export default function ColumnEditModal({
   onEditTodo,
 }: ColumnEditModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(column.name);
 
   useEffect(() => {
@@ -31,6 +32,9 @@ export default function ColumnEditModal({
     if (!dialog) return;
 
     dialog.showModal();
+    const input = inputRef.current;
+    input?.focus();
+    input?.setSelectionRange(input.value.length, input.value.length);
     return () => dialog.close();
   }, []);
 
@@ -57,7 +61,7 @@ export default function ColumnEditModal({
           {isCreating ? "Create new column" : "Edit column"}
         </h2>
         <Input
-          autoFocus
+          ref={inputRef}
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Column name"

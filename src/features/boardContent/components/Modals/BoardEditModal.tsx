@@ -22,6 +22,7 @@ export default function BoardEditModal({
   onOpenColumn,
 }: BoardEditModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(board.name);
 
   useEffect(() => {
@@ -29,6 +30,9 @@ export default function BoardEditModal({
     if (!dialog) return;
 
     dialog.showModal();
+    const input = inputRef.current;
+    input?.focus();
+    input?.setSelectionRange(input.value.length, input.value.length);
     return () => dialog.close();
   }, []);
 
@@ -56,7 +60,7 @@ export default function BoardEditModal({
           {isCreating ? "Create new board" : "Edit board"}
         </h2>
         <Input
-          autoFocus
+          ref={inputRef}
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Board name"
